@@ -251,6 +251,12 @@ body {
 .react-grid-item {
   position: relative;
   transition: box-shadow 0.15s ease;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.react-grid-item.resizing {
+  transition: none !important;
 }
 
 .react-grid-item::after {
@@ -351,4 +357,18 @@ body {
   top: 50% !important;
   transform: translate(50%, -50%) !important;
   cursor: e-resize;
+}
+
+.react-grid-item button {
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+/* react-grid-layout cursor/handle desync fixes */
+.react-grid-layout {
+  position: relative;
+}
+
+.react-grid-item {
+  touch-action: none;
 }

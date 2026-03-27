@@ -16,11 +16,10 @@ function initialBlockH(type: Block["type"]): number {
   switch (type) {
     case "note":
     case "markdown":
-      return contentHeightToRows(BLOCK_DEFAULT_H_PX);
-    case "image":
-      return BLOCK_H;
-    case "code":
     case "todo":
+    case "image":
+      return contentHeightToRows(BLOCK_DEFAULT_H_PX);
+    case "code":
       return BLOCK_H;
     default:
       return BLOCK_H;

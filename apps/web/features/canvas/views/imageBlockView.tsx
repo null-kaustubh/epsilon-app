@@ -66,7 +66,6 @@ export default function ImageBlockView({
             sizes="100vw"
             style={{ objectFit: "contain" }}
             onLoadingComplete={handleLoad}
-            priority
           />
         </div>
       )}

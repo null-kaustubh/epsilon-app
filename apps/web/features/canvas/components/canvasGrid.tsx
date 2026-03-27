@@ -1,3 +1,4 @@
+import React from "react";
 import { Responsive } from "react-grid-layout/legacy";
 import { Layout } from "react-grid-layout/legacy";
 import { Block } from "../lib/createBlockHelper";
@@ -13,45 +14,64 @@ interface CanvasGridProps {
   editingId: string | null;
   setEditingId: (id: string | null) => void;
   onLayoutChange: (current: Layout, all: Layouts) => void;
+  onInteractionStart: () => void;
+  onInteractionStop: () => void;
   onBlockGrow: (id: string, heightPx: number) => void;
   onChangeContent: (id: string, next: string) => void;
+  onDeleteBlock: (id: string) => void;
   isDraggable?: boolean;
+  mode: "cursor" | "delete";
 }
 
-export default function CanvasGrid({
+function CanvasGrid({
   blocks,
   layouts,
   containerWidth,
   editingId,
   setEditingId,
   onLayoutChange,
+  onInteractionStart,
+  onInteractionStop,
   onBlockGrow,
   onChangeContent,
+  onDeleteBlock,
   isDraggable = true,
+  mode,
 }: CanvasGridProps) {
+  const isInteractionModeNormal = mode === "cursor";
+
   return (
     <Responsive
       className="layout canvas-grid"
       width={containerWidth}
       layouts={layouts}
       onLayoutChange={onLayoutChange}
+      onDragStart={() => onInteractionStart()}
+      onDragStop={() => onInteractionStop()}
+      onResizeStart={() => onInteractionStart()}
+      onResizeStop={() => onInteractionStop()}
       resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
       breakpoints={{ lg: 1200 }}
       cols={{ lg: 27 }}
       rowHeight={ROW_HEIGHT}
       margin={MARGIN}
       containerPadding={CONTAINER_PADDING}
-      isResizable
-      isDraggable={isDraggable}
+      isResizable={isInteractionModeNormal}
+      isDraggable={isInteractionModeNormal && isDraggable}
       compactType={null}
       preventCollision
       draggableCancel=".block-editor"
+      // Transforms are significantly smoother with many items; keep React work
+      // low so the cursor/placeholder remain visually in sync.
+      useCSSTransforms={true}
     >
       {blocks.map((block) => (
         <div key={block.id}>
           <CanvasBlockItem
             block={block}
             isEditing={editingId === block.id}
+            isDeleteMode={mode === "delete"}
+            onDeleteBlock={onDeleteBlock}
             onStartEditingAction={setEditingId}
             onStopEditingAction={() => setEditingId(null)}
             onChangeContentAction={onChangeContent}
@@ -62,3 +82,5 @@ export default function CanvasGrid({
     </Responsive>
   );
 }
+
+export default React.memo(CanvasGrid);
