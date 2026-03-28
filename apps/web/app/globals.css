@@ -1,26 +1,374 @@
 @import "tailwindcss";
-@import "@repo/tailwind-config";
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background: #f8f1e9;
+  --foreground: #30241c;
+
+  /* main surface */
+  --primary: #30241c;
+  --primary-foreground: #ffffff;
+
+  /* cards / blocks */
+  --secondary: #efe7dd;
+  --secondary-foreground: #30241c;
+
+  /* subtle UI */
+  --muted: #f3ece4;
+  --muted-foreground: #847b72;
+
+  /* borders */
+  --border: #e6ded4;
+  --edge: #e6ded4;
+
+  /* focus ring */
+  --ring: #fd913e;
+
+  /* main accent (orange) */
+  --accent: #fd913e;
+  --accent-foreground: #ffffff;
+
+  /* semantic */
+  --success: #6a92b8;
+  --destructive: #b46f89;
+
+  /* links */
+  --link: #fd913e;
+
+  /* selection */
+  --selection: #fdae62;
+  --selection-foreground: #000000;
+
+  /* shadow */
+  --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+[data-color-theme="dark"] {
+  --background: #1f1f1f;
+  --foreground: #ffffff;
+
+  /* primary = main surface */
+  --primary: #232323;
+  --primary-foreground: #ffffff;
+
+  /* secondary = cards / blocks */
+  --secondary: #2a2a2a;
+  --secondary-foreground: #f8e7c8;
+
+  /* muted = subtle UI */
+  --muted: #1a1a1a;
+  --muted-foreground: #99927d;
+
+  /* borders */
+  --border: #323232;
+  --edge: #323232;
+
+  /* ring / focus */
+  --ring: #f4480c;
+
+  /* accents (main personality) */
+  --accent: #f4480c;
+  --accent-foreground: #ffffff;
+
+  /* semantic */
+  --success: #f8e205;
+  --destructive: #c66527;
+
+  /* links */
+  --link: #fdae07;
+
+  /* selection */
+  --selection: #f8e205;
+  --selection-foreground: #000000;
+
+  /* shadow */
+  --shadow-popover: 0 0 24px rgba(0, 0, 0, 0.6);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  /*--color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover-border: var(--popover-border);
+    --color-accent2: var(--accent2);*/
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-edge: var(--edge);
+  /*--color-input: var(--input);
+    --color-info: var(--info);*/
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-destructive: var(--destructive);
+  --color-link: var(--link);
+  /*--color-code: var(--code);
+    --color-code-foreground: var(--code-foreground);
+    --color-code-number: var(--code-number);
+    --color-code-highlight: var(--code-highlight);*/
+  --color-selection: var(--selection);
+  --color-selection-foreground: var(--selection-foreground);
+
+  --font-sans: var(--font-sf-pro-display);
+  --font-mono: var(--font-departure-mono);
+
+  --shadow-popover: var(--shadow-popover);
+
+  --animate-fade-in: fade-in var(--tw-duration, 200ms) ease-out;
+  --animate-fade-out: fade-out var(--tw-duration, 200ms) ease-out;
+
+  --animate-collapsible-fade-down:
+    collapsible-down var(--tw-duration, 200ms) ease-out,
+    fade-in var(--tw-duration, 200ms) ease-out;
+
+  --animate-collapsible-fade-up:
+    collapsible-up var(--tw-duration, 200ms) ease-out,
+    fade-out var(--tw-duration, 200ms) ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
 }
 
+html,
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    @apply border-border outline-ring/50;
+  }
+
+  ::selection {
+    @apply bg-selection text-selection-foreground;
+  }
+
+  html {
+    @apply motion-safe:scroll-smooth;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--muted-foreground) 40%, transparent);
+    border-radius: 10px;
+    background-clip: content-box;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--muted-foreground) 40%,
+        transparent
+      )
+      transparent;
+  }
+
+  [id] {
+    @apply scroll-mt-22;
+  }
+}
+
+/* ─── Canvas grid — subtle dashed grid ─── */
+.canvas-wrapper {
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 28 0 L 0 0 0 28' fill='none' stroke='%23c4b8aa' stroke-width='0.25' stroke-dasharray='3 4'/%3E%3C/svg%3E");
+  background-size: 28px 28px;
+  overflow: visible;
+}
+
+.canvas-scroll {
+  background: transparent;
+}
+
+[data-color-theme="dark"] .canvas-wrapper {
+  background-image: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 28 0 L 0 0 0 28' fill='none' stroke='%23484848' stroke-width='0.25' stroke-dasharray='3 4'/%3E%3C/svg%3E");
+}
+
+/* ─── Placeholder (drop preview) ─── */
+.react-grid-placeholder {
+  background: transparent !important;
+  border: 1.5px dashed var(--accent) !important;
+  border-radius: 4px !important;
+  opacity: 0.5 !important;
+}
+
+/* ─── Item while dragging ─── */
+.react-grid-item.react-draggable-dragging {
+  background: var(--muted) !important;
+  opacity: 0.65;
+  z-index: 50;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+}
+
+/* ─── Hover border on grid items ─── */
+.react-grid-item {
+  position: relative;
+  transition: box-shadow 0.15s ease;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.react-grid-item.resizing {
+  transition: none !important;
+}
+
+.react-grid-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  pointer-events: none;
+  transition: border-color 0.15s ease;
+}
+
+.react-grid-item:hover::after {
+  border-color: var(--accent);
+}
+
+/* ─── Reset ALL handle styles — wipe RGL/react-resizable defaults ─── */
+.react-resizable-handle {
+  /* Strip the default SVG background and sizing RGL injects */
+  background-image: none !important;
+  background: var(--accent) !important;
+
+  /* Fixed dot size */
+  width: 7px !important;
+  height: 7px !important;
+  padding: 0 !important;
+
+  /* react-resizable sets -10px margins for its 20px handles.
+     Since we shrink the handle, those stale margins offset centering. */
+  margin: 0 !important;
+
+  border-radius: 50% !important;
+  border: 1.5px solid var(--background) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+
+  /* Use absolute positioning anchored via inset shortcuts below */
+  position: absolute !important;
+
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+/* Kill the ::after pseudo RGL uses for the SVG arrow */
+.react-resizable-handle::after {
+  display: none !important;
+}
+
+/* ─── Corners ─── */
+/* anchor to the corner with inset, then shift back half the dot size */
+.react-resizable-handle-nw {
+  top: 0 !important;
+  left: 0 !important;
+  transform: translate(-50%, -50%) !important;
+  cursor: nw-resize;
+}
+.react-resizable-handle-ne {
+  top: 0 !important;
+  right: 0 !important;
+  transform: translate(50%, -50%) !important;
+  cursor: ne-resize;
+}
+.react-resizable-handle-sw {
+  bottom: 0 !important;
+  left: 0 !important;
+  transform: translate(-50%, 50%) !important;
+  cursor: sw-resize;
+}
+.react-resizable-handle-se {
+  bottom: 0 !important;
+  right: 0 !important;
+  transform: translate(50%, 50%) !important;
+  cursor: se-resize;
+}
+
+/* ─── Edge midpoints ─── */
+/* left/right: 50% + translateX(-50%) = true center regardless of block width */
+.react-resizable-handle-n {
+  top: 0 !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  cursor: n-resize;
+}
+.react-resizable-handle-s {
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translate(-50%, 50%) !important;
+  cursor: s-resize;
+}
+.react-resizable-handle-w {
+  left: 0 !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  cursor: w-resize;
+}
+.react-resizable-handle-e {
+  right: 0 !important;
+  top: 50% !important;
+  transform: translate(50%, -50%) !important;
+  cursor: e-resize;
+}
+
+.react-grid-item button {
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+/* react-grid-layout cursor/handle desync fixes */
+.react-grid-layout {
+  position: relative;
+}
+
+.react-grid-item {
+  touch-action: none;
 }
