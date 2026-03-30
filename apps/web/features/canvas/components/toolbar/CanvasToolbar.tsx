@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CaretDown, Cursor, Trash, TextT, Image } from "phosphor-react";
+import {
+  CaretDown,
+  Code,
+  Cursor,
+  Image,
+  ListChecks,
+  TextT,
+  Trash,
+} from "phosphor-react";
 
 import ToolbarButton from "./ToolbarButton";
 import type { Block } from "../../lib/createBlockHelper";
@@ -29,7 +37,7 @@ export default function CanvasToolbar({
         transition={{ type: "spring", stiffness: 320, damping: 26 }}
         className="bg-background backdrop-blur-md flex items-center overflow-hidden border-x border-b border-white/10"
         animate={{
-          width: isOpen ? 340 : 72,
+          width: isOpen ? 400 : 72,
           height: isOpen ? 56 : 28,
           borderWidth: 1,
           borderTopWidth: 0,
@@ -103,6 +111,16 @@ export default function CanvasToolbar({
                 </svg>
               }
               onClick={() => onAdd("markdown")}
+            />
+
+            <ToolbarButton
+              icon={<Code size={18} />}
+              onClick={() => onAdd("code")}
+            />
+
+            <ToolbarButton
+              icon={<ListChecks size={18} />}
+              onClick={() => onAdd("todo")}
             />
 
             {/* Spacer */}

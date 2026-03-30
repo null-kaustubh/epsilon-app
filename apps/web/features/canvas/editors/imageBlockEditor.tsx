@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Image from "next/image";
-import { Plus } from "phosphor-react";
+import { Check, Plus } from "phosphor-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseEditorProps } from "../lib/blockRegistry";
 
@@ -116,16 +116,16 @@ export default function ImageBlockEditor({
             <button
               type="button"
               onClick={openPicker}
-              className="absolute top-2 right-2 flex items-center justify-center w-8 h-8 rounded-lg bg-muted/90 hover:bg-muted transition"
+              className="absolute top-2.5 right-2.5 flex items-center justify-center p-3 rounded-full bg-muted/90 hover:bg-muted transition"
             >
               <Plus size={16} />
             </button>
             <button
               type="button"
               onClick={onRequestCloseAction}
-              className="absolute bottom-2 right-2 px-3 py-2 rounded-xl bg-muted/90 hover:bg-muted transition"
+              className="absolute bottom-2.5 right-2.5 p-3 flex items-center justify-center rounded-full bg-muted/90 hover:bg-muted transition"
             >
-              Done
+              <Check size={16} />
             </button>
           </>
         ) : (
@@ -133,10 +133,9 @@ export default function ImageBlockEditor({
             <button
               type="button"
               onClick={openPicker}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted hover:bg-muted/70 transition"
+              className="flex items-center gap-2 px-3 py-3 rounded-full bg-muted hover:bg-muted/70 transition"
             >
               <Plus size={16} />
-              <span>Add Image</span>
             </button>
           </div>
         )}

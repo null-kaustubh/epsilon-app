@@ -39,11 +39,10 @@ export default function ImageBlockView({
           e.stopPropagation();
           onRequestEditAction?.();
         }}
-        className="absolute inset-4 flex items-center justify-center rounded-sm border-2 border-dashed border-border/60 bg-transparent hover:bg-muted/50 transition"
+        className="absolute inset-4 flex items-center justify-center rounded-sm border-2 border-dashed border-border/60 bg-transparent hover:bg-muted/50 transition-[color]"
       >
-        <div className="flex items-center gap-2 px-3 py-2 rounded-sm bg-muted">
+        <div className="flex items-center gap-2 px-3 py-3 rounded-full bg-muted">
           <Plus size={16} />
-          <span>Add Image</span>
         </div>
       </button>
     );

@@ -17,7 +17,7 @@ export default function ThemeToggle() {
       onClick={handleChange}
       className="fixed top-3 right-6 z-50 p-2 rounded-xl 
                  bg-background/80 backdrop-blur-md border shadow-sm
-                 hover:bg-muted/70 transition-opacity"
+                 hover:bg-muted/70 transition-opacity cursor-pointer"
       aria-label="Toggle theme"
     >
       {isDark ? <Sun size={18} /> : <Moon size={18} />}

@@ -8,3 +8,6 @@ export const MARGIN: [number, number] = [10, 10];
 export const CONTAINER_PADDING: [number, number] = [10, 10];
 
 export const BLOCK_DEFAULT_H_PX = 180;
+
+export const CODE_BLOCK_W = 8;
+export const CODE_BLOCK_H = 6;

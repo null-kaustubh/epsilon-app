@@ -33,7 +33,7 @@ export default function MarkdownBlockView({
   return (
     <div
       ref={containerRef}
-      className="h-full w-full p-4 text-sm leading-5 text-foreground"
+      className="h-full w-full p-4 text-sm leading-5 text-foreground select-none"
     >
       {blocks.length ? blocks : <span style={{ opacity: 0.65 }}>&nbsp;</span>}
     </div>

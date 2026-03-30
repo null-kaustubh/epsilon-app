@@ -15,11 +15,21 @@ export type Block = {
  * dragged positions.
  */
 export function createBlock(type: Block["type"], x: number, y: number): Block {
+  const content =
+    type === "code"
+      ? JSON.stringify({
+          filename: "snippet.ts",
+          language: "typescript",
+          code: "",
+        })
+      : type === "todo"
+        ? JSON.stringify({ title: "Todo list", items: [] })
+        : "";
   return {
     id: nanoid(),
     type,
     x,
     y,
-    content: "",
+    content,
   };
 }

@@ -1,12 +1,17 @@
 import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Fragment_Mono } from "next/font/google";
 import clsx from "clsx";
 import ThemeProvider, { Theme } from "../context/ThemeProvider";
 import { cookies } from "next/headers";
 
-const geist = Geist({ subsets: ["latin"] });
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const fragmentMono = Fragment_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "Create Turborepo",
@@ -24,7 +29,12 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={clsx(theme, "overflow-hidden antialiased", geist.className)}
+      className={clsx(
+        theme,
+        "overflow-hidden antialiased",
+        geist.variable,
+        fragmentMono.variable,
+      )}
       data-color-theme={theme}
     >
       <body suppressHydrationWarning>
