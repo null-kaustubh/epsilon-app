@@ -7,6 +7,8 @@ import {
   BLOCK_MIN_H,
   BLOCK_MIN_W,
   BLOCK_W,
+  CODE_BLOCK_H,
+  CODE_BLOCK_W,
   GRID_COLS,
 } from "./gridConstants";
 
@@ -20,7 +22,7 @@ function initialBlockH(type: Block["type"]): number {
     case "image":
       return contentHeightToRows(BLOCK_DEFAULT_H_PX);
     case "code":
-      return BLOCK_H;
+      return CODE_BLOCK_H;
     default:
       return BLOCK_H;
   }
@@ -65,13 +67,18 @@ export function findNextAvailablePosition(
 }
 
 export function blockToLayout(block: Block): GridItem {
+  const w = block.type === "code" ? CODE_BLOCK_W : BLOCK_W;
+  const h = initialBlockH(block.type);
+  // Keep code blocks from shrinking too aggressively; it's easier to keep editor overlay aligned.
+  const minW = block.type === "code" ? BLOCK_MIN_W + 3 : BLOCK_MIN_W;
+
   return {
     i: block.id,
     x: block.x,
     y: block.y,
-    w: BLOCK_W,
-    h: initialBlockH(block.type),
-    minW: BLOCK_MIN_W,
+    w,
+    h,
+    minW,
     minH: BLOCK_MIN_H,
   };
 }

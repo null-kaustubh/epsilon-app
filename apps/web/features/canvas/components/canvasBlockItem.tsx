@@ -49,8 +49,9 @@ function CanvasBlockItem({
       content: block.content,
       onGrowAction,
       onRequestEditAction: () => onStartEditingAction(block.id),
+      onChangeContentAction: (next) => onChangeContentAction(block.id, next),
     }),
-    [block.content, block.id, onGrowAction, onStartEditingAction],
+    [block.content, block.id, onChangeContentAction, onGrowAction, onStartEditingAction],
   );
 
   return (

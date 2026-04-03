@@ -28,57 +28,57 @@
   --accent-foreground: #ffffff;
 
   /* semantic */
-  --success: #6a92b8;
-  --destructive: #b46f89;
+  --success: #7a9e7e;
+  --destructive: #b85c4a;
 
   /* links */
-  --link: #fd913e;
+  --link: #e07b2e;
 
   /* selection */
   --selection: #fdae62;
-  --selection-foreground: #000000;
+  --selection-foreground: #30241c;
 
   /* shadow */
   --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 [data-color-theme="dark"] {
-  --background: #1f1f1f;
-  --foreground: #ffffff;
+  --background: #1e1c1a;
+  --foreground: #f0e6d8;
 
   /* primary = main surface */
-  --primary: #232323;
+  --primary: #252320;
   --primary-foreground: #ffffff;
 
   /* secondary = cards / blocks */
-  --secondary: #2a2a2a;
+  --secondary: #2e2b27;
   --secondary-foreground: #f8e7c8;
 
   /* muted = subtle UI */
-  --muted: #1a1a1a;
-  --muted-foreground: #99927d;
+  --muted: #191714;
+  --muted-foreground: #a8998a;
 
   /* borders */
-  --border: #323232;
-  --edge: #323232;
+  --border: #3a3733;
+  --edge: #3a3733;
 
   /* ring / focus */
-  --ring: #f4480c;
+  --ring: #e07b2e;
 
   /* accents (main personality) */
-  --accent: #f4480c;
+  --accent: #fd913e;
   --accent-foreground: #ffffff;
 
   /* semantic */
-  --success: #f8e205;
-  --destructive: #c66527;
+  --success: #7aab8a;
+  --destructive: #c47a7a;
 
   /* links */
-  --link: #fdae07;
+  --link: #f9a86b;
 
   /* selection */
-  --selection: #f8e205;
-  --selection-foreground: #000000;
+  --selection: #fd913e;
+  --selection-foreground: #1e1c1a;
 
   /* shadow */
   --shadow-popover: 0 0 24px rgba(0, 0, 0, 0.6);
@@ -93,31 +93,16 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  /*--color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover-border: var(--popover-border);
-    --color-accent2: var(--accent2);*/
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   --color-edge: var(--edge);
-  /*--color-input: var(--input);
-    --color-info: var(--info);*/
   --color-ring: var(--ring);
   --color-success: var(--success);
   --color-destructive: var(--destructive);
   --color-link: var(--link);
-  /*--color-code: var(--code);
-    --color-code-foreground: var(--code-foreground);
-    --color-code-number: var(--code-number);
-    --color-code-highlight: var(--code-highlight);*/
   --color-selection: var(--selection);
   --color-selection-foreground: var(--selection-foreground);
-
-  --font-sans: var(--font-sf-pro-display);
-  --font-mono: var(--font-departure-mono);
 
   --shadow-popover: var(--shadow-popover);
 
@@ -156,13 +141,6 @@ body {
   height: 100%;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  overflow: hidden;
-}
-
 @layer base {
   *,
   ::after,
@@ -182,6 +160,7 @@ body {
 
   body {
     @apply bg-background font-sans text-foreground antialiased;
+    overflow: hidden;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
@@ -371,4 +350,131 @@ body {
 
 .react-grid-item {
   touch-action: none;
+}
+
+/* ─── shiki base ─── */
+.shiki-wrapper .shiki,
+.shiki-editor-overlay pre.shiki {
+  background: transparent !important;
+  margin: 0;
+  border: 0;
+  padding: 0.5rem 0;
+  font-size: 14px;
+  line-height: 4px;
+  font-family: var(--font-mono, monospace);
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  font-synthesis: none;
+}
+
+/* ─── code reset ─── */
+.shiki-wrapper code,
+.shiki-editor-overlay pre.shiki code {
+  counter-reset: line;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
+}
+
+/* ─── lines ─── */
+.shiki-wrapper .line,
+.shiki-editor-overlay .line {
+  position: relative;
+  counter-increment: line;
+  display: block;
+  padding-right: 1.5rem;
+  /* Prevent wrap-glitch by giving each shiki "line" a stable height. */
+  line-height: 1.25rem;
+  min-height: 1.25rem;
+  padding-left: 3rem;
+}
+
+/* ─── line numbers ─── */
+.shiki-wrapper .line::before,
+.shiki-editor-overlay .line::before {
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  width: 2.5rem;
+  text-align: right;
+  padding-right: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.25rem;
+  user-select: none;
+  font-family: var(--font-mono, monospace);
+}
+
+/* ─── theme colors ─── */
+.shiki-wrapper span,
+.shiki-editor-overlay span {
+  color: var(--shiki-light) !important;
+}
+
+[data-color-theme="dark"] .shiki-wrapper span,
+[data-color-theme="dark"] .shiki-editor-overlay span {
+  color: var(--shiki-dark) !important;
+}
+
+/* ─── editor overlay ─── */
+.shiki-editor-overlay {
+  scrollbar-width: none;
+}
+.shiki-editor-overlay::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── textarea ─── */
+.block-editor.code-editor-textarea {
+  box-sizing: border-box;
+  margin: 0;
+  border-width: 0;
+  scrollbar-width: none;
+  font-synthesis: none;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.block-editor.code-editor-textarea::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── react-simple-code-editor wrapper ─── */
+.rsce-wrapper {
+  scrollbar-width: thin;
+}
+
+.rsce-wrapper span {
+  color: var(--shiki-light) !important;
+}
+
+[data-color-theme="dark"] .rsce-wrapper span {
+  color: var(--shiki-dark) !important;
+}
+
+.rsce-wrapper pre.rsce-pre {
+  background: transparent !important;
+  margin: 0 !important;
+}
+
+/* shiki wraps output in <pre class="shiki"> inside rsce's <pre> */
+.rsce-wrapper .shiki {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+code,
+pre {
+  font-family: var(--font-mono, monospace);
 }
