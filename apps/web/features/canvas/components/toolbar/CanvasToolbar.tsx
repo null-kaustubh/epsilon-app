@@ -37,7 +37,7 @@ export default function CanvasToolbar({
         transition={{ type: "spring", stiffness: 320, damping: 26 }}
         className="bg-background backdrop-blur-md flex items-center overflow-hidden border-x border-b border-white/10"
         animate={{
-          width: isOpen ? 400 : 72,
+          width: isOpen ? 380 : 72,
           height: isOpen ? 56 : 28,
           borderWidth: 1,
           borderTopWidth: 0,
@@ -124,7 +124,6 @@ export default function CanvasToolbar({
             />
 
             {/* Spacer */}
-            <div className="flex-1" />
             <div className="w-px h-6 bg-border mx-1" />
 
             {/* Close */}

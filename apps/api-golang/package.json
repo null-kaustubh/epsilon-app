@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "go run ./...",
-    "build": "go build -o bin/api .",
+    "dev": "go run ./cmd/server",
+    "build": "go build -o bin/api ./cmd/server",
     "lint": "golangci-lint run ./...",
     "test": "go test ./..."
   }

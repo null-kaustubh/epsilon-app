@@ -54,6 +54,14 @@ export function parseMarkdownBlocks(content: string): ReactNode[] {
     const line = lines[i] ?? "";
 
     if (line.trim().length === 0) {
+      blocks.push(
+        <div
+          key={`empty-${i}`}
+          style={{
+            height: "1em",
+          }}
+        />,
+      );
       i += 1;
       continue;
     }
