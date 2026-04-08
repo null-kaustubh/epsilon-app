@@ -1,0 +1,220 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeClosed } from "phosphor-react";
+
+export default function SignInPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const canSubmit = isEmailValid && password.length > 0;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(
+          data?.error || data?.message || "Sign in failed. Please try again.",
+        );
+      }
+
+      router.push("/home");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
+      <div
+        className="w-full max-w-105 bg-white dark:bg-secondary
+                   rounded-md border border-border p-10
+                   shadow-popover"
+        style={{ animation: "cardIn 0.4s cubic-bezier(0.22,1,0.36,1) both" }}
+      >
+        {/* Header */}
+        <header className="mb-8">
+          <span className="block text-accent text-2xl mb-4">Ɛ</span>
+          <h1 className="text-foreground text-[26px] font-semibold tracking-tight leading-snug mb-1">
+            Welcome back
+          </h1>
+          <p className="text-muted-foreground text-sm font-light">
+            Sign in to continue.
+          </p>
+        </header>
+
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-5"
+          noValidate
+        >
+          {/* ── Email ── */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-foreground text-[13px] font-medium tracking-wide">
+              Email
+            </label>
+            <div className="relative">
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError(null);
+                }}
+                className="w-full bg-muted text-foreground
+                           placeholder:text-muted-foreground/50
+                           border border-border rounded-md
+                           px-3.5 py-2.75 pr-9 text-sm
+                           outline-none caret-accent
+                           transition-all duration-200
+                           focus:bg-background
+                           focus:border-accent
+                           focus:ring-2 focus:ring-accent/20"
+              />
+              {email.length > 0 &&
+                (isEmailValid ? (
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-success text-[11px] font-bold"
+                    style={{
+                      animation:
+                        "popIn 0.2s cubic-bezier(0.34,1.56,0.64,1) both",
+                    }}
+                  >
+                    ✓
+                  </span>
+                ) : (
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-destructive text-[11px] font-bold"
+                    style={{
+                      animation:
+                        "popIn 0.2s cubic-bezier(0.34,1.56,0.64,1) both",
+                    }}
+                  >
+                    !
+                  </span>
+                ))}
+            </div>
+          </div>
+
+          {/* ── Password ── */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-foreground text-[13px] font-medium tracking-wide">
+                Password
+              </label>
+              <a
+                href="/forgot-password"
+                className="text-[12px] text-link hover:underline"
+              >
+                Forgot password?
+              </a>
+            </div>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                placeholder="Your password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
+                className="w-full bg-muted text-foreground
+                           placeholder:text-muted-foreground/50
+                           border border-border rounded-md
+                           px-3.5 py-2.75 pr-9 text-sm
+                           outline-none caret-accent
+                           transition-all duration-200
+                           focus:bg-background
+                           focus:border-accent
+                           focus:ring-2 focus:ring-accent/20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label="Toggle password visibility"
+                className="absolute right-3 top-1/2 -translate-y-1/2
+                           text-muted-foreground hover:text-foreground
+                           transition-colors text-xs leading-none p-0.5 cursor-pointer"
+              >
+                {showPassword ? <EyeClosed size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+
+          {/* ── Error ── */}
+          {error && (
+            <p className="text-sm text-destructive rounded-lg">{error}</p>
+          )}
+
+          {/* ── Submit ── */}
+          <button
+            type="submit"
+            disabled={!canSubmit || loading}
+            className={`w-full rounded-md py-3 px-5
+                        text-sm font-medium tracking-wide
+                        flex items-center justify-center min-h-11.5
+                        transition-all duration-200
+                        ${
+                          canSubmit && !loading
+                            ? `bg-accent text-accent-foreground cursor-pointer
+                             shadow-[0_4px_16px_rgba(253,145,62,0.32)]
+                             hover:-translate-y-px
+                             hover:shadow-[0_6px_20px_rgba(253,145,62,0.42)]
+                             active:translate-y-0`
+                            : "bg-primary/80 dark:bg-primary text-primary-foreground/30 cursor-not-allowed"
+                        }
+                        ${loading ? "opacity-75 cursor-wait" : ""}`}
+          >
+            {loading ? (
+              <span className="w-4.5 h-4.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+            ) : (
+              "Sign in"
+            )}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-[13px] text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <a href="/signup" className="text-link font-medium hover:underline">
+            Create one
+          </a>
+        </p>
+      </div>
+
+      <style>{`
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+          from { transform: scale(0.5); opacity: 0; }
+          to   { transform: scale(1);   opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}

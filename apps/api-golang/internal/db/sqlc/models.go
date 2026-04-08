@@ -10,6 +10,19 @@ import (
 	"github.com/google/uuid"
 )
 
+type Block struct {
+	ID        uuid.UUID
+	SpaceID   uuid.UUID
+	Type      string
+	Content   string
+	X         int32
+	Y         int32
+	W         int32
+	H         int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type SchemaMigration struct {
 	Version int64
 	Dirty   bool
@@ -20,6 +33,15 @@ type Session struct {
 	UserID    uuid.UUID
 	ExpiresAt time.Time
 	CreatedAt time.Time
+}
+
+type Space struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Name      string
+	Slug      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type User struct {

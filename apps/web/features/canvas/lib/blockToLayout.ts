@@ -14,7 +14,7 @@ import {
 
 export type GridItem = Layout[number];
 
-function initialBlockH(type: Block["type"]): number {
+export function initialBlockH(type: Block["type"]): number {
   switch (type) {
     case "note":
     case "markdown":
