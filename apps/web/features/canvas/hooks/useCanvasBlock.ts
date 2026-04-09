@@ -1,23 +1,51 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Layout } from "react-grid-layout/legacy";
 import { Block, createBlock } from "../lib/createBlockHelper";
-import { blockToLayout, findNextAvailablePosition } from "../lib/blockToLayout";
+import {
+  blockToLayout,
+  findNextAvailablePosition,
+  initialBlockH,
+} from "../lib/blockToLayout";
 import { contentHeightToRows } from "../lib/blockSizing";
+import { SpaceBlock, spacesApi } from "../../../lib/spaces";
+import { BLOCK_W, CODE_BLOCK_W } from "../lib/gridConstants";
 
 type Layouts = Partial<Record<string, Layout>>;
 
-export function useCanvasBlocks() {
-  const [blocks, setBlocks] = useState<Block[]>([]);
-  const [layouts, setLayouts] = useState<Layouts>({ lg: [] });
+function blocksFromDB(dbBlocks: SpaceBlock[]): {
+  blocks: Block[];
+  layouts: Layouts;
+} {
+  const blocks: Block[] = dbBlocks.map((b) => ({
+    id: b.id,
+    type: b.type,
+    content: b.content,
+    x: b.x,
+    y: b.y,
+    w: b.w,
+    h: b.h,
+  }));
+
+  const lg: Layout = blocks.map((b) => blockToLayout(b));
+
+  return { blocks, layouts: { lg } };
+}
+
+export function useCanvasBlocks(
+  initialBlocks: SpaceBlock[] = [],
+  slug: string,
+) {
+  const init = blocksFromDB(initialBlocks);
+
+  const [blocks, setBlocks] = useState<Block[]>(init.blocks);
+  const [layouts, setLayouts] = useState<Layouts>(init.layouts);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Cursor/handle desync under load (e.g. console open) is commonly caused by
   // React state updates racing the drag/resize loop. We keep the latest
   // layout in a ref and only commit it to React state when the interaction ends.
-  const layoutsRef = useRef<Layouts>(layouts);
-  useEffect(() => {
-    layoutsRef.current = layouts;
-  }, [layouts]);
+  const layoutsRef = useRef<Layouts>(init.layouts);
+
   const isInteractingRef = useRef(false);
   const syncRafRef = useRef<number | null>(null);
 
@@ -42,14 +70,11 @@ export function useCanvasBlocks() {
 
   const handleInteractionStop = useCallback(() => {
     isInteractingRef.current = false;
-
-    // Ensure the last `onLayoutChange` (which updates `layoutsRef`) has run
-    // before we commit React state. Under load (console open) the ordering can
-    // otherwise cause a "snap back" on the next render/add.
     if (syncRafRef.current != null) cancelAnimationFrame(syncRafRef.current);
     syncRafRef.current = requestAnimationFrame(() => {
       syncRafRef.current = null;
-      setLayouts(layoutsRef.current);
+      const latest = layoutsRef.current;
+      setLayouts(latest); // commit ref → state, not the other way around
     });
   }, []);
 
@@ -57,7 +82,13 @@ export function useCanvasBlocks() {
     const currentLayouts = layoutsRef.current;
     const currentItems = currentLayouts.lg ?? [];
 
-    const { x, y } = findNextAvailablePosition(currentItems);
+    const desiredW = type === "code" ? CODE_BLOCK_W : BLOCK_W;
+    const desiredH = initialBlockH(type);
+    const { x, y } = findNextAvailablePosition(
+      currentItems,
+      desiredW,
+      desiredH,
+    );
 
     const newBlock = createBlock(type, x, y);
     const newItem = blockToLayout(newBlock);
@@ -144,27 +175,39 @@ export function useCanvasBlocks() {
     );
   }, []);
 
-  const handleDeleteBlock = useCallback((id: string) => {
-    // Remove only the clicked block item + its layout entry.
-    // `compactType={null}` ensures other blocks don't reflow after deletion.
-    pendingGrowRef.current.delete(id);
+  const handleDeleteBlock = useCallback(
+    async (id: string) => {
+      // Remove only the clicked block item + its layout entry.
+      // `compactType={null}` ensures other blocks don't reflow after deletion.
+      pendingGrowRef.current.delete(id);
 
-    setBlocks((prev) => prev.filter((b) => b.id !== id));
-    setEditingId((prev) => (prev === id ? null : prev));
+      setBlocks((prev) => prev.filter((b) => b.id !== id));
+      setEditingId((prev) => (prev === id ? null : prev));
 
-    setLayouts((prev) => {
-      const lg = prev.lg ?? [];
-      const nextLg = lg.filter((item) => item.i !== id);
-      const nextLayouts = { ...prev, lg: nextLg };
-      layoutsRef.current = nextLayouts;
-      return nextLayouts;
-    });
-  }, []);
+      setLayouts((prev) => {
+        const lg = prev.lg ?? [];
+        const nextLg = lg.filter((item) => item.i !== id);
+        const nextLayouts = { ...prev, lg: nextLg };
+        layoutsRef.current = nextLayouts;
+        return nextLayouts;
+      });
+
+      // then delete from DB
+      try {
+        await spacesApi.deleteBlock(slug, id);
+      } catch {
+        // optionally show an error toast here later
+        console.error("Failed to delete block from DB");
+      }
+    },
+    [slug],
+  );
 
   return {
     blocks,
     layouts,
     editingId,
+    layoutsRef,
     setEditingId,
     handleLayoutChange,
     handleInteractionStart,

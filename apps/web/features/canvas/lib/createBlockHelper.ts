@@ -1,10 +1,14 @@
-import { nanoid } from "nanoid";
+import { BLOCK_W, CODE_BLOCK_W } from "./gridConstants";
+import { initialBlockH } from "./blockToLayout";
+import { v4 as uuidv4 } from "uuid";
 
 export type Block = {
   id: string;
   type: "note" | "code" | "todo" | "image" | "markdown";
   x: number;
   y: number;
+  w: number;
+  h: number;
   content: string;
 };
 
@@ -25,11 +29,16 @@ export function createBlock(type: Block["type"], x: number, y: number): Block {
       : type === "todo"
         ? JSON.stringify({ title: "Todo list", items: [] })
         : "";
+  const w = type === "code" ? CODE_BLOCK_W : BLOCK_W;
+  const h = initialBlockH(type);
+
   return {
-    id: nanoid(),
+    id: uuidv4(),
     type,
     x,
     y,
+    w,
+    h,
     content,
   };
 }

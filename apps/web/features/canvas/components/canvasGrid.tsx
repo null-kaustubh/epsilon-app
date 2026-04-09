@@ -45,6 +45,7 @@ function CanvasGrid({
       className="layout canvas-grid"
       width={containerWidth}
       layouts={layouts}
+      measureBeforeMount={true}
       onLayoutChange={onLayoutChange}
       onDragStart={() => onInteractionStart()}
       onDragStop={() => onInteractionStop()}

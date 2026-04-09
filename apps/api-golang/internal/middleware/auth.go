@@ -9,7 +9,7 @@ import (
 
 type contextKey string
 
-const userIDKey contextKey = "user_id"
+const UserIDKey contextKey = "user_id"
 
 func AuthMiddleware(authService *service.AuthService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -26,7 +26,7 @@ func AuthMiddleware(authService *service.AuthService) func(http.Handler) http.Ha
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), userIDKey, user.ID)
+			ctx := context.WithValue(r.Context(), UserIDKey, user.ID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

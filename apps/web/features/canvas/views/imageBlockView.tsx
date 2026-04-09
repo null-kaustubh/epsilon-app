@@ -1,33 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { BaseViewProps } from "../lib/blockRegistry";
 import { Plus } from "phosphor-react";
 
 export default function ImageBlockView({
   blockId,
   content,
-  onGrowAction,
   onRequestEditAction,
 }: BaseViewProps) {
-  const innerRef = useRef<HTMLDivElement | null>(null);
   const [ratio, setRatio] = useState<number | null>(null);
 
   const handleLoad = useCallback(
     (img: HTMLImageElement) => {
       const r = img.naturalHeight / img.naturalWidth;
       setRatio(r);
-
-      const width = innerRef.current?.clientWidth;
-      if (!width) return;
-
-      const height = width * r;
-
-      // 16px top + 16px bottom padding
-      onGrowAction(blockId, height + 32);
     },
-    [blockId, onGrowAction],
+    [],
   );
 
   if (!content) {
@@ -49,7 +39,7 @@ export default function ImageBlockView({
   }
 
   return (
-    <div ref={innerRef} className="absolute inset-4 rounded-sm overflow-hidden">
+    <div className="absolute inset-4 rounded-sm overflow-hidden">
       {content && (
         <div
           style={{
