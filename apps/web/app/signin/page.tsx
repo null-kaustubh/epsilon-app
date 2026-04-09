@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "phosphor-react";
+import { api, ApiError } from "../../lib/api";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -21,23 +22,11 @@ export default function SignInPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(
-          data?.error || data?.message || "Sign in failed. Please try again.",
-        );
-      }
+      await api.post("/auth/login", { email, password });
 
       router.push("/home");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof ApiError ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }

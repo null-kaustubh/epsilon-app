@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PROTECTED = ["/home", "/spaces"];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (!PROTECTED.some((path) => pathname.startsWith(path))) {

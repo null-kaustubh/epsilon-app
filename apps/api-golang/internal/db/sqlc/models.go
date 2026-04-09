@@ -11,42 +11,42 @@ import (
 )
 
 type Block struct {
-	ID        uuid.UUID
-	SpaceID   uuid.UUID
-	Type      string
-	Content   string
-	X         int32
-	Y         int32
-	W         int32
-	H         int32
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID `json:"id"`
+	SpaceID   uuid.UUID `json:"space_id"`
+	Type      string    `json:"type"`
+	Content   string    `json:"content"`
+	X         int32     `json:"x"`
+	Y         int32     `json:"y"`
+	W         int32     `json:"w"`
+	H         int32     `json:"h"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type SchemaMigration struct {
-	Version int64
-	Dirty   bool
+	Version int64 `json:"version"`
+	Dirty   bool  `json:"dirty"`
 }
 
 type Session struct {
-	ID        string
-	UserID    uuid.UUID
-	ExpiresAt time.Time
-	CreatedAt time.Time
+	ID        string    `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	ExpiresAt time.Time `json:"expires_at"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Space struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Name      string
-	Slug      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	Name      string    `json:"name"`
+	Slug      string    `json:"slug"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type User struct {
-	ID           uuid.UUID
-	Email        string
-	PasswordHash string
-	CreatedAt    time.Time
+	ID           uuid.UUID `json:"id"`
+	Email        string    `json:"email"`
+	PasswordHash string    `json:"password_hash"`
+	CreatedAt    time.Time `json:"created_at"`
 }

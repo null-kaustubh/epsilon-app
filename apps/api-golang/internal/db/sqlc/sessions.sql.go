@@ -19,9 +19,9 @@ RETURNING id, user_id, expires_at, created_at
 `
 
 type CreateSessionParams struct {
-	ID        string
-	UserID    uuid.UUID
-	ExpiresAt time.Time
+	ID        string    `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {

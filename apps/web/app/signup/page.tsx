@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "phosphor-react";
+import { api, ApiError } from "../../lib/api";
 
 const checks = [
   {
@@ -46,30 +47,15 @@ export default function SignUpPage() {
     if (!canSubmit) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include", // send/receive cookies
-          body: JSON.stringify({ email, password }),
-        },
-      );
-
-      if (!res.ok) {
-        // try to parse a message from the Go error response
-        const data = await res.json().catch(() => ({}));
-        throw new Error(
-          data?.error ||
-            data?.message ||
-            "Registration failed. Please try again.",
-        );
-      }
+      await api.post<{ id: string; email: string }>("/auth/register", {
+        email,
+        password,
+      });
 
       // backend sets the session cookie via Set-Cookie header — nothing to do manually
       router.push("/home");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof ApiError ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }

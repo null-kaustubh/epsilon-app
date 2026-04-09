@@ -12,12 +12,12 @@ SELECT * FROM spaces
 WHERE user_id = $1
 ORDER BY created_at DESC;
 
--- name: UpdateSpaceName :exec
+-- name: UpdateSpaceName :execrows
 UPDATE spaces
 SET name = $1, updated_at = NOW()
 WHERE slug = $2 AND user_id = $3;
 
--- name: DeleteSpace :exec
+-- name: DeleteSpace :execrows
 DELETE FROM spaces
 WHERE slug = $1 AND user_id = $2;
 
@@ -37,6 +37,6 @@ SELECT * FROM blocks
 WHERE space_id = $1
 ORDER BY created_at ASC;
 
--- name: DeleteBlock :exec
+-- name: DeleteBlock :execrows
 DELETE FROM blocks
 WHERE id = $1 AND space_id = $2;

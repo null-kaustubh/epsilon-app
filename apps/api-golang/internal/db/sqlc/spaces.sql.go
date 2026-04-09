@@ -18,10 +18,10 @@ RETURNING id, user_id, name, slug, created_at, updated_at
 `
 
 type CreateSpaceParams struct {
-	ID     uuid.UUID
-	UserID uuid.UUID
-	Name   string
-	Slug   string
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+	Name   string    `json:"name"`
+	Slug   string    `json:"slug"`
 }
 
 func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space, error) {
@@ -43,34 +43,40 @@ func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space
 	return i, err
 }
 
-const deleteBlock = `-- name: DeleteBlock :exec
+const deleteBlock = `-- name: DeleteBlock :execrows
 DELETE FROM blocks
 WHERE id = $1 AND space_id = $2
 `
 
 type DeleteBlockParams struct {
-	ID      uuid.UUID
-	SpaceID uuid.UUID
+	ID      uuid.UUID `json:"id"`
+	SpaceID uuid.UUID `json:"space_id"`
 }
 
-func (q *Queries) DeleteBlock(ctx context.Context, arg DeleteBlockParams) error {
-	_, err := q.db.ExecContext(ctx, deleteBlock, arg.ID, arg.SpaceID)
-	return err
+func (q *Queries) DeleteBlock(ctx context.Context, arg DeleteBlockParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteBlock, arg.ID, arg.SpaceID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
-const deleteSpace = `-- name: DeleteSpace :exec
+const deleteSpace = `-- name: DeleteSpace :execrows
 DELETE FROM spaces
 WHERE slug = $1 AND user_id = $2
 `
 
 type DeleteSpaceParams struct {
-	Slug   string
-	UserID uuid.UUID
+	Slug   string    `json:"slug"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
-func (q *Queries) DeleteSpace(ctx context.Context, arg DeleteSpaceParams) error {
-	_, err := q.db.ExecContext(ctx, deleteSpace, arg.Slug, arg.UserID)
-	return err
+func (q *Queries) DeleteSpace(ctx context.Context, arg DeleteSpaceParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteSpace, arg.Slug, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const getBlocksBySpaceID = `-- name: GetBlocksBySpaceID :many
@@ -119,8 +125,8 @@ WHERE slug = $1 AND user_id = $2
 `
 
 type GetSpaceBySlugParams struct {
-	Slug   string
-	UserID uuid.UUID
+	Slug   string    `json:"slug"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
 func (q *Queries) GetSpaceBySlug(ctx context.Context, arg GetSpaceBySlugParams) (Space, error) {
@@ -173,21 +179,24 @@ func (q *Queries) ListSpaces(ctx context.Context, userID uuid.UUID) ([]Space, er
 	return items, nil
 }
 
-const updateSpaceName = `-- name: UpdateSpaceName :exec
+const updateSpaceName = `-- name: UpdateSpaceName :execrows
 UPDATE spaces
 SET name = $1, updated_at = NOW()
 WHERE slug = $2 AND user_id = $3
 `
 
 type UpdateSpaceNameParams struct {
-	Name   string
-	Slug   string
-	UserID uuid.UUID
+	Name   string    `json:"name"`
+	Slug   string    `json:"slug"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
-func (q *Queries) UpdateSpaceName(ctx context.Context, arg UpdateSpaceNameParams) error {
-	_, err := q.db.ExecContext(ctx, updateSpaceName, arg.Name, arg.Slug, arg.UserID)
-	return err
+func (q *Queries) UpdateSpaceName(ctx context.Context, arg UpdateSpaceNameParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateSpaceName, arg.Name, arg.Slug, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const upsertBlock = `-- name: UpsertBlock :exec
@@ -203,14 +212,14 @@ ON CONFLICT (id) DO UPDATE SET
 `
 
 type UpsertBlockParams struct {
-	ID      uuid.UUID
-	SpaceID uuid.UUID
-	Type    string
-	Content string
-	X       int32
-	Y       int32
-	W       int32
-	H       int32
+	ID      uuid.UUID `json:"id"`
+	SpaceID uuid.UUID `json:"space_id"`
+	Type    string    `json:"type"`
+	Content string    `json:"content"`
+	X       int32     `json:"x"`
+	Y       int32     `json:"y"`
+	W       int32     `json:"w"`
+	H       int32     `json:"h"`
 }
 
 func (q *Queries) UpsertBlock(ctx context.Context, arg UpsertBlockParams) error {

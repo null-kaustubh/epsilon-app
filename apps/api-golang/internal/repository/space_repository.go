@@ -3,11 +3,11 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	db "api-golang/internal/db/sqlc"
 
 	"github.com/google/uuid"
-	"github.com/lib/pq"
 )
 
 type PostgresSpaceRepository struct {
@@ -21,18 +21,19 @@ func NewPostgresSpaceRepository(conn *sql.DB) *PostgresSpaceRepository {
 }
 
 func (r *PostgresSpaceRepository) CreateSpace(ctx context.Context, arg db.CreateSpaceParams) (db.Space, error) {
-	space, err := r.queries.CreateSpace(ctx, arg)
-	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
-			return db.Space{}, ErrSlugConflict
-		}
-		return db.Space{}, err
-	}
-	return space, nil
+	return r.queries.CreateSpace(ctx, arg)
 }
 
 func (r *PostgresSpaceRepository) GetSpaceBySlug(ctx context.Context, arg db.GetSpaceBySlugParams) (db.Space, error) {
-	return r.queries.GetSpaceBySlug(ctx, arg)
+	space, err := r.queries.GetSpaceBySlug(ctx, arg)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return db.Space{}, ErrSpaceNotFound
+		}
+		return db.Space{}, err
+	}
+
+	return space, nil
 }
 
 func (r *PostgresSpaceRepository) ListSpaces(ctx context.Context, userID uuid.UUID) ([]db.Space, error) {
@@ -40,11 +41,29 @@ func (r *PostgresSpaceRepository) ListSpaces(ctx context.Context, userID uuid.UU
 }
 
 func (r *PostgresSpaceRepository) UpdateSpaceName(ctx context.Context, arg db.UpdateSpaceNameParams) error {
-	return r.queries.UpdateSpaceName(ctx, arg)
+	rows, err := r.queries.UpdateSpaceName(ctx, arg)
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrSpaceNotFound
+	}
+
+	return nil
 }
 
 func (r *PostgresSpaceRepository) DeleteSpace(ctx context.Context, arg db.DeleteSpaceParams) error {
-	return r.queries.DeleteSpace(ctx, arg)
+	rows, err := r.queries.DeleteSpace(ctx, arg)
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrSpaceNotFound
+	}
+
+	return nil
 }
 
 func (r *PostgresSpaceRepository) GetBlocksBySpaceID(ctx context.Context, spaceID uuid.UUID) ([]db.Block, error) {
@@ -56,5 +75,14 @@ func (r *PostgresSpaceRepository) UpsertBlock(ctx context.Context, arg db.Upsert
 }
 
 func (r *PostgresSpaceRepository) DeleteBlock(ctx context.Context, arg db.DeleteBlockParams) error {
-	return r.queries.DeleteBlock(ctx, arg)
+	rows, err := r.queries.DeleteBlock(ctx, arg)
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrBlockNotFound
+	}
+
+	return nil
 }

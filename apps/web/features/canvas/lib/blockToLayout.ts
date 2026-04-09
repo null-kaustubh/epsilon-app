@@ -67,8 +67,12 @@ export function findNextAvailablePosition(
 }
 
 export function blockToLayout(block: Block): GridItem {
-  const w = block.type === "code" ? CODE_BLOCK_W : BLOCK_W;
-  const h = initialBlockH(block.type);
+  // Persisted dimensions should drive layout; fall back only if missing.
+  const defaultW = block.type === "code" ? CODE_BLOCK_W : BLOCK_W;
+  const defaultH = initialBlockH(block.type);
+
+  const w = Number.isFinite(block.w) ? Math.max(BLOCK_MIN_W, block.w) : defaultW;
+  const h = Number.isFinite(block.h) ? Math.max(BLOCK_MIN_H, block.h) : defaultH;
   // Keep code blocks from shrinking too aggressively; it's easier to keep editor overlay aligned.
   const minW = block.type === "code" ? BLOCK_MIN_W + 3 : BLOCK_MIN_W;
 

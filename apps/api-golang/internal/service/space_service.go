@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	db "api-golang/internal/db/sqlc"
+	"api-golang/internal/repository"
 
 	"github.com/google/uuid"
 )
@@ -34,8 +36,20 @@ var validBlockTypes = map[string]bool{
 	"code": true, "todo": true,
 }
 
+var (
+	nonAlnumRegex  = regexp.MustCompile(`[^a-z0-9-]`)
+	multiDashRegex = regexp.MustCompile(`-+`)
+)
+
 func (s *SpaceService) CreateSpace(ctx context.Context, userID uuid.UUID, name string) (db.Space, error) {
+	name = strings.TrimSpace(name)
+
+	if name == "" {
+		name = "Untitled"
+	}
+
 	slug := generateSlug(name)
+
 	return s.repo.CreateSpace(ctx, db.CreateSpaceParams{
 		ID:     uuid.New(),
 		UserID: userID,
@@ -58,6 +72,10 @@ func (s *SpaceService) GetSpace(ctx context.Context, slug string, userID uuid.UU
 		return db.Space{}, nil, err
 	}
 
+	if blocks == nil {
+		blocks = []db.Block{} // always return [] never null
+	}
+
 	return space, blocks, nil
 }
 
@@ -73,6 +91,16 @@ func (s *SpaceService) ListSpaces(ctx context.Context, userID uuid.UUID) ([]db.S
 }
 
 func (s *SpaceService) UpdateSpaceName(ctx context.Context, slug string, userID uuid.UUID, name string) error {
+	name = strings.TrimSpace(name)
+
+	if name == "" {
+		return repository.ErrInvalidSpaceName
+	}
+
+	if len(name) > 100 {
+		return repository.ErrSpaceNameTooLong
+	}
+
 	return s.repo.UpdateSpaceName(ctx, db.UpdateSpaceNameParams{
 		Name:   name,
 		Slug:   slug,
@@ -90,7 +118,7 @@ func (s *SpaceService) DeleteSpace(ctx context.Context, slug string, userID uuid
 func (s *SpaceService) SaveBlocks(ctx context.Context, spaceID uuid.UUID, blocks []db.UpsertBlockParams) error {
 	for _, b := range blocks {
 		if !validBlockTypes[b.Type] {
-			return fmt.Errorf("invalid block type: %s", b.Type)
+			return repository.ErrInvalidBlockType
 		}
 		if b.X < 0 || b.Y < 0 || b.W <= 0 || b.H <= 0 {
 			return fmt.Errorf("invalid block dimensions for block %s", b.ID)
@@ -113,5 +141,15 @@ func (s *SpaceService) DeleteBlock(ctx context.Context, blockID uuid.UUID, space
 func generateSlug(name string) string {
 	slug := strings.ToLower(strings.TrimSpace(name))
 	slug = strings.ReplaceAll(slug, " ", "-")
+	// strip any characters that aren't alphanumeric or hyphens
+	slug = nonAlnumRegex.ReplaceAllString(slug, "")
+	// collapse multiple hyphens into one
+	slug = multiDashRegex.ReplaceAllString(slug, "-")
+	slug = strings.Trim(slug, "-")
+
+	if slug == "" {
+		slug = "space"
+	}
+
 	return fmt.Sprintf("%s-%s", slug, uuid.New().String()[:8])
 }

@@ -1,13 +1,15 @@
 package handler
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"io"
+	"log"
 	"net/http"
 
 	"api-golang/internal/middleware"
-	"api-golang/internal/repository"
 	"api-golang/internal/response"
 	"api-golang/internal/service"
 
@@ -37,10 +39,6 @@ func (h *SpaceHandler) CreateSpace(w http.ResponseWriter, r *http.Request) {
 
 	space, err := h.service.CreateSpace(r.Context(), userID, body.Name)
 	if err != nil {
-		if errors.Is(err, repository.ErrSlugConflict) {
-			response.Error(w, http.StatusConflict, "a space with that name already exists")
-			return
-		}
 		response.Error(w, http.StatusInternalServerError, "failed to create space")
 		return
 	}
@@ -113,6 +111,7 @@ func (h *SpaceHandler) DeleteSpace(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
+	log.Printf("SaveBlocks called")
 	userID := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
 	slug := r.PathValue("slug")
 
@@ -126,8 +125,14 @@ func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// debug — remove after
+	body, _ := io.ReadAll(r.Body)
+	log.Printf("SaveBlocks raw body: %s", string(body))
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+
 	var blocks []db.UpsertBlockParams
 	if err := json.NewDecoder(r.Body).Decode(&blocks); err != nil {
+		log.Printf("SaveBlocks decode error: %v", err)
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
