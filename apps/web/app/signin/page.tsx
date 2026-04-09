@@ -43,10 +43,10 @@ export default function SignInPage() {
         {/* Header */}
         <header className="mb-8">
           <span className="block text-accent text-2xl mb-4">Ɛ</span>
-          <h1 className="text-foreground text-[26px] font-semibold tracking-tight leading-snug mb-1">
+          <h1 className="text-foreground text-[26px] font-semibold leading-snug mb-1">
             Welcome back
           </h1>
-          <p className="text-muted-foreground text-sm font-light">
+          <p className="text-muted-foreground text-base">
             Sign in to continue.
           </p>
         </header>

@@ -106,6 +106,9 @@
 
   --shadow-popover: var(--shadow-popover);
 
+  --font-sans: var(--font-neue-montreal);
+  --font-mono: var(--font-fragment-mono);
+
   --animate-fade-in: fade-in var(--tw-duration, 200ms) ease-out;
   --animate-fade-out: fade-out var(--tw-duration, 200ms) ease-out;
 
@@ -139,6 +142,7 @@
 html,
 body {
   height: 100%;
+  font-family: var(--font-neue-montreal);
 }
 
 @layer base {

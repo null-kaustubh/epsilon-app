@@ -1,12 +1,12 @@
 import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Geist, Fragment_Mono } from "next/font/google";
+import { Fragment_Mono } from "next/font/google";
 import clsx from "clsx";
 import ThemeProvider, { Theme } from "../context/ThemeProvider";
 import { cookies } from "next/headers";
+import { neueMontreal } from "../assets/fonts/fonts";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const fragmentMono = Fragment_Mono({
   subsets: ["latin"],
   weight: ["400"],
@@ -32,7 +32,7 @@ export default async function RootLayout({
       className={clsx(
         theme,
         "overflow-hidden antialiased",
-        geist.variable,
+        neueMontreal.variable,
         fragmentMono.variable,
       )}
       data-color-theme={theme}
