@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Canvas from "../../../features/canvas/canvas";
+import TrackRecent from "../../../features/dashboard/components/TrackRecent";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +37,8 @@ export default async function SpacePage({
 
   return (
     <>
+      <TrackRecent slug={data.space.slug} name={data.space.name} />
+
       <div className="hidden pointer-coarse:flex xl:max-[1279px]:flex min-h-dvh items-center justify-center p-8 text-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Desktop only</h2>

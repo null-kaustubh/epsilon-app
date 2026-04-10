@@ -11,8 +11,9 @@
     "db:down": "docker compose down",
     
     "db:migrate": "npx dotenv-cli -e .env.local -- cross-env-shell migrate -path apps/api-golang/internal/db/migrations -database \"$DATABASE_URL\" up",
-    "db:schema": "npx dotenv-cli -e .env.local -- cross-env-shell pg_dump --schema-only --no-owner --no-privileges \"$DATABASE_URL\" -f apps/api-golang/internal/db/schema/schema.sql",
+    "db:schema": "docker exec epsilon-postgres sh -c \"pg_dump --schema-only --no-owner --no-privileges -U postgres epsilon | sed '/^\\\\restrict/d;/^\\\\unrestrict/d'\" > apps/api-golang/internal/db/schema/schema.sql",
     "db:generate": "npx dotenv-cli -e .env.local -- sqlc generate --file apps/api-golang/sqlc.yaml",
+    "db:seed": "go run -C apps/api-golang ./cmd/seed",
     "db:sync": "yarn db:migrate && yarn db:schema && yarn db:generate",
     "db:reset": "yarn db:down && yarn db:up && yarn db:sync",
     
