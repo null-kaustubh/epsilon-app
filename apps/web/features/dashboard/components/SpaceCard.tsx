@@ -1,25 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Space } from "../../../lib/spaces";
 import { cn } from "../../../lib/utils";
 import SpaceMenu from "./SpaceMenu";
+import UndoToast from "./UndoToast";
 
 type SpaceCardProps = {
   space: Space;
   onClick?: () => void;
   onRename?: () => void;
   onDelete?: () => void;
-  variant?: "default" | "compact";
 };
-
-const GRADIENTS = [
-  "from-accent/12 to-accent/4",
-  "from-success/12 to-success/4",
-  "from-link/12 to-link/4",
-  "from-destructive/12 to-destructive/4",
-  "from-ring/12 to-ring/4",
-];
 
 const ICON_COLORS = [
   "bg-accent/20 text-accent",
@@ -50,68 +43,82 @@ export default function SpaceCard({
   onClick,
   onRename,
   onDelete,
-  variant = "default",
 }: SpaceCardProps) {
-  const idx = hashName(space.name) % GRADIENTS.length;
-  const isCompact = variant === "compact";
+  const [pendingDelete, setPendingDelete] = useState(false);
+  const idx = hashName(space.name) % ICON_COLORS.length;
+
+  const handleDeleteRequest = () => setPendingDelete(true);
+
+  const handleUndo = () => setPendingDelete(false);
+
+  const handleExpire = () => {
+    setPendingDelete(false);
+    onDelete?.();
+  };
 
   return (
-    <Link
-      href={`/spaces/${space.slug}`}
-      onClick={onClick}
-      className="group block"
-    >
-      <div
-        className="rounded-xl border border-border bg-secondary hover:border-accent/40
-                    transition-all duration-200 hover:shadow-md overflow-hidden"
+    <>
+      <Link
+        href={`/spaces/${space.slug}`}
+        onClick={onClick}
+        className="group block"
       >
-        {/* Cover */}
         <div
           className={cn(
-            "bg-linear-to-br flex items-center justify-center relative",
-            isCompact ? "h-28" : "h-32",
-            GRADIENTS[idx],
+            "flex items-center gap-3.5 p-2.5 rounded-lg border border-border",
+            "bg-secondary hover:border-accent/60 transition-all duration-200 hover:shadow-sm",
+            pendingDelete && "opacity-40 pointer-events-none",
           )}
         >
-          {/* 3-dot menu */}
-          {(onRename || onDelete) && (
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <SpaceMenu
-                onRename={onRename ?? (() => {})}
-                onDelete={onDelete ?? (() => {})}
-              />
-            </div>
-          )}
-
-          <span
+          {/* Icon thumbnail */}
+          <div
             className={cn(
-              "rounded-xl font-bold flex items-center justify-center",
-              "group-hover:scale-110 transition-transform duration-200",
-              isCompact
-                ? "w-10 h-10 text-lg"
-                : "w-12 h-12 text-xl",
+              "w-11 h-11 rounded-md flex items-center justify-center shrink-0",
               ICON_COLORS[idx],
             )}
           >
-            {space.name.charAt(0).toUpperCase()}
-          </span>
-        </div>
+            <span className="text-lg font-bold">
+              {space.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
 
-        {/* Info */}
-        <div className={isCompact ? "px-3 py-2.5" : "px-4 py-3"}>
-          <h3
-            className={cn(
-              "font-medium text-foreground truncate group-hover:text-accent transition-colors",
-              isCompact ? "text-sm" : "text-[15px]",
+          {/* Text content */}
+          <div className="min-w-0 flex-1">
+            <h3
+              className="text-sm font-medium font-head text-foreground truncate
+                         group-hover:text-accent transition-colors"
+            >
+              {space.name}
+            </h3>
+            {space.description && (
+              <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                {space.description}
+              </p>
             )}
-          >
-            {space.name}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            {timeAgo(space.updated_at)}
-          </p>
+            <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+              {timeAgo(space.updated_at)}
+            </p>
+          </div>
+
+          {/* 3-dot menu */}
+          {(onRename || onDelete) && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-start">
+              <SpaceMenu
+                onRename={onRename ?? (() => {})}
+                onDelete={handleDeleteRequest}
+              />
+            </div>
+          )}
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      {pendingDelete && (
+        <UndoToast
+          spaceName={space.name}
+          onUndo={handleUndo}
+          onExpire={handleExpire}
+        />
+      )}
+    </>
   );
 }

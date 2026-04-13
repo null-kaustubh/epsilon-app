@@ -1,7 +1,7 @@
 import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Fragment_Mono } from "next/font/google";
+import { Fragment_Mono, Playfair_Display } from "next/font/google";
 import clsx from "clsx";
 import ThemeProvider, { Theme } from "../context/ThemeProvider";
 import { cookies } from "next/headers";
@@ -10,7 +10,13 @@ import { neueMontreal } from "../assets/fonts/fonts";
 const fragmentMono = Fragment_Mono({
   subsets: ["latin"],
   weight: ["400"],
-  variable: "--font-mono",
+  variable: "--font-fragment-mono",
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-playfair-display",
 });
 
 export const metadata: Metadata = {
@@ -34,6 +40,7 @@ export default async function RootLayout({
         "overflow-hidden antialiased",
         neueMontreal.variable,
         fragmentMono.variable,
+        playfairDisplay.variable,
       )}
       data-color-theme={theme}
     >

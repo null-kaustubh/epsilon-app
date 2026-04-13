@@ -5,6 +5,7 @@ export type Space = {
   user_id: string;
   name: string;
   slug: string;
+  description?: string;
   created_at: string;
   updated_at: string;
 };
