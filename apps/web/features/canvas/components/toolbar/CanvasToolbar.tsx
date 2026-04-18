@@ -38,7 +38,7 @@ export default function CanvasToolbar({
         className="bg-background backdrop-blur-md flex items-center overflow-hidden border-x border-b border-white/10"
         animate={{
           width: isOpen ? 380 : 72,
-          height: isOpen ? 56 : 28,
+          height: isOpen ? 56 : 32,
           borderWidth: 1,
           borderTopWidth: 0,
           borderStyle: "solid",
@@ -48,15 +48,15 @@ export default function CanvasToolbar({
             : "0 4px 16px rgba(0,0,0,0.25)",
         }}
         style={{
-          borderBottomLeftRadius: isOpen ? 16 : 999,
-          borderBottomRightRadius: isOpen ? 16 : 999,
+          borderBottomLeftRadius: isOpen ? 16 : 20,
+          borderBottomRightRadius: isOpen ? 16 : 20,
         }}
       >
         {/* CLOSED STATE (NOTCH) */}
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="w-full h-full flex items-center justify-center"
+            className="w-full h-full flex items-center justify-center gap-2 px-4"
           >
             <CaretDown size={14} />
           </button>

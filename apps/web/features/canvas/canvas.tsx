@@ -11,6 +11,8 @@ import ThemeToggle from "./components/theme/ThemeToggle";
 import { Space, SpaceBlock } from "../../lib/spaces";
 import { useSaveBlocks } from "./hooks/useSaveBlocks";
 import { CANVAS_MIN_WIDTH_PX } from "./lib/gridConstants";
+import { HouseSimple } from "phosphor-react";
+import Link from "next/link";
 
 type SaveStatus = "saved" | "saving" | "error";
 
@@ -72,6 +74,15 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
         setEditingId={setEditingId}
         onAdd={handleAddBlock}
       />
+
+      <Link
+        href={"/home"}
+        className="fixed top-3 right-18 z-50 p-2 rounded-xl 
+                 bg-background/80 backdrop-blur-md border shadow-sm
+                 hover:bg-muted/70 transition-opacity cursor-pointer"
+      >
+        <HouseSimple size={18} />
+      </Link>
 
       <ThemeToggle />
 

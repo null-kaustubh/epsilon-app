@@ -27,14 +27,15 @@ func (h *SpaceHandler) CreateSpace(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
 
 	var body struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" {
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	space, err := h.service.CreateSpace(r.Context(), userID, body.Name)
+	space, err := h.service.CreateSpace(r.Context(), userID, body.Name, body.Description)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "failed to create space")
 		return
@@ -80,14 +81,16 @@ func (h *SpaceHandler) UpdateSpaceName(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 
 	var body struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		IconUrl     string `json:"icon_url"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" {
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	if err := h.service.UpdateSpaceName(r.Context(), slug, userID, body.Name); err != nil {
+	if err := h.service.UpdateSpaceName(r.Context(), slug, userID, body.Name, body.Description, body.IconUrl); err != nil {
 		response.Error(w, http.StatusInternalServerError, "failed to update space")
 		return
 	}

@@ -15,7 +15,6 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Position the portal menu relative to the trigger button
   const openMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -23,13 +22,12 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
       const rect = triggerRef.current.getBoundingClientRect();
       setCoords({
         top: rect.bottom + window.scrollY + 4,
-        left: rect.right + window.scrollX,
+        left: rect.left + window.scrollX,
       });
     }
     setOpen((v) => !v);
   };
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
@@ -46,7 +44,6 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  // Close on scroll / resize so it doesn't drift
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
@@ -65,26 +62,21 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
         position: "absolute",
         top: coords.top,
         left: coords.left,
-        transform: "translateX(-100%)",
         zIndex: 9999,
         animation: "menuIn 0.1s ease-out both",
       }}
     >
-      <div
-        className="flex items-center gap-0.5 bg-secondary border border-border
-                    rounded-lg shadow-popover p-1"
-      >
+      <div className="flex items-center gap-0.5 bg-secondary border border-border rounded-lg shadow-popover p-1">
         <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setOpen(false);
-            onRename();
+            onRename(); // just calls () => void, no args
           }}
-          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground
-                      hover:bg-muted transition-colors cursor-pointer"
+          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
           aria-label="Rename space"
-          title="Rename"
+          title="Edit"
         >
           <PencilSimple size={14} weight="bold" />
         </button>
@@ -95,19 +87,17 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
             setOpen(false);
             onDelete();
           }}
-          className="p-1.5 rounded-md text-muted-foreground hover:text-destructive
-                      hover:bg-destructive/10 transition-colors cursor-pointer"
+          className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
           aria-label="Delete space"
           title="Delete"
         >
           <Trash size={14} weight="bold" />
         </button>
       </div>
-
       <style>{`
         @keyframes menuIn {
-          from { opacity: 0; transform: translateX(-100%) translateY(-4px); }
-          to   { opacity: 1; transform: translateX(-100%) translateY(0); }
+          from { opacity: 0; transform: translateY(-4px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
@@ -127,7 +117,6 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
           className="text-muted-foreground hover:text-foreground transition-[color]"
         />
       </button>
-
       {typeof document !== "undefined" &&
         menu &&
         createPortal(menu, document.body)}

@@ -41,3 +41,7 @@ export const api = {
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };
+
+export async function logout(): Promise<void> {
+  await api.post("/auth/logout", {});
+}

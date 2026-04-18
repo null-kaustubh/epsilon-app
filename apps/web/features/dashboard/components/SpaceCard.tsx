@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Space } from "../../../lib/spaces";
 import { cn } from "../../../lib/utils";
 import SpaceMenu from "./SpaceMenu";
-import UndoToast from "./UndoToast";
 
 type SpaceCardProps = {
   space: Space;
   onClick?: () => void;
-  onRename?: () => void;
+  onRename?: (name: string, description: string, iconUrl: string) => void;
   onDelete?: () => void;
+  isNew?: boolean;
+  onCancel?: () => void;
+  isPendingDelete?: boolean;
 };
 
 const ICON_COLORS = [
@@ -43,81 +45,219 @@ export default function SpaceCard({
   onClick,
   onRename,
   onDelete,
+  isNew,
+  onCancel,
+  isPendingDelete,
 }: SpaceCardProps) {
-  const [pendingDelete, setPendingDelete] = useState(false);
+  const [renaming, setRenaming] = useState(isNew ?? false);
+  const [draftName, setDraftName] = useState(space.name);
+  const [draftDesc, setDraftDesc] = useState(space.description ?? "");
+  const nameRef = useRef<HTMLInputElement>(null);
   const idx = hashName(space.name) % ICON_COLORS.length;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [draftIcon, setDraftIcon] = useState(space.icon_url ?? "");
+  const fileRef = useRef<HTMLInputElement>(null);
+  const isPickingFile = useRef(false);
 
-  const handleDeleteRequest = () => setPendingDelete(true);
+  const handleDeleteRequest = () => onDelete?.();
 
-  const handleUndo = () => setPendingDelete(false);
-
-  const handleExpire = () => {
-    setPendingDelete(false);
-    onDelete?.();
+  const startRename = () => {
+    setDraftName(space.name);
+    setDraftDesc(space.description ?? "");
+    setDraftIcon(space.icon_url ?? "");
+    setRenaming(true);
+    // focus name input after render
+    setTimeout(() => nameRef.current?.focus(), 0);
   };
 
-  return (
-    <>
-      <Link
-        href={`/spaces/${space.slug}`}
-        onClick={onClick}
-        className="group block"
-      >
-        <div
-          className={cn(
-            "flex items-center gap-3.5 p-2.5 rounded-lg border border-border",
-            "bg-secondary hover:border-accent/60 transition-all duration-200 hover:shadow-sm",
-            pendingDelete && "opacity-40 pointer-events-none",
-          )}
-        >
-          {/* Icon thumbnail */}
-          <div
-            className={cn(
-              "w-11 h-11 rounded-md flex items-center justify-center shrink-0",
-              ICON_COLORS[idx],
-            )}
-          >
-            <span className="text-lg font-bold">
-              {space.name.charAt(0).toUpperCase()}
-            </span>
-          </div>
+  const handleBlur = (e: React.FocusEvent) => {
+    if (isPickingFile.current) return;
+    if (containerRef.current?.contains(e.relatedTarget as Node)) return;
+    commitRename(draftName, draftDesc, draftIcon);
+  };
 
-          {/* Text content */}
-          <div className="min-w-0 flex-1">
-            <h3
-              className="text-sm font-medium font-head text-foreground truncate
-                         group-hover:text-accent transition-colors"
-            >
+  const commitRename = (
+    name = draftName,
+    desc = draftDesc,
+    icon = draftIcon,
+  ) => {
+    setRenaming(false);
+    const trimName = name.trim();
+    if (!trimName) {
+      if (isNew) {
+        onCancel?.();
+        return;
+      }
+      setDraftName(space.name);
+      setDraftDesc(space.description ?? "");
+      setDraftIcon(space.icon_url ?? "");
+      return;
+    }
+
+    // skip if nothing changed
+    const unchanged =
+      trimName === space.name &&
+      desc.trim() === (space.description ?? "") &&
+      icon === (space.icon_url ?? "");
+    if (unchanged) return;
+
+    onRename?.(trimName, desc.trim(), icon);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commitRename();
+    }
+    if (e.key === "Escape") {
+      if (isNew) {
+        onCancel?.();
+        return;
+      }
+      setDraftName(space.name);
+      setDraftDesc(space.description ?? "");
+      setDraftIcon(space.icon_url ?? "");
+      setRenaming(false);
+    }
+    e.stopPropagation();
+  };
+
+  const cardContent = (
+    <div
+      className={cn(
+        "flex items-start gap-3 p-3 rounded-lg border border-border w-full",
+        "bg-secondary hover:border-accent/60 transition-[color] duration-200 hover:shadow-sm",
+        renaming && "border-accent/60",
+        isPendingDelete && "opacity-40 pointer-events-none",
+      )}
+    >
+      {/* Icon thumbnail */}
+      <div
+        className={cn(
+          "w-23 h-23 rounded-md flex items-center justify-center shrink-0 overflow-hidden relative",
+          !draftIcon && !space.icon_url && ICON_COLORS[idx],
+          renaming && "cursor-pointer",
+        )}
+        onMouseDown={
+          renaming
+            ? (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isPickingFile.current = true;
+                fileRef.current?.click();
+              }
+            : undefined
+        }
+      >
+        {(renaming ? draftIcon : space.icon_url) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={(renaming ? draftIcon : space.icon_url) as string}
+            alt={space.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-xl font-bold">
+            {space.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+        {renaming && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+            <span className="text-white text-[10px] font-medium">edit</span>
+          </div>
+        )}
+      </div>
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          isPickingFile.current = false;
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result =
+              typeof reader.result === "string" ? reader.result : "";
+            if (result) setDraftIcon(result);
+          };
+          reader.readAsDataURL(file);
+
+          e.target.value = "";
+        }}
+        onBlur={() => {
+          isPickingFile.current = false;
+        }}
+      />
+
+      {/* Text content */}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        {renaming ? (
+          <div
+            ref={containerRef}
+            className="flex flex-col gap-1"
+            onClick={(e) => e.preventDefault()}
+          >
+            <input
+              ref={nameRef}
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              placeholder="Space name"
+              className="text-base font-semibold font-head text-foreground bg-transparent border-b border-border focus:border-accent/40 outline-none w-full placeholder:text-muted-foreground/40"
+            />
+            <input
+              value={draftDesc}
+              onChange={(e) => setDraftDesc(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              placeholder="Add a description…"
+              className="text-sm text-muted-foreground bg-transparent border-b border-border outline-none w-full mt-0.5 placeholder:text-muted-foreground/30 focus:border-accent/40 transition-[color]"
+            />
+          </div>
+        ) : (
+          <>
+            <h3 className="text-base font-semibold font-head text-foreground truncate group-hover:text-accent transition-[color]">
               {space.name}
             </h3>
             {space.description && (
-              <p className="text-xs text-muted-foreground mt-0.5 truncate">
+              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2 wrap-break-word">
                 {space.description}
               </p>
             )}
-            <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+            <p className="text-[11px] text-muted-foreground mt-1">
               {timeAgo(space.updated_at)}
             </p>
-          </div>
+          </>
+        )}
+      </div>
 
-          {/* 3-dot menu */}
-          {(onRename || onDelete) && (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 self-start">
-              <SpaceMenu
-                onRename={onRename ?? (() => {})}
-                onDelete={handleDeleteRequest}
-              />
-            </div>
-          )}
+      {/* 3-dot menu */}
+      {(onRename || onDelete) && !renaming && (
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">
+          <SpaceMenu onRename={startRename} onDelete={handleDeleteRequest} />
         </div>
-      </Link>
+      )}
+    </div>
+  );
 
-      {pendingDelete && (
-        <UndoToast
-          spaceName={space.name}
-          onUndo={handleUndo}
-          onExpire={handleExpire}
-        />
+  return (
+    <>
+      {renaming ? (
+        // Not a link while editing so clicks don't navigate
+        <div className="group block">{cardContent}</div>
+      ) : (
+        <Link
+          href={`/spaces/${space.slug}`}
+          onClick={onClick}
+          className="group block"
+        >
+          {cardContent}
+        </Link>
       )}
     </>
   );

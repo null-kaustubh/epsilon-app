@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "epsilon:recent-spaces";
-const MAX_RECENTS = 3;
+const MAX_RECENTS = 5;
 
 export type RecentSpace = {
   slug: string;
@@ -27,9 +27,11 @@ function save(recents: RecentSpace[]) {
 
 export function useRecents() {
   const [recents, setRecents] = useState<RecentSpace[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setRecents(load());
+    setHydrated(true);
   }, []);
 
   const addRecent = useCallback((slug: string, name: string) => {
@@ -44,5 +46,13 @@ export function useRecents() {
     });
   }, []);
 
-  return { recents, addRecent };
+  const removeRecent = useCallback((slug: string) => {
+    setRecents((prev) => {
+      const next = prev.filter((r) => r.slug !== slug);
+      save(next);
+      return next;
+    });
+  }, []);
+
+  return { recents, addRecent, removeRecent, hydrated };
 }

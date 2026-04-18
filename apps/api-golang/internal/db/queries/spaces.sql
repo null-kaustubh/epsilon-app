@@ -1,6 +1,6 @@
 -- name: CreateSpace :one
-INSERT INTO spaces (id, user_id, name, slug)
-VALUES ($1, $2, $3, $4)
+INSERT INTO spaces (id, user_id, name, slug, description, icon_url)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 
 -- name: GetSpaceBySlug :one
@@ -14,8 +14,8 @@ ORDER BY created_at DESC;
 
 -- name: UpdateSpaceName :execrows
 UPDATE spaces
-SET name = $1, updated_at = NOW()
-WHERE slug = $2 AND user_id = $3;
+SET name = $1, description = $2, icon_url = $3, updated_at = NOW()
+WHERE slug = $4 AND user_id = $5;
 
 -- name: DeleteSpace :execrows
 DELETE FROM spaces

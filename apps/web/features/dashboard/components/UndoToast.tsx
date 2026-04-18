@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { ArrowCounterClockwise } from "phosphor-react";
 
 type UndoToastProps = {
@@ -20,6 +19,11 @@ export default function UndoToast({
   const [progress, setProgress] = useState(100);
   const startRef = useRef<number>(Date.now());
   const rafRef = useRef<number>(0);
+  const onExpireRef = useRef(onExpire);
+
+  useEffect(() => {
+    onExpireRef.current = onExpire;
+  }, [onExpire]);
 
   useEffect(() => {
     const tick = () => {
@@ -32,53 +36,47 @@ export default function UndoToast({
     };
     rafRef.current = requestAnimationFrame(tick);
 
-    const timer = setTimeout(onExpire, duration);
+    const timer = setTimeout(() => onExpireRef.current(), duration);
     return () => {
       cancelAnimationFrame(rafRef.current!);
       clearTimeout(timer);
     };
-  }, [duration, onExpire]);
+  }, [duration]);
 
-  return createPortal(
-    <div
-      className="fixed bottom-5 left-0 right-0 z-9999 flex justify-center pointer-events-none"
-      style={{ animation: "toastIn 0.2s ease-out both" }}
-    >
+  // UndoToast — return just the toast div, no portal, no fixed:
+  return (
+    <>
       <div
         className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl
-                    bg-secondary border border-border shadow-popover overflow-hidden
-                    min-w-65 max-w-sm pointer-events-auto"
+                  bg-secondary border border-border shadow-popover overflow-hidden
+                  min-w-65 max-w-sm pointer-events-auto"
+        style={{ animation: "toastIn 0.2s ease-out both" }}
       >
-        {/* Progress bar */}
         <div
           className="absolute bottom-0 left-0 h-0.5 bg-destructive/50 transition-none"
           style={{ width: `${progress}%` }}
         />
-
         <span className="text-sm text-muted-foreground flex-1 truncate">
           <span className="text-foreground font-medium">
             &quot;{spaceName}&quot;
           </span>{" "}
           deleted
         </span>
-
         <button
           onClick={onUndo}
           className="flex items-center gap-1.5 text-xs font-medium text-accent
-                      hover:text-accent/80 transition-colors cursor-pointer shrink-0"
+                    hover:text-accent/80 transition-colors cursor-pointer shrink-0"
         >
           <ArrowCounterClockwise size={13} weight="bold" />
           Undo
         </button>
       </div>
-
       <style>{`
-        @keyframes toastIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-    </div>,
-    document.body,
+      @keyframes toastIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    `}</style>
+    </>
   );
 }

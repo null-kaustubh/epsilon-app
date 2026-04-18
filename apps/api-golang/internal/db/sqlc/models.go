@@ -36,12 +36,14 @@ type Session struct {
 }
 
 type Space struct {
-	ID        uuid.UUID `json:"id"`
-	UserID    uuid.UUID `json:"user_id"`
-	Name      string    `json:"name"`
-	Slug      string    `json:"slug"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID          uuid.UUID `json:"id"`
+	UserID      uuid.UUID `json:"user_id"`
+	Name        string    `json:"name"`
+	Slug        string    `json:"slug"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Description string    `json:"description"`
+	IconUrl     string    `json:"icon_url"`
 }
 
 type User struct {

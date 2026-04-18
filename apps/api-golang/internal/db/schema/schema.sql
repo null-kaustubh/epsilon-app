@@ -71,7 +71,9 @@ CREATE TABLE public.spaces (
     name text DEFAULT 'Untitled'::text NOT NULL,
     slug text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    icon_url text DEFAULT ''::text NOT NULL
 );
 
 
