@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import HomeContent from "../../features/dashboard/components/HomeContent";
 import { Space } from "../../lib/spaces";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,9 @@ async function getSpaces(session: string): Promise<Space[]> {
   }
 }
 
-async function getUser(session: string): Promise<{ id: string; email: string } | null> {
+async function getUser(
+  session: string,
+): Promise<{ id: string; email: string; username: string } | null> {
   try {
     const res = await fetch(`${process.env.API_URL}/auth/me`, {
       headers: { Cookie: `session_id=${session}` },
@@ -39,6 +42,11 @@ async function getUser(session: string): Promise<{ id: string; email: string } |
 
 export default async function HomePage() {
   const session = await getSession();
-  const [spaces, user] = await Promise.all([getSpaces(session), getUser(session)]);
-  return <HomeContent initialSpaces={spaces} userEmail={user?.email ?? ""} />;
+  if (!session) redirect("/signin");
+  const [spaces, user] = await Promise.all([
+    getSpaces(session),
+    getUser(session),
+  ]);
+  if (!user) redirect("/signin");
+  return <HomeContent initialSpaces={spaces} username={user.username} />;
 }

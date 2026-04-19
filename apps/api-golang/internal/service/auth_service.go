@@ -17,6 +17,8 @@ import (
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrWeakPassword       = errors.New("password does not meet requirements")
+	ErrInvalidUsername    = errors.New("invalid username")
+	ErrUsernameTaken      = errors.New("username already taken")
 )
 
 // --- INTERFACE ---
@@ -29,6 +31,7 @@ type AuthRepository interface {
 	GetSession(ctx context.Context, id string) (db.Session, error)
 	DeleteSession(ctx context.Context, id string) error
 	DeleteSessionsByUserID(ctx context.Context, userID uuid.UUID) error
+	CheckUsernameExists(ctx context.Context, username string) (bool, error)
 }
 
 type AuthService struct {
@@ -40,13 +43,14 @@ func NewAuthService(repo AuthRepository) *AuthService {
 }
 
 var (
-	upper = regexp.MustCompile(`[A-Z]`)
-	lower = regexp.MustCompile(`[a-z]`)
-	num   = regexp.MustCompile(`[0-9]`)
-	spec  = regexp.MustCompile(`[^A-Za-z0-9]`)
+	upper         = regexp.MustCompile(`[A-Z]`)
+	lower         = regexp.MustCompile(`[a-z]`)
+	num           = regexp.MustCompile(`[0-9]`)
+	spec          = regexp.MustCompile(`[^A-Za-z0-9]`)
+	usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]{3,30}$`)
 )
 
-// --- PASSWORD VALIDATION ---
+// --- PASSWORD & USERNAME VALIDATION ---
 
 func validatePassword(password string) error {
 	if len(password) < 8 {
@@ -60,6 +64,13 @@ func validatePassword(password string) error {
 		return ErrWeakPassword
 	}
 
+	return nil
+}
+
+func validateUsername(username string) error {
+	if !usernameRegex.MatchString(username) {
+		return ErrInvalidUsername
+	}
 	return nil
 }
 
@@ -100,15 +111,28 @@ func generateSessionID() (string, error) {
 
 // --- REGISTER ---
 
-func (s *AuthService) Register(ctx context.Context, email, password string) (db.User, string, error) {
+func (s *AuthService) Register(ctx context.Context, email, password, username string) (db.User, string, error) {
 	if err := validatePassword(password); err != nil {
 		return db.User{}, "", err
+	}
+
+	if err := validateUsername(username); err != nil {
+		return db.User{}, "", err
+	}
+
+	exists, err := s.repo.CheckUsernameExists(ctx, username)
+	if err != nil {
+		return db.User{}, "", err
+	}
+	if exists {
+		return db.User{}, "", ErrUsernameTaken
 	}
 
 	user := db.User{
 		ID:           uuid.New(),
 		Email:        email,
 		PasswordHash: hashPassword(password),
+		Username:     username,
 		CreatedAt:    time.Now(),
 	}
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Space } from "../../../lib/spaces";
 import { cn } from "../../../lib/utils";
 import SpaceMenu from "./SpaceMenu";
+import { X } from "phosphor-react";
 
 type SpaceCardProps = {
   space: Space;
@@ -241,6 +242,22 @@ export default function SpaceCard({
         <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">
           <SpaceMenu onRename={startRename} onDelete={handleDeleteRequest} />
         </div>
+      )}
+
+      {isNew && (
+        <button
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onCancel?.();
+          }}
+          className="shrink-0 self-start mt-0.5 p-1.5 rounded-md 
+               text-muted-foreground hover:text-destructive 
+               hover:bg-destructive/10 transition-colors cursor-pointer"
+          aria-label="Cancel"
+        >
+          <X size={14} weight="bold" />
+        </button>
       )}
     </div>
   );

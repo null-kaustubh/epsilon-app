@@ -38,6 +38,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
     handleBlockGrow,
     handleChangeContent,
     handleDeleteBlock,
+    savedBlockIdsRef,
   } = useCanvasBlocks(initialBlocks, space.slug);
 
   const handleStatusChange = useCallback((status: SaveStatus) => {
@@ -49,6 +50,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
     spaceId: space.id,
     blocks,
     layoutsRef,
+    savedBlockIdsRef,
     onStatusChange: handleStatusChange,
   });
 

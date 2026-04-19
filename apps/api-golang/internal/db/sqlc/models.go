@@ -51,4 +51,5 @@ type User struct {
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"password_hash"`
 	CreatedAt    time.Time `json:"created_at"`
+	Username     string    `json:"username"`
 }

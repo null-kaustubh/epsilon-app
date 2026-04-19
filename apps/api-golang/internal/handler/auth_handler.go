@@ -16,7 +16,13 @@ func NewAuthHandler(s *service.AuthService) *AuthHandler {
 	return &AuthHandler{service: s}
 }
 
-type credentials struct {
+type registerRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+type loginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
@@ -24,13 +30,13 @@ type credentials struct {
 // --- REGISTER ---
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var req credentials
+	var req registerRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	user, sessionID, err := h.service.Register(r.Context(), req.Email, req.Password)
+	user, sessionID, err := h.service.Register(r.Context(), req.Email, req.Password, req.Username)
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, err.Error())
 		return
@@ -39,15 +45,16 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	setSessionCookie(w, sessionID)
 
 	response.JSON(w, http.StatusOK, map[string]string{
-		"id":    user.ID.String(),
-		"email": user.Email,
+		"id":       user.ID.String(),
+		"email":    user.Email,
+		"username": user.Username,
 	})
 }
 
 // --- LOGIN ---
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	var req credentials
+	var req loginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
@@ -100,8 +107,9 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.JSON(w, http.StatusOK, map[string]string{
-		"id":    user.ID.String(),
-		"email": user.Email,
+		"id":       user.ID.String(),
+		"email":    user.Email,
+		"username": user.Username,
 	})
 }
 
@@ -115,5 +123,6 @@ func setSessionCookie(w http.ResponseWriter, sessionID string) {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Secure:   false,
+		MaxAge:   7 * 24 * 60 * 60,
 	})
 }

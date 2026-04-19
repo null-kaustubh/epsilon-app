@@ -9,6 +9,12 @@ export class ApiError extends Error {
   }
 }
 
+export type AuthUser = {
+  id: string;
+  email: string;
+  username: string;
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
@@ -44,4 +50,12 @@ export const api = {
 
 export async function logout(): Promise<void> {
   await api.post("/auth/logout", {});
+}
+
+export async function register(
+  email: string,
+  password: string,
+  username: string,
+): Promise<AuthUser> {
+  return api.post<AuthUser>("/auth/register", { email, password, username });
 }

@@ -85,7 +85,8 @@ CREATE TABLE public.users (
     id uuid NOT NULL,
     email text NOT NULL,
     password_hash text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    username text DEFAULT ''::text NOT NULL
 );
 
 
@@ -170,6 +171,13 @@ CREATE INDEX idx_spaces_user_id ON public.spaces USING btree (user_id);
 --
 
 CREATE UNIQUE INDEX users_email_unique ON public.users USING btree (lower(email));
+
+
+--
+-- Name: users_username_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_username_unique ON public.users USING btree (lower(username));
 
 
 --
