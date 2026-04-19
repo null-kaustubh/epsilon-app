@@ -1,5 +1,3 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
-
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -16,6 +14,7 @@ export type AuthUser = {
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     credentials: "include",
