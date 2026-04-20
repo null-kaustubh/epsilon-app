@@ -1,7 +1,7 @@
 import React from "react";
 import { Responsive } from "react-grid-layout/legacy";
 import { Layout } from "react-grid-layout/legacy";
-import { Block } from "../lib/createBlockHelper";
+import { Block, BlockStyle } from "../lib/createBlockHelper";
 import { ROW_HEIGHT, MARGIN, CONTAINER_PADDING } from "../lib/gridConstants";
 import CanvasBlockItem from "./canvasBlockItem";
 
@@ -18,6 +18,7 @@ interface CanvasGridProps {
   onInteractionStop: () => void;
   onBlockGrow: (id: string, heightPx: number) => void;
   onChangeContent: (id: string, next: string) => void;
+  onChangeBlockStyle: (id: string, style: BlockStyle) => void;
   onDeleteBlock: (id: string) => void;
   isDraggable?: boolean;
   mode: "cursor" | "delete";
@@ -34,6 +35,7 @@ function CanvasGrid({
   onInteractionStop,
   onBlockGrow,
   onChangeContent,
+  onChangeBlockStyle,
   onDeleteBlock,
   isDraggable = true,
   mode,
@@ -45,7 +47,6 @@ function CanvasGrid({
       className="layout canvas-grid"
       width={containerWidth}
       layouts={layouts}
-      measureBeforeMount={true}
       onLayoutChange={onLayoutChange}
       onDragStart={() => onInteractionStart()}
       onDragStop={() => onInteractionStop()}
@@ -76,6 +77,7 @@ function CanvasGrid({
             onStartEditingAction={setEditingId}
             onStopEditingAction={() => setEditingId(null)}
             onChangeContentAction={onChangeContent}
+            onChangeBlockStyleAction={onChangeBlockStyle}
             onGrowAction={onBlockGrow}
           />
         </div>

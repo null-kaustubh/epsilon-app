@@ -2,6 +2,11 @@ import { BLOCK_W, CODE_BLOCK_W } from "./gridConstants";
 import { initialBlockH } from "./blockToLayout";
 import { v4 as uuidv4 } from "uuid";
 
+export type BlockStyle = {
+  fontSize?: number;
+  color?: string;
+};
+
 export type Block = {
   id: string;
   type: "note" | "code" | "todo" | "image" | "markdown";
@@ -10,6 +15,7 @@ export type Block = {
   w: number;
   h: number;
   content: string;
+  style?: BlockStyle;
 };
 
 /**

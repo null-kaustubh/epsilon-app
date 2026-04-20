@@ -5,6 +5,7 @@ import { BaseEditorProps } from "../lib/blockRegistry";
 
 export default function TextBlockEditor({
   value,
+  blockStyle,
   onChangeAction,
   onGrowAction,
   onRequestCloseAction,
@@ -60,7 +61,11 @@ export default function TextBlockEditor({
           if (e.key === "Escape") onRequestCloseAction();
         }}
         className="block-editor w-full resize-none overflow-hidden bg-transparent p-4 text-sm leading-5 text-foreground whitespace-pre-wrap wrap-break-word outline-none"
-        style={{ height: "auto" }}
+        style={{
+          height: "auto",
+          fontSize: blockStyle?.fontSize,
+          color: blockStyle?.color,
+        }}
         spellCheck={false}
         aria-label="Text block"
       />

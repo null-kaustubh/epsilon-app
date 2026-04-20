@@ -35,7 +35,8 @@ CREATE TABLE public.blocks (
     w integer DEFAULT 4 NOT NULL,
     h integer DEFAULT 3 NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    style jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 

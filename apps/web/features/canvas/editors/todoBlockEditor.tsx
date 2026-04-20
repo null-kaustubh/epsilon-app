@@ -11,6 +11,7 @@ import {
 
 export default function TodoBlockEditor({
   value,
+  blockStyle,
   onChangeAction,
   onGrowAction,
   onRequestCloseAction,
@@ -94,6 +95,7 @@ export default function TodoBlockEditor({
           value={payload.title}
           onChange={(e) => persist({ ...payload, title: e.target.value })}
           className="block-editor w-full bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground"
+          style={{ fontSize: blockStyle?.fontSize, color: blockStyle?.color }}
           placeholder="List name"
           spellCheck={false}
           aria-label="Todo block title"
@@ -130,6 +132,7 @@ export default function TodoBlockEditor({
                     ? "text-muted-foreground line-through"
                     : "text-foreground"
                 }`}
+                style={{ fontSize: blockStyle?.fontSize, color: blockStyle?.color }}
                 placeholder="Todo…"
                 spellCheck={false}
                 aria-label="Todo text"

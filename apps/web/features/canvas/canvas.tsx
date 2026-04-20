@@ -37,6 +37,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
     handleAddBlock,
     handleBlockGrow,
     handleChangeContent,
+    handleChangeBlockStyle,
     handleDeleteBlock,
     savedBlockIdsRef,
   } = useCanvasBlocks(initialBlocks, space.slug);
@@ -106,6 +107,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
               onInteractionStop={handleInteractionStop}
               onBlockGrow={handleBlockGrow}
               onChangeContent={handleChangeContent}
+              onChangeBlockStyle={handleChangeBlockStyle}
               onDeleteBlock={handleDeleteBlock}
               mode={mode}
               isDraggable

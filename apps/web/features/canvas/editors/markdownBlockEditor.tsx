@@ -1,14 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { BaseEditorProps } from "../lib/blockRegistry";
+import type { MarkdownEditorHandle } from "../components/blockEditToolbar";
 
-export default function MarkdownBlockEditor({
-  value,
-  onChangeAction,
-  onGrowAction,
-  onRequestCloseAction,
-}: BaseEditorProps) {
+const MarkdownBlockEditor = forwardRef<MarkdownEditorHandle, BaseEditorProps>(function MarkdownBlockEditor(
+  { value, blockStyle, onChangeAction, onGrowAction, onRequestCloseAction },
+  ref,
+) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [draftValue, setDraftValue] = useState(value);
 
@@ -94,6 +93,8 @@ export default function MarkdownBlockEditor({
     });
   };
 
+  useImperativeHandle(ref, () => ({ wrapSelection, insertAtLineStart }));
+
   return (
     <div className="relative w-full">
       <textarea
@@ -146,10 +147,16 @@ export default function MarkdownBlockEditor({
           }
         }}
         className="block-editor w-full resize-none overflow-hidden bg-transparent p-4 text-sm leading-5 text-foreground whitespace-pre-wrap wrap-break-word outline-none"
-        style={{ height: "auto" }}
+        style={{
+          height: "auto",
+          fontSize: blockStyle?.fontSize,
+          color: blockStyle?.color,
+        }}
         spellCheck={false}
         aria-label="Markdown block"
       />
     </div>
   );
-}
+});
+
+export default MarkdownBlockEditor;

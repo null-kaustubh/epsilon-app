@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Layout } from "react-grid-layout/legacy";
-import { Block, createBlock } from "../lib/createBlockHelper";
+import { Block, BlockStyle, createBlock } from "../lib/createBlockHelper";
 import {
   blockToLayout,
   findNextAvailablePosition,
@@ -24,6 +24,7 @@ function blocksFromDB(dbBlocks: SpaceBlock[]): {
     y: b.y,
     w: b.w,
     h: b.h,
+    style: (b.style as BlockStyle | undefined) ?? undefined,
   }));
 
   const lg: Layout = blocks.map((b) => blockToLayout(b));
@@ -179,6 +180,15 @@ export function useCanvasBlocks(
     );
   }, []);
 
+  const handleChangeBlockStyle = useCallback(
+    (id: string, style: BlockStyle) => {
+      setBlocks((prev) =>
+        prev.map((block) => (block.id === id ? { ...block, style } : block)),
+      );
+    },
+    [],
+  );
+
   const handleDeleteBlock = useCallback(
     async (id: string) => {
       // Remove only the clicked block item + its layout entry.
@@ -223,6 +233,7 @@ export function useCanvasBlocks(
     handleAddBlock,
     handleBlockGrow,
     handleChangeContent,
+    handleChangeBlockStyle,
     handleDeleteBlock,
     savedBlockIdsRef,
   };

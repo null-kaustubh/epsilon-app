@@ -12,6 +12,7 @@ import {
 export default function TodoBlockView({
   blockId,
   content,
+  blockStyle,
   onGrowAction,
   onChangeContentAction,
 }: BaseViewProps) {
@@ -70,7 +71,10 @@ export default function TodoBlockView({
       className="flex h-full min-h-0 flex-col overflow-hidden rounded-lg bg-secondary select-none p-1"
     >
       <header className="shrink-0 px-2 py-2">
-        <span className="block truncate text-sm font-medium text-foreground">
+        <span
+          className="block truncate text-sm font-medium text-foreground"
+          style={{ fontSize: blockStyle?.fontSize, color: blockStyle?.color }}
+        >
           {payload.title || "Todo list"}
         </span>
       </header>
@@ -100,6 +104,7 @@ export default function TodoBlockView({
                     ? "text-muted-foreground line-through"
                     : "text-foreground"
                 }`}
+                style={{ fontSize: blockStyle?.fontSize, color: blockStyle?.color }}
               >
                 {item.text || "\u00a0"}
               </span>
