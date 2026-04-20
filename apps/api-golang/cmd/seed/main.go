@@ -59,17 +59,17 @@ func main() {
 
 	// --- Users ---
 	_, err = tx.Exec(
-		`INSERT INTO users (id, email, password_hash) VALUES ($1, $2, $3)`,
-		test_user1, "test@epsilon.app", hashPassword("Demo1234!"),
+		`INSERT INTO users (id, email, password_hash, username) VALUES ($1, $2, $3, $4)`,
+		test_user1, "test@epsilon.app", hashPassword("Demo1234!"), "test",
 	)
 	if err != nil {
 		tx.Rollback()
 		log.Fatal("failed to create user 1:", err)
 	}
-
+	
 	_, err = tx.Exec(
-		`INSERT INTO users (id, email, password_hash) VALUES ($1, $2, $3)`,
-		test_user2, "contributor@epsilon.app", hashPassword("Contrib1234!"),
+		`INSERT INTO users (id, email, password_hash, username) VALUES ($1, $2, $3, $4)`,
+		test_user2, "contributor@epsilon.app", hashPassword("Contrib1234!"), "contributor",
 	)
 	if err != nil {
 		tx.Rollback()
@@ -93,8 +93,8 @@ func main() {
 		typ, content        string
 		x, y, w, h         int
 	}{
-		{block1ID, "text", "Welcome to Epsilon! This is a demo space for contributors.", 0, 0, 6, 2},
-		{block2ID, "text", "Try dragging and resizing blocks on the canvas.", 0, 2, 4, 2},
+		{block1ID, "note", "Welcome to Epsilon! This is a demo space for contributors.", 0, 0, 6, 2},
+		{block2ID, "note", "Try dragging and resizing blocks on the canvas.", 0, 2, 4, 2},
 		{block3ID, "code", "console.log('Hello, Epsilon!');", 4, 2, 4, 3},
 	}
 
@@ -117,7 +117,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("  Demo accounts:")
 	fmt.Println("  ┌─────────────────────────────────────────────────┐")
-	fmt.Println("  │  test@epsilon.app          / Demo1234!           │")
-	fmt.Println("  │  contributor@epsilon.dev   / Contrib1234!       │")
+	fmt.Println("  │  test@epsilon.app          / Demo1234!          │")
+	fmt.Println("  │  contributor@epsilon.app   / Contrib1234!       │")
 	fmt.Println("  └─────────────────────────────────────────────────┘")
 }
