@@ -28,6 +28,7 @@ func (r *PostgresAuthRepository) CreateUser(ctx context.Context, user db.User) e
 		ID:           user.ID,
 		Email:        user.Email,
 		PasswordHash: user.PasswordHash,
+		Username:     user.Username,
 	})
 	if err != nil {
 		// postgres unique violation code
@@ -37,6 +38,21 @@ func (r *PostgresAuthRepository) CreateUser(ctx context.Context, user db.User) e
 		return err
 	}
 	return nil
+}
+
+func (r *PostgresAuthRepository) CheckUsernameExists(ctx context.Context, username string) (bool, error) {
+	return r.queries.CheckUsernameExists(ctx, username)
+}
+
+func (r *PostgresAuthRepository) GetUserByUsername(ctx context.Context, username string) (db.User, error) {
+	u, err := r.queries.GetUserByUsername(ctx, username)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return db.User{}, ErrUserNotFound
+		}
+		return db.User{}, err
+	}
+	return u, nil
 }
 
 func (r *PostgresAuthRepository) GetUserByEmail(ctx context.Context, email string) (db.User, error) {

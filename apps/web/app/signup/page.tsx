@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeClosed } from "phosphor-react";
-import { api, ApiError } from "../../lib/api";
+import { ApiError, register } from "../../lib/api";
 
 const checks = [
   {
@@ -40,17 +40,18 @@ export default function SignUpPage() {
   const passwordMeta = checks.map((c) => ({ ...c, passed: c.test(password) }));
   const allPassed = passwordMeta.every((c) => c.passed);
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const canSubmit = isEmailValid && allPassed;
+
+  const [username, setUsername] = useState("");
+  const isUsernameValid = /^[a-zA-Z0-9_]{3,30}$/.test(username);
+
+  const canSubmit = isEmailValid && allPassed && isUsernameValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
     setLoading(true);
     try {
-      await api.post<{ id: string; email: string }>("/auth/register", {
-        email,
-        password,
-      });
+      await register(email, password, username);
 
       // backend sets the session cookie via Set-Cookie header — nothing to do manually
       router.push("/home");
@@ -128,6 +129,50 @@ export default function SignUpPage() {
                 </span>
               )}
             </div>
+          </div>
+
+          {/* ── Username ── */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-foreground text-[13px] font-medium tracking-wide">
+              Username
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                autoComplete="username"
+                placeholder="yourname"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setError(null);
+                }}
+                className="w-full bg-muted text-foreground
+                 placeholder:text-muted-foreground/50
+                 border border-border rounded-md
+                 px-3.5 py-2.75 pr-9 text-sm
+                 outline-none caret-accent
+                 transition-all duration-200
+                 focus:bg-background
+                 focus:border-accent
+                 focus:ring-2 focus:ring-accent/20"
+              />
+              {username.length > 0 && (
+                <span
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold
+                    ${isUsernameValid ? "text-success" : "text-destructive"}`}
+                  style={{
+                    animation: "popIn 0.2s cubic-bezier(0.34,1.56,0.64,1) both",
+                  }}
+                >
+                  {isUsernameValid ? "✓" : "!"}
+                </span>
+              )}
+            </div>
+            {username.length > 0 && !isUsernameValid && (
+              <p className="text-[11px] text-muted-foreground">
+                3–30 chars, letters, numbers, underscore only
+              </p>
+            )}
           </div>
 
           {/* ── Password ── */}

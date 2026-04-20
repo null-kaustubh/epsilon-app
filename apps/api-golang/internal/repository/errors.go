@@ -15,4 +15,7 @@ var (
 
 	ErrInvalidSpaceName = errors.New("invalid space name")
 	ErrSpaceNameTooLong = errors.New("space name too long")
+
+	ErrUsernameTaken   = errors.New("username already taken")
+	ErrInvalidUsername = errors.New("invalid username")
 )

@@ -116,14 +116,14 @@ export default function ImageBlockEditor({
             <button
               type="button"
               onClick={openPicker}
-              className="absolute top-2.5 right-2.5 flex items-center justify-center p-3 rounded-full bg-muted/90 hover:bg-muted transition"
+              className="absolute top-2.5 right-2.5 flex items-center justify-center p-3 rounded-full bg-muted/90 hover:bg-muted transition-[color]"
             >
               <Plus size={16} />
             </button>
             <button
               type="button"
               onClick={onRequestCloseAction}
-              className="absolute bottom-2.5 right-2.5 p-3 flex items-center justify-center rounded-full bg-muted/90 hover:bg-muted transition"
+              className="absolute bottom-2.5 right-2.5 p-3 flex items-center justify-center rounded-full bg-muted/90 hover:bg-muted transition-[color]"
             >
               <Check size={16} />
             </button>
@@ -133,7 +133,7 @@ export default function ImageBlockEditor({
             <button
               type="button"
               onClick={openPicker}
-              className="flex items-center gap-2 px-3 py-3 rounded-full bg-muted hover:bg-muted/70 transition"
+              className="flex items-center gap-2 px-3 py-3 rounded-full bg-muted hover:bg-muted/70 transition-[color]"
             >
               <Plus size={16} />
             </button>

@@ -1,5 +1,3 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
-
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -9,7 +7,14 @@ export class ApiError extends Error {
   }
 }
 
+export type AuthUser = {
+  id: string;
+  email: string;
+  username: string;
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     credentials: "include",
@@ -41,3 +46,15 @@ export const api = {
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };
+
+export async function logout(): Promise<void> {
+  await api.post("/auth/logout", {});
+}
+
+export async function register(
+  email: string,
+  password: string,
+  username: string,
+): Promise<AuthUser> {
+  return api.post<AuthUser>("/auth/register", { email, password, username });
+}

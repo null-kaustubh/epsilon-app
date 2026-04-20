@@ -12,16 +12,18 @@ import (
 )
 
 const createSpace = `-- name: CreateSpace :one
-INSERT INTO spaces (id, user_id, name, slug)
-VALUES ($1, $2, $3, $4)
-RETURNING id, user_id, name, slug, created_at, updated_at
+INSERT INTO spaces (id, user_id, name, slug, description, icon_url)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, user_id, name, slug, created_at, updated_at, description, icon_url
 `
 
 type CreateSpaceParams struct {
-	ID     uuid.UUID `json:"id"`
-	UserID uuid.UUID `json:"user_id"`
-	Name   string    `json:"name"`
-	Slug   string    `json:"slug"`
+	ID          uuid.UUID `json:"id"`
+	UserID      uuid.UUID `json:"user_id"`
+	Name        string    `json:"name"`
+	Slug        string    `json:"slug"`
+	Description string    `json:"description"`
+	IconUrl     string    `json:"icon_url"`
 }
 
 func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space, error) {
@@ -30,6 +32,8 @@ func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space
 		arg.UserID,
 		arg.Name,
 		arg.Slug,
+		arg.Description,
+		arg.IconUrl,
 	)
 	var i Space
 	err := row.Scan(
@@ -39,6 +43,8 @@ func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space
 		&i.Slug,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Description,
+		&i.IconUrl,
 	)
 	return i, err
 }
@@ -120,7 +126,7 @@ func (q *Queries) GetBlocksBySpaceID(ctx context.Context, spaceID uuid.UUID) ([]
 }
 
 const getSpaceBySlug = `-- name: GetSpaceBySlug :one
-SELECT id, user_id, name, slug, created_at, updated_at FROM spaces
+SELECT id, user_id, name, slug, created_at, updated_at, description, icon_url FROM spaces
 WHERE slug = $1 AND user_id = $2
 `
 
@@ -139,12 +145,14 @@ func (q *Queries) GetSpaceBySlug(ctx context.Context, arg GetSpaceBySlugParams) 
 		&i.Slug,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Description,
+		&i.IconUrl,
 	)
 	return i, err
 }
 
 const listSpaces = `-- name: ListSpaces :many
-SELECT id, user_id, name, slug, created_at, updated_at FROM spaces
+SELECT id, user_id, name, slug, created_at, updated_at, description, icon_url FROM spaces
 WHERE user_id = $1
 ORDER BY created_at DESC
 `
@@ -165,6 +173,8 @@ func (q *Queries) ListSpaces(ctx context.Context, userID uuid.UUID) ([]Space, er
 			&i.Slug,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Description,
+			&i.IconUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -181,18 +191,26 @@ func (q *Queries) ListSpaces(ctx context.Context, userID uuid.UUID) ([]Space, er
 
 const updateSpaceName = `-- name: UpdateSpaceName :execrows
 UPDATE spaces
-SET name = $1, updated_at = NOW()
-WHERE slug = $2 AND user_id = $3
+SET name = $1, description = $2, icon_url = $3, updated_at = NOW()
+WHERE slug = $4 AND user_id = $5
 `
 
 type UpdateSpaceNameParams struct {
-	Name   string    `json:"name"`
-	Slug   string    `json:"slug"`
-	UserID uuid.UUID `json:"user_id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	IconUrl     string    `json:"icon_url"`
+	Slug        string    `json:"slug"`
+	UserID      uuid.UUID `json:"user_id"`
 }
 
 func (q *Queries) UpdateSpaceName(ctx context.Context, arg UpdateSpaceNameParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, updateSpaceName, arg.Name, arg.Slug, arg.UserID)
+	result, err := q.db.ExecContext(ctx, updateSpaceName,
+		arg.Name,
+		arg.Description,
+		arg.IconUrl,
+		arg.Slug,
+		arg.UserID,
+	)
 	if err != nil {
 		return 0, err
 	}

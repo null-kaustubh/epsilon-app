@@ -1,12 +1,9 @@
 package handler
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"io"
-	"log"
 	"net/http"
 
 	"api-golang/internal/middleware"
@@ -30,14 +27,15 @@ func (h *SpaceHandler) CreateSpace(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
 
 	var body struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" {
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	space, err := h.service.CreateSpace(r.Context(), userID, body.Name)
+	space, err := h.service.CreateSpace(r.Context(), userID, body.Name, body.Description)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "failed to create space")
 		return
@@ -83,14 +81,16 @@ func (h *SpaceHandler) UpdateSpaceName(w http.ResponseWriter, r *http.Request) {
 	slug := r.PathValue("slug")
 
 	var body struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		IconUrl     string `json:"icon_url"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" {
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	if err := h.service.UpdateSpaceName(r.Context(), slug, userID, body.Name); err != nil {
+	if err := h.service.UpdateSpaceName(r.Context(), slug, userID, body.Name, body.Description, body.IconUrl); err != nil {
 		response.Error(w, http.StatusInternalServerError, "failed to update space")
 		return
 	}
@@ -111,7 +111,6 @@ func (h *SpaceHandler) DeleteSpace(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
-	log.Printf("SaveBlocks called")
 	userID := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
 	slug := r.PathValue("slug")
 
@@ -125,14 +124,8 @@ func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// debug — remove after
-	body, _ := io.ReadAll(r.Body)
-	log.Printf("SaveBlocks raw body: %s", string(body))
-	r.Body = io.NopCloser(bytes.NewBuffer(body))
-
 	var blocks []db.UpsertBlockParams
 	if err := json.NewDecoder(r.Body).Decode(&blocks); err != nil {
-		log.Printf("SaveBlocks decode error: %v", err)
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}

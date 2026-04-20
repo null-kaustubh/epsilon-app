@@ -5,6 +5,8 @@ export type Space = {
   user_id: string;
   name: string;
   slug: string;
+  description?: string;
+  icon_url?: string;
   created_at: string;
   updated_at: string;
 };
@@ -43,9 +45,15 @@ export type UpsertBlockPayload = {
 export const spacesApi = {
   getSpace: (slug: string) => api.get<SpaceResponse>(`/spaces/${slug}`),
   listSpaces: () => api.get<Space[]>("/spaces"),
-  createSpace: (name: string) => api.post<Space>("/spaces", { name }),
-  updateName: (slug: string, name: string) =>
-    api.put<void>(`/spaces/${slug}`, { name }),
+  createSpace: (name: string, description?: string) =>
+    api.post<Space>("/spaces", { name, description }),
+  updateName: (
+    slug: string,
+    name: string,
+    description?: string,
+    iconUrl?: string,
+  ) =>
+    api.put<void>(`/spaces/${slug}`, { name, description, icon_url: iconUrl }),
   deleteSpace: (slug: string) => api.delete<void>(`/spaces/${slug}`),
   saveBlocks: (slug: string, blocks: UpsertBlockPayload[]) =>
     api.patch<void>(`/spaces/${slug}/blocks`, blocks),

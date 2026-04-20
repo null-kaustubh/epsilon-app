@@ -2,13 +2,13 @@
 -- PostgreSQL database dump
 --
 
+
 -- Dumped from database version 16.13 (Debian 16.13-1.pgdg13+1)
--- Dumped by pg_dump version 17.5
+-- Dumped by pg_dump version 16.13 (Debian 16.13-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -71,7 +71,9 @@ CREATE TABLE public.spaces (
     name text DEFAULT 'Untitled'::text NOT NULL,
     slug text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    icon_url text DEFAULT ''::text NOT NULL
 );
 
 
@@ -83,7 +85,8 @@ CREATE TABLE public.users (
     id uuid NOT NULL,
     email text NOT NULL,
     password_hash text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    username text DEFAULT ''::text NOT NULL
 );
 
 
@@ -171,6 +174,13 @@ CREATE UNIQUE INDEX users_email_unique ON public.users USING btree (lower(email)
 
 
 --
+-- Name: users_username_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_username_unique ON public.users USING btree (lower(username));
+
+
+--
 -- Name: blocks blocks_space_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -197,4 +207,5 @@ ALTER TABLE ONLY public.spaces
 --
 -- PostgreSQL database dump complete
 --
+
 

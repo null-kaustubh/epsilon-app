@@ -12,6 +12,7 @@ interface UseSaveBlocksOptions {
   spaceId: string;
   blocks: Block[];
   layoutsRef: React.MutableRefObject<Layouts>;
+  savedBlockIdsRef: React.MutableRefObject<Set<string>>;
   onStatusChange: (status: SaveStatus) => void;
 }
 
@@ -20,6 +21,7 @@ export function useSaveBlocks({
   spaceId,
   blocks,
   layoutsRef,
+  savedBlockIdsRef,
   onStatusChange,
 }: UseSaveBlocksOptions) {
   const blocksRef = useRef(blocks);
@@ -51,13 +53,13 @@ export function useSaveBlocks({
 
     onStatusChange("saving");
     try {
-      console.log("payload being sent:", JSON.stringify(payload));
       await spacesApi.saveBlocks(slug, payload);
+      payload.forEach((b) => savedBlockIdsRef.current.add(b.id));
       onStatusChange("saved");
     } catch {
       onStatusChange("error");
     }
-  }, [slug, spaceId, layoutsRef, onStatusChange]);
+  }, [slug, spaceId, layoutsRef, savedBlockIdsRef, onStatusChange]);
 
   // Ctrl+S handler
   useEffect(() => {

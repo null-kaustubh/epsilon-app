@@ -41,7 +41,7 @@ var (
 	multiDashRegex = regexp.MustCompile(`-+`)
 )
 
-func (s *SpaceService) CreateSpace(ctx context.Context, userID uuid.UUID, name string) (db.Space, error) {
+func (s *SpaceService) CreateSpace(ctx context.Context, userID uuid.UUID, name, description string) (db.Space, error) {
 	name = strings.TrimSpace(name)
 
 	if name == "" {
@@ -51,10 +51,12 @@ func (s *SpaceService) CreateSpace(ctx context.Context, userID uuid.UUID, name s
 	slug := generateSlug(name)
 
 	return s.repo.CreateSpace(ctx, db.CreateSpaceParams{
-		ID:     uuid.New(),
-		UserID: userID,
-		Name:   name,
-		Slug:   slug,
+		ID:          uuid.New(),
+		UserID:      userID,
+		Name:        name,
+		Slug:        slug,
+		Description: strings.TrimSpace(description),
+		IconUrl:     "",
 	})
 }
 
@@ -90,7 +92,7 @@ func (s *SpaceService) ListSpaces(ctx context.Context, userID uuid.UUID) ([]db.S
 	return spaces, nil
 }
 
-func (s *SpaceService) UpdateSpaceName(ctx context.Context, slug string, userID uuid.UUID, name string) error {
+func (s *SpaceService) UpdateSpaceName(ctx context.Context, slug string, userID uuid.UUID, name, description, iconUrl string) error {
 	name = strings.TrimSpace(name)
 
 	if name == "" {
@@ -102,9 +104,11 @@ func (s *SpaceService) UpdateSpaceName(ctx context.Context, slug string, userID 
 	}
 
 	return s.repo.UpdateSpaceName(ctx, db.UpdateSpaceNameParams{
-		Name:   name,
-		Slug:   slug,
-		UserID: userID,
+		Name:        name,
+		Description: strings.TrimSpace(description),
+		IconUrl:     iconUrl,
+		Slug:        slug,
+		UserID:      userID,
 	})
 }
 

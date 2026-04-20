@@ -41,6 +41,10 @@ export function useCanvasBlocks(
   const [layouts, setLayouts] = useState<Layouts>(init.layouts);
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  const savedBlockIdsRef = useRef<Set<string>>(
+    new Set(initialBlocks.map((b) => b.id)),
+  );
+
   // Cursor/handle desync under load (e.g. console open) is commonly caused by
   // React state updates racing the drag/resize loop. We keep the latest
   // layout in a ref and only commit it to React state when the interaction ends.
@@ -192,6 +196,10 @@ export function useCanvasBlocks(
         return nextLayouts;
       });
 
+      // only hit API if block was persisted
+      if (!savedBlockIdsRef.current.has(id)) return; // ← key line
+      savedBlockIdsRef.current.delete(id);
+
       // then delete from DB
       try {
         await spacesApi.deleteBlock(slug, id);
@@ -216,5 +224,6 @@ export function useCanvasBlocks(
     handleBlockGrow,
     handleChangeContent,
     handleDeleteBlock,
+    savedBlockIdsRef,
   };
 }

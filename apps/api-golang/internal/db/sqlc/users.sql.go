@@ -11,32 +11,50 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkUsernameExists = `-- name: CheckUsernameExists :one
+SELECT EXISTS(SELECT 1 FROM users WHERE lower(username) = lower($1)) AS exists
+`
+
+func (q *Queries) CheckUsernameExists(ctx context.Context, lower string) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkUsernameExists, lower)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (id, email, password_hash)
-VALUES ($1, $2, $3)
-RETURNING id, email, password_hash, created_at
+INSERT INTO users (id, email, password_hash, username)
+VALUES ($1, $2, $3, $4)
+RETURNING id, email, password_hash, created_at, username
 `
 
 type CreateUserParams struct {
 	ID           uuid.UUID `json:"id"`
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"password_hash"`
+	Username     string    `json:"username"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.ID, arg.Email, arg.PasswordHash)
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.ID,
+		arg.Email,
+		arg.PasswordHash,
+		arg.Username,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,
+		&i.Username,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, created_at FROM users WHERE email = $1
+SELECT id, email, password_hash, created_at, username FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -47,12 +65,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,
+		&i.Username,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, password_hash, created_at FROM users WHERE id = $1
+SELECT id, email, password_hash, created_at, username FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -63,6 +82,24 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,
+		&i.Username,
+	)
+	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id, email, password_hash, created_at, username FROM users WHERE lower(username) = lower($1)
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, lower string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, lower)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.Username,
 	)
 	return i, err
 }
