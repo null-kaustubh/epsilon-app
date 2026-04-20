@@ -108,14 +108,14 @@ export default function TodoBlockEditor({
           <p className="text-sm text-muted-foreground">No items yet.</p>
         ) : (
           payload.items.map((item) => (
-            <div key={item.id} className="flex items-start gap-2">
+            <div key={item.id} className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={item.done}
                 onChange={(e) =>
                   updateItem(item.id, { done: e.target.checked })
                 }
-                className="block-editor mt-0.5 size-3.5 shrink-0 rounded border border-accent/50
+                className="block-editor size-3.5 shrink-0 rounded-full border border-accent/50
                             bg-transparent
                             appearance-none
                             checked:bg-accent
@@ -132,7 +132,10 @@ export default function TodoBlockEditor({
                     ? "text-muted-foreground line-through"
                     : "text-foreground"
                 }`}
-                style={{ fontSize: blockStyle?.fontSize, color: blockStyle?.color }}
+                style={{
+                  fontSize: blockStyle?.fontSize,
+                  color: blockStyle?.color,
+                }}
                 placeholder="Todo…"
                 spellCheck={false}
                 aria-label="Todo text"
@@ -140,7 +143,7 @@ export default function TodoBlockEditor({
               <button
                 type="button"
                 onClick={() => removeItem(item.id)}
-                className="block-editor mt-0.5 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive"
+                className="block-editor shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive"
                 aria-label="Remove todo"
               >
                 <Trash size={14} />

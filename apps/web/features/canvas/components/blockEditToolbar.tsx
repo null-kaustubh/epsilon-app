@@ -12,6 +12,8 @@ import {
   Plus,
 } from "phosphor-react";
 import { Block, BlockStyle } from "../lib/createBlockHelper";
+import { useToolbarPosition } from "../hooks/useToolbarPosition";
+import { createPortal } from "react-dom";
 
 const FONT_STEP = 2;
 const MIN_FONT = 10;
@@ -20,13 +22,13 @@ const DEFAULT_FONT = 14;
 
 const COLOR_SWATCHES = [
   { value: undefined, label: "Default" },
-  { value: "#ef4444", label: "Red" },
-  { value: "#f97316", label: "Orange" },
-  { value: "#eab308", label: "Yellow" },
-  { value: "#22c55e", label: "Green" },
-  { value: "#3b82f6", label: "Blue" },
-  { value: "#a855f7", label: "Purple" },
-  { value: "#ec4899", label: "Pink" },
+  { value: "#c04a4a", label: "Red" },
+  { value: "#d4924e", label: "Orange" },
+  { value: "#c9a84c", label: "Yellow" },
+  { value: "#5a9e6f", label: "Green" },
+  { value: "#5589d4", label: "Blue" },
+  { value: "#8a5fc7", label: "Purple" },
+  { value: "#c45c7a", label: "Pink" },
 ] as const;
 
 export type MarkdownEditorHandle = {
@@ -39,6 +41,7 @@ interface BlockEditToolbarProps {
   blockStyle?: BlockStyle;
   onChangeStyle: (style: BlockStyle) => void;
   editorRef?: React.RefObject<MarkdownEditorHandle | null>;
+  anchorRef: React.RefObject<HTMLElement | null>;
 }
 
 export default function BlockEditToolbar({
@@ -46,8 +49,11 @@ export default function BlockEditToolbar({
   blockStyle,
   onChangeStyle,
   editorRef,
+  anchorRef,
 }: BlockEditToolbarProps) {
   const currentSize = blockStyle?.fontSize ?? DEFAULT_FONT;
+  const pos = useToolbarPosition(anchorRef, true);
+  const prevent = (e: React.MouseEvent) => e.preventDefault();
 
   const adjustSize = useCallback(
     (delta: number) => {
@@ -66,14 +72,15 @@ export default function BlockEditToolbar({
     [blockStyle, onChangeStyle],
   );
 
+  if (!pos) return null;
   // prevent toolbar clicks from blurring the editor
-  const prevent = (e: React.MouseEvent) => e.preventDefault();
 
-  return (
+  const toolbar = (
     <div
-      className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[calc(100%+6px)] z-50
-                 flex items-center gap-1 rounded-xl px-2 py-1.5
-                 bg-background/90 backdrop-blur-md border border-border shadow-lg"
+      className="fixed z-9999 flex items-center gap-1 rounded-xl px-2 py-1.5
+                 bg-background/90 backdrop-blur-md border border-border shadow-lg
+                 -translate-x-1/2"
+      style={{ top: pos.top, left: pos.left }}
       onMouseDown={prevent}
     >
       {/* ── Font size ── */}
@@ -85,11 +92,9 @@ export default function BlockEditToolbar({
         >
           <Minus size={14} />
         </ToolbarBtn>
-
         <span className="min-w-[2ch] text-center text-xs text-muted-foreground select-none tabular-nums">
           {currentSize}
         </span>
-
         <ToolbarBtn
           title="Increase font size"
           onClick={() => adjustSize(FONT_STEP)}
@@ -112,9 +117,7 @@ export default function BlockEditToolbar({
             onClick={() => setColor(swatch.value)}
             className="relative flex h-5 w-5 shrink-0 items-center justify-center rounded-full
                        border border-border/60 transition-transform hover:scale-110"
-            style={{
-              backgroundColor: swatch.value ?? "var(--foreground)",
-            }}
+            style={{ backgroundColor: swatch.value ?? "var(--foreground)" }}
           >
             {(blockStyle?.color ?? undefined) === swatch.value && (
               <span className="absolute inset-0 rounded-full ring-2 ring-accent ring-offset-1 ring-offset-background" />
@@ -123,7 +126,6 @@ export default function BlockEditToolbar({
         ))}
       </ToolbarGroup>
 
-      {/* ── Markdown-specific formatting ── */}
       {blockType === "markdown" && editorRef && (
         <>
           <Divider />
@@ -169,6 +171,8 @@ export default function BlockEditToolbar({
       )}
     </div>
   );
+
+  return createPortal(toolbar, document.body);
 }
 
 /* ── tiny internal helpers ── */

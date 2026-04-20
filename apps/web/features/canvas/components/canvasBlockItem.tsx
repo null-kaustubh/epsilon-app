@@ -36,6 +36,7 @@ function CanvasBlockItem({
   onGrowAction,
 }: CanvasBlockItemProps) {
   const editorRef = useRef<MarkdownEditorHandle | null>(null);
+  const anchorRef = useRef<HTMLDivElement | null>(null);
   const Editor = editorRegistry[block.type] ?? editorRegistry["note"];
   const View = viewRegistry[block.type] ?? viewRegistry["note"];
 
@@ -47,7 +48,14 @@ function CanvasBlockItem({
       onGrowAction: (px) => onGrowAction(block.id, px),
       onRequestCloseAction: onStopEditingAction,
     }),
-    [block.content, block.style, block.id, onChangeContentAction, onGrowAction, onStopEditingAction],
+    [
+      block.content,
+      block.style,
+      block.id,
+      onChangeContentAction,
+      onGrowAction,
+      onStopEditingAction,
+    ],
   );
 
   const viewProps: BaseViewProps = useMemo(
@@ -59,13 +67,18 @@ function CanvasBlockItem({
       onRequestEditAction: () => onStartEditingAction(block.id),
       onChangeContentAction: (next) => onChangeContentAction(block.id, next),
     }),
-    [block.content, block.style, block.id, onChangeContentAction, onGrowAction, onStartEditingAction],
+    [
+      block.content,
+      block.style,
+      block.id,
+      onChangeContentAction,
+      onGrowAction,
+      onStartEditingAction,
+    ],
   );
 
   const showToolbar =
-    isEditing &&
-    block.type !== "image" &&
-    block.type !== "code";
+    isEditing && block.type !== "image" && block.type !== "code";
 
   const handleStyleChange = useMemo(
     () => (style: BlockStyle) => onChangeBlockStyleAction(block.id, style),
@@ -74,8 +87,9 @@ function CanvasBlockItem({
 
   return (
     <div
+      ref={anchorRef}
       className="relative w-full h-full rounded-sm bg-secondary"
-      style={{ overflow: "visible", zIndex: isEditing ? 200 : undefined }}
+      style={{ overflow: "visible" }}
       onClick={(e) => {
         if (!isDeleteMode) return;
         e.preventDefault();
@@ -107,6 +121,7 @@ function CanvasBlockItem({
           blockStyle={block.style}
           onChangeStyle={handleStyleChange}
           editorRef={block.type === "markdown" ? editorRef : undefined}
+          anchorRef={anchorRef}
         />
       )}
     </div>
