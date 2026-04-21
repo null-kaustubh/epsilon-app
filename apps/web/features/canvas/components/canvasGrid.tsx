@@ -2,7 +2,7 @@ import React from "react";
 import { Responsive } from "react-grid-layout/legacy";
 import { Layout } from "react-grid-layout/legacy";
 import { Block, BlockStyle } from "../lib/createBlockHelper";
-import { ROW_HEIGHT, MARGIN, CONTAINER_PADDING } from "../lib/gridConstants";
+import { ROW_HEIGHT, MARGIN, CONTAINER_PADDING, CANVAS_MIN_WIDTH_PX } from "../lib/gridConstants";
 import CanvasBlockItem from "./canvasBlockItem";
 
 type Layouts = Partial<Record<string, Layout>>;
@@ -27,7 +27,6 @@ interface CanvasGridProps {
 function CanvasGrid({
   blocks,
   layouts,
-  containerWidth,
   editingId,
   setEditingId,
   onLayoutChange,
@@ -45,7 +44,7 @@ function CanvasGrid({
   return (
     <Responsive
       className="layout canvas-grid"
-      width={containerWidth}
+      width={CANVAS_MIN_WIDTH_PX}
       layouts={layouts}
       onLayoutChange={onLayoutChange}
       onDragStart={() => onInteractionStart()}

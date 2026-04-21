@@ -96,9 +96,9 @@ func main() {
 		{block1ID, "markdown", `**Welcome to Epsilon ✦**
 This is a demo space for contributors.
 
-Break things freely, that's what this space is for.`, 9, 5, 10, 5},
-		{block2ID, "note", "Try dragging and resizing blocks on the canvas.", 9, 10, 4, 3},
-		{block3ID, "code", "console.log('Hello, Epsilon!');", 13, 10, 6, 3},
+Break things freely, that's what this space is for.`, 0, 0, 10, 5},
+		{block2ID, "note", "Try dragging and resizing blocks on the canvas.", 0, 5, 4, 3},
+		{block3ID, "code", `{"filename":"snippet.ts","language":"typescript","code":"console.log('Hello, Epsilon!');"}`, 4, 5, 6, 3},
 	}
 
 	for _, b := range blocks {

@@ -8,7 +8,7 @@ import {
 } from "../lib/blockToLayout";
 import { contentHeightToRows } from "../lib/blockSizing";
 import { SpaceBlock, spacesApi } from "../../../lib/spaces";
-import { BLOCK_W, CODE_BLOCK_W } from "../lib/gridConstants";
+import { BLOCK_W, CODE_BLOCK_W, visibleCols } from "../lib/gridConstants";
 
 type Layouts = Partial<Record<string, Layout>>;
 
@@ -35,6 +35,7 @@ function blocksFromDB(dbBlocks: SpaceBlock[]): {
 export function useCanvasBlocks(
   initialBlocks: SpaceBlock[] = [],
   slug: string,
+  viewportWidthRef: React.RefObject<number>,
 ) {
   const init = blocksFromDB(initialBlocks);
 
@@ -84,6 +85,7 @@ export function useCanvasBlocks(
   }, []);
 
   const handleAddBlock = useCallback((type: Block["type"]) => {
+    const cols = visibleCols(viewportWidthRef.current ?? 0);
     const currentLayouts = layoutsRef.current;
     const currentItems = currentLayouts.lg ?? [];
 
@@ -93,6 +95,7 @@ export function useCanvasBlocks(
       currentItems,
       desiredW,
       desiredH,
+      cols,
     );
 
     const newBlock = createBlock(type, x, y);
@@ -108,6 +111,7 @@ export function useCanvasBlocks(
     // update both
     layoutsRef.current = nextLayouts;
     setLayouts(nextLayouts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Batch "auto-grow" updates so rendering many blocks doesn't trigger

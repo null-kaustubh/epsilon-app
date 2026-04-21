@@ -5,7 +5,7 @@ import "react-resizable/css/styles.css";
 import { useCanvasBlocks } from "./hooks/useCanvasBlock";
 import { useContainerWidth } from "./hooks/useContainerWidth";
 import CanvasGrid from "./components/canvasGrid";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CanvasToolbar from "./components/toolbar/CanvasToolbar";
 import ThemeToggle from "./components/theme/ThemeToggle";
 import { Space, SpaceBlock } from "../../lib/spaces";
@@ -24,6 +24,8 @@ interface CanvasProps {
 export default function Canvas({ space, initialBlocks }: CanvasProps) {
   const { ref, width } = useContainerWidth();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+  const viewportWidthRef = useRef(0);
+  useEffect(() => { viewportWidthRef.current = width; }, [width])
 
   const {
     blocks,
@@ -40,7 +42,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
     handleChangeBlockStyle,
     handleDeleteBlock,
     savedBlockIdsRef,
-  } = useCanvasBlocks(initialBlocks, space.slug);
+  } = useCanvasBlocks(initialBlocks, space.slug, viewportWidthRef);
 
   const handleStatusChange = useCallback((status: SaveStatus) => {
     setSaveStatus(status);
@@ -93,7 +95,6 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
         <div
           ref={ref}
           className="w-full"
-          style={{ minWidth: CANVAS_MIN_WIDTH_PX }}
         >
           {gridWidth > 0 ? (
             <CanvasGrid
