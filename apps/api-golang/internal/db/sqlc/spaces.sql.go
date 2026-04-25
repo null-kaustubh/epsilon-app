@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/google/uuid"
 )
@@ -86,7 +87,7 @@ func (q *Queries) DeleteSpace(ctx context.Context, arg DeleteSpaceParams) (int64
 }
 
 const getBlocksBySpaceID = `-- name: GetBlocksBySpaceID :many
-SELECT id, space_id, type, content, x, y, w, h, created_at, updated_at FROM blocks
+SELECT id, space_id, type, content, x, y, w, h, created_at, updated_at, style FROM blocks
 WHERE space_id = $1
 ORDER BY created_at ASC
 `
@@ -111,6 +112,7 @@ func (q *Queries) GetBlocksBySpaceID(ctx context.Context, spaceID uuid.UUID) ([]
 			&i.H,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Style,
 		); err != nil {
 			return nil, err
 		}
@@ -218,26 +220,28 @@ func (q *Queries) UpdateSpaceName(ctx context.Context, arg UpdateSpaceNameParams
 }
 
 const upsertBlock = `-- name: UpsertBlock :exec
-INSERT INTO blocks (id, space_id, type, content, x, y, w, h)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO blocks (id, space_id, type, content, x, y, w, h, style)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 ON CONFLICT (id) DO UPDATE SET
     content    = EXCLUDED.content,
     x          = EXCLUDED.x,
     y          = EXCLUDED.y,
     w          = EXCLUDED.w,
     h          = EXCLUDED.h,
+    style      = EXCLUDED.style,
     updated_at = NOW()
 `
 
 type UpsertBlockParams struct {
-	ID      uuid.UUID `json:"id"`
-	SpaceID uuid.UUID `json:"space_id"`
-	Type    string    `json:"type"`
-	Content string    `json:"content"`
-	X       int32     `json:"x"`
-	Y       int32     `json:"y"`
-	W       int32     `json:"w"`
-	H       int32     `json:"h"`
+	ID      uuid.UUID       `json:"id"`
+	SpaceID uuid.UUID       `json:"space_id"`
+	Type    string          `json:"type"`
+	Content string          `json:"content"`
+	X       int32           `json:"x"`
+	Y       int32           `json:"y"`
+	W       int32           `json:"w"`
+	H       int32           `json:"h"`
+	Style   json.RawMessage `json:"style"`
 }
 
 func (q *Queries) UpsertBlock(ctx context.Context, arg UpsertBlockParams) error {
@@ -250,6 +254,7 @@ func (q *Queries) UpsertBlock(ctx context.Context, arg UpsertBlockParams) error 
 		arg.Y,
 		arg.W,
 		arg.H,
+		arg.Style,
 	)
 	return err
 }

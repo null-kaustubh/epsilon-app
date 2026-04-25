@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Layout } from "react-grid-layout/legacy";
-import { Block, createBlock } from "../lib/createBlockHelper";
+import { Block, BlockStyle, createBlock } from "../lib/createBlockHelper";
 import {
   blockToLayout,
   findNextAvailablePosition,
@@ -8,7 +8,7 @@ import {
 } from "../lib/blockToLayout";
 import { contentHeightToRows } from "../lib/blockSizing";
 import { SpaceBlock, spacesApi } from "../../../lib/spaces";
-import { BLOCK_W, CODE_BLOCK_W } from "../lib/gridConstants";
+import { BLOCK_W, CODE_BLOCK_W, visibleCols } from "../lib/gridConstants";
 
 type Layouts = Partial<Record<string, Layout>>;
 
@@ -24,6 +24,7 @@ function blocksFromDB(dbBlocks: SpaceBlock[]): {
     y: b.y,
     w: b.w,
     h: b.h,
+    style: (b.style as BlockStyle | undefined) ?? undefined,
   }));
 
   const lg: Layout = blocks.map((b) => blockToLayout(b));
@@ -34,6 +35,7 @@ function blocksFromDB(dbBlocks: SpaceBlock[]): {
 export function useCanvasBlocks(
   initialBlocks: SpaceBlock[] = [],
   slug: string,
+  viewportWidthRef: React.RefObject<number>,
 ) {
   const init = blocksFromDB(initialBlocks);
 
@@ -83,6 +85,7 @@ export function useCanvasBlocks(
   }, []);
 
   const handleAddBlock = useCallback((type: Block["type"]) => {
+    const cols = visibleCols(viewportWidthRef.current ?? 0);
     const currentLayouts = layoutsRef.current;
     const currentItems = currentLayouts.lg ?? [];
 
@@ -92,6 +95,7 @@ export function useCanvasBlocks(
       currentItems,
       desiredW,
       desiredH,
+      cols,
     );
 
     const newBlock = createBlock(type, x, y);
@@ -107,6 +111,7 @@ export function useCanvasBlocks(
     // update both
     layoutsRef.current = nextLayouts;
     setLayouts(nextLayouts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Batch "auto-grow" updates so rendering many blocks doesn't trigger
@@ -179,6 +184,15 @@ export function useCanvasBlocks(
     );
   }, []);
 
+  const handleChangeBlockStyle = useCallback(
+    (id: string, style: BlockStyle) => {
+      setBlocks((prev) =>
+        prev.map((block) => (block.id === id ? { ...block, style } : block)),
+      );
+    },
+    [],
+  );
+
   const handleDeleteBlock = useCallback(
     async (id: string) => {
       // Remove only the clicked block item + its layout entry.
@@ -223,6 +237,7 @@ export function useCanvasBlocks(
     handleAddBlock,
     handleBlockGrow,
     handleChangeContent,
+    handleChangeBlockStyle,
     handleDeleteBlock,
     savedBlockIdsRef,
   };

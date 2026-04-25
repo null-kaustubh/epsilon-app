@@ -5,22 +5,24 @@
 package db
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type Block struct {
-	ID        uuid.UUID `json:"id"`
-	SpaceID   uuid.UUID `json:"space_id"`
-	Type      string    `json:"type"`
-	Content   string    `json:"content"`
-	X         int32     `json:"x"`
-	Y         int32     `json:"y"`
-	W         int32     `json:"w"`
-	H         int32     `json:"h"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uuid.UUID       `json:"id"`
+	SpaceID   uuid.UUID       `json:"space_id"`
+	Type      string          `json:"type"`
+	Content   string          `json:"content"`
+	X         int32           `json:"x"`
+	Y         int32           `json:"y"`
+	W         int32           `json:"w"`
+	H         int32           `json:"h"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
+	Style     json.RawMessage `json:"style"`
 }
 
 type SchemaMigration struct {

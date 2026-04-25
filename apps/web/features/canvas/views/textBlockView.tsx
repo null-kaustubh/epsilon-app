@@ -6,6 +6,7 @@ import { BaseViewProps } from "../lib/blockRegistry";
 export default function TextBlockView({
   blockId,
   content,
+  blockStyle,
   onGrowAction,
 }: BaseViewProps) {
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -27,6 +28,10 @@ export default function TextBlockView({
       <div
         ref={contentRef}
         className="w-full p-4 text-sm leading-5 whitespace-pre-wrap wrap-break-word"
+        style={{
+          fontSize: blockStyle?.fontSize,
+          color: blockStyle?.color,
+        }}
       >
         {content || " "}
       </div>

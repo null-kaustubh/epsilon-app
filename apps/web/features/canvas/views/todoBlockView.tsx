@@ -12,6 +12,7 @@ import {
 export default function TodoBlockView({
   blockId,
   content,
+  blockStyle,
   onGrowAction,
   onChangeContentAction,
 }: BaseViewProps) {
@@ -70,7 +71,10 @@ export default function TodoBlockView({
       className="flex h-full min-h-0 flex-col overflow-hidden rounded-lg bg-secondary select-none p-1"
     >
       <header className="shrink-0 px-2 py-2">
-        <span className="block truncate text-sm font-medium text-foreground">
+        <span
+          className="block truncate text-sm font-medium text-foreground"
+          style={{ fontSize: blockStyle?.fontSize, color: blockStyle?.color }}
+        >
           {payload.title || "Todo list"}
         </span>
       </header>
@@ -80,14 +84,14 @@ export default function TodoBlockView({
           <p className="text-sm text-muted-foreground">No items yet.</p>
         ) : (
           payload.items.map((item) => (
-            <div key={item.id} className="flex items-start gap-2">
+            <div key={item.id} className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={item.done}
                 disabled={!interactive}
                 onChange={() => interactive && toggle(item.id)}
                 onPointerDown={(e) => e.stopPropagation()}
-                className="block-editor mt-0.5 size-3.5 shrink-0 rounded border border-accent/50
+                className="block-editor size-3.5 shrink-0 rounded-full border border-accent/50
                             bg-transparent
                             appearance-none
                             checked:bg-accent
@@ -100,6 +104,10 @@ export default function TodoBlockView({
                     ? "text-muted-foreground line-through"
                     : "text-foreground"
                 }`}
+                style={{
+                  fontSize: blockStyle?.fontSize,
+                  color: blockStyle?.color,
+                }}
               >
                 {item.text || "\u00a0"}
               </span>
@@ -108,7 +116,7 @@ export default function TodoBlockView({
                   type="button"
                   onClick={() => removeItem(item.id)}
                   onPointerDown={(e) => e.stopPropagation()}
-                  className="block-editor mt-0.5 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive"
+                  className="block-editor shrink-0 rounded p-1 text-muted-foreground hover:bg-muted hover:text-destructive"
                   aria-label="Remove todo"
                 >
                   <Trash size={14} />

@@ -66,7 +66,7 @@ func main() {
 		tx.Rollback()
 		log.Fatal("failed to create user 1:", err)
 	}
-	
+
 	_, err = tx.Exec(
 		`INSERT INTO users (id, email, password_hash, username) VALUES ($1, $2, $3, $4)`,
 		test_user2, "contributor@epsilon.app", hashPassword("Contrib1234!"), "contributor",
@@ -89,13 +89,16 @@ func main() {
 	// --- Blocks ---
 	// TODO: Adjust content, positions, and sizes to your liking
 	blocks := []struct {
-		id                  uuid.UUID
-		typ, content        string
-		x, y, w, h         int
+		id           uuid.UUID
+		typ, content string
+		x, y, w, h   int
 	}{
-		{block1ID, "note", "Welcome to Epsilon! This is a demo space for contributors.", 0, 0, 6, 2},
-		{block2ID, "note", "Try dragging and resizing blocks on the canvas.", 0, 2, 4, 2},
-		{block3ID, "code", "console.log('Hello, Epsilon!');", 4, 2, 4, 3},
+		{block1ID, "markdown", `**Welcome to Epsilon ✦**
+This is a demo space for contributors.
+
+Break things freely, that's what this space is for.`, 0, 0, 10, 5},
+		{block2ID, "note", "Try dragging and resizing blocks on the canvas.", 0, 5, 4, 3},
+		{block3ID, "code", `{"filename":"snippet.ts","language":"typescript","code":"console.log('Hello, Epsilon!');"}`, 4, 5, 6, 3},
 	}
 
 	for _, b := range blocks {

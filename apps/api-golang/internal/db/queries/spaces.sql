@@ -22,14 +22,15 @@ DELETE FROM spaces
 WHERE slug = $1 AND user_id = $2;
 
 -- name: UpsertBlock :exec
-INSERT INTO blocks (id, space_id, type, content, x, y, w, h)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO blocks (id, space_id, type, content, x, y, w, h, style)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 ON CONFLICT (id) DO UPDATE SET
     content    = EXCLUDED.content,
     x          = EXCLUDED.x,
     y          = EXCLUDED.y,
     w          = EXCLUDED.w,
     h          = EXCLUDED.h,
+    style      = EXCLUDED.style,
     updated_at = NOW();
 
 -- name: GetBlocksBySpaceID :many

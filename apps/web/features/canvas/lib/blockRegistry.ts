@@ -1,8 +1,10 @@
 import React from "react";
+import { BlockStyle } from "./createBlockHelper";
 
 // --- shared contracts ---
 export interface BaseEditorProps {
   value: string;
+  blockStyle?: BlockStyle;
   onChangeAction: (next: string) => void;
   onGrowAction: (contentHeightPx: number) => void;
   onRequestCloseAction: () => void;
@@ -11,6 +13,7 @@ export interface BaseEditorProps {
 export interface BaseViewProps {
   blockId: string;
   content: string;
+  blockStyle?: BlockStyle;
   onGrowAction: (id: string, contentHeightPx: number) => void;
   onRequestEditAction?: () => void;
   /** Optional: update block content from view mode (e.g. todo checkboxes). */

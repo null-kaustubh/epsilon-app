@@ -1,4 +1,5 @@
 import { WebApplication, WithContext } from "schema-dts";
+import Landing from "../../features/landing/mainLanding";
 
 export default function Page() {
   return (
@@ -10,7 +11,9 @@ export default function Page() {
         }}
       />
 
-      <div>Hi</div>
+      <div data-color-theme="dark">
+        <Landing />
+      </div>
     </>
   );
 }

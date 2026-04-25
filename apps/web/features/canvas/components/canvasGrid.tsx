@@ -1,8 +1,8 @@
 import React from "react";
 import { Responsive } from "react-grid-layout/legacy";
 import { Layout } from "react-grid-layout/legacy";
-import { Block } from "../lib/createBlockHelper";
-import { ROW_HEIGHT, MARGIN, CONTAINER_PADDING } from "../lib/gridConstants";
+import { Block, BlockStyle } from "../lib/createBlockHelper";
+import { ROW_HEIGHT, MARGIN, CONTAINER_PADDING, CANVAS_MIN_WIDTH_PX } from "../lib/gridConstants";
 import CanvasBlockItem from "./canvasBlockItem";
 
 type Layouts = Partial<Record<string, Layout>>;
@@ -18,6 +18,7 @@ interface CanvasGridProps {
   onInteractionStop: () => void;
   onBlockGrow: (id: string, heightPx: number) => void;
   onChangeContent: (id: string, next: string) => void;
+  onChangeBlockStyle: (id: string, style: BlockStyle) => void;
   onDeleteBlock: (id: string) => void;
   isDraggable?: boolean;
   mode: "cursor" | "delete";
@@ -26,7 +27,6 @@ interface CanvasGridProps {
 function CanvasGrid({
   blocks,
   layouts,
-  containerWidth,
   editingId,
   setEditingId,
   onLayoutChange,
@@ -34,6 +34,7 @@ function CanvasGrid({
   onInteractionStop,
   onBlockGrow,
   onChangeContent,
+  onChangeBlockStyle,
   onDeleteBlock,
   isDraggable = true,
   mode,
@@ -43,9 +44,8 @@ function CanvasGrid({
   return (
     <Responsive
       className="layout canvas-grid"
-      width={containerWidth}
+      width={CANVAS_MIN_WIDTH_PX}
       layouts={layouts}
-      measureBeforeMount={true}
       onLayoutChange={onLayoutChange}
       onDragStart={() => onInteractionStart()}
       onDragStop={() => onInteractionStop()}
@@ -76,6 +76,7 @@ function CanvasGrid({
             onStartEditingAction={setEditingId}
             onStopEditingAction={() => setEditingId(null)}
             onChangeContentAction={onChangeContent}
+            onChangeBlockStyleAction={onChangeBlockStyle}
             onGrowAction={onBlockGrow}
           />
         </div>

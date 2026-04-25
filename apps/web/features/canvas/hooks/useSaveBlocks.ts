@@ -46,6 +46,7 @@ export function useSaveBlocks({
         y: layoutItem?.y ?? block.y,
         w: layoutItem?.w ?? block.w,
         h: layoutItem?.h ?? block.h,
+        style: block.style ?? {},
       };
     });
 

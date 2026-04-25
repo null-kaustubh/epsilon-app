@@ -22,6 +22,7 @@ export type SpaceBlock = {
   y: number;
   w: number;
   h: number;
+  style?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 };
@@ -40,6 +41,7 @@ export type UpsertBlockPayload = {
   y: number;
   w: number;
   h: number;
+  style: Record<string, unknown>;
 };
 
 export const spacesApi = {
