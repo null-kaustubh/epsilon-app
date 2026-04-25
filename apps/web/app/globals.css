@@ -72,34 +72,131 @@
   --selection-foreground: #0f0f10;
 
   --shadow-popover: 0 0 40px rgba(0, 0, 0, 0.6);
+
+  --landing-background: #0a0a0b; /* true Linear black */
+  --landing-surface: #111113; /* barely lifted */
+  --landing-surface-2: #141416;
+  --landing-surface-3: #18181b;
+  --landing-surface-4: #1c1c1f;
+  --landing-surface-5: #202023;
+
+  /* Cards */
+  --landing-card: #1a1a1d;
+  --landing-card-hover: #1e1e21;
+  --landing-popover: #18181b;
+  --landing-overlay: #242427;
+
+  /* Borders — very subtle */
+  --landing-border: #27272a;
+  --landing-border-muted: #222225;
+  --landing-border-strong: #323235;
+
+  /* Text */
+  --landing-foreground: #ffffff;
+  --landing-foreground-soft: #f4f4f5;
+  --landing-text-secondary: #a1a1aa;
+  --landing-text-muted: #71717a;
+  --landing-text-dim: #52525b;
+  --landing-text-faint: #3f3f46;
+
+  /* Brand — Linear violet */
+  --landing-primary: #5e6ad2;
+  --landing-primary-hover: #6872e5;
+  --landing-primary-soft: #8b97ff;
+
+  /* Accent panels */
+  --landing-accent-surface: #1e2035;
+  --landing-accent-surface-2: #232440;
+
+  /* Whites */
+  --landing-white-5: rgba(255, 255, 255, 0.05);
+  --landing-white-8: rgba(255, 255, 255, 0.08);
+  --landing-white-12: rgba(255, 255, 255, 0.12);
+  --landing-white-16: rgba(255, 255, 255, 0.16);
+  --landing-white-20: rgba(255, 255, 255, 0.2);
+
+  /* Shadow */
+  --landing-shadow-popover: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {
+  /* App theme */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
   --color-border: var(--border);
   --color-edge: var(--edge);
   --color-ring: var(--ring);
+
   --color-success: var(--success);
   --color-destructive: var(--destructive);
+
   --color-link: var(--link);
+
   --color-selection: var(--selection);
   --color-selection-foreground: var(--selection-foreground);
 
   --shadow-popover: var(--shadow-popover);
 
+  /* Landing page theme */
+  --color-landing-background: var(--landing-background);
+
+  --color-landing-surface: var(--landing-surface);
+  --color-landing-surface-2: var(--landing-surface-2);
+  --color-landing-surface-3: var(--landing-surface-3);
+  --color-landing-surface-4: var(--landing-surface-4);
+  --color-landing-surface-5: var(--landing-surface-5);
+
+  --color-landing-card: var(--landing-card);
+  --color-landing-card-hover: var(--landing-card-hover);
+  --color-landing-popover: var(--landing-popover);
+  --color-landing-overlay: var(--landing-overlay);
+
+  --color-landing-border: var(--landing-border);
+  --color-landing-border-muted: var(--landing-border-muted);
+  --color-landing-border-strong: var(--landing-border-strong);
+
+  --color-landing-foreground: var(--landing-foreground);
+  --color-landing-foreground-soft: var(--landing-foreground-soft);
+
+  --color-landing-text-secondary: var(--landing-text-secondary);
+  --color-landing-text-muted: var(--landing-text-muted);
+  --color-landing-text-dim: var(--landing-text-dim);
+  --color-landing-text-faint: var(--landing-text-faint);
+
+  --color-landing-primary: var(--landing-primary);
+  --color-landing-primary-hover: var(--landing-primary-hover);
+  --color-landing-primary-soft: var(--landing-primary-soft);
+
+  --color-landing-accent-surface: var(--landing-accent-surface);
+  --color-landing-accent-surface-2: var(--landing-accent-surface-2);
+
+  --color-landing-white-5: var(--landing-white-5);
+  --color-landing-white-8: var(--landing-white-8);
+  --color-landing-white-12: var(--landing-white-12);
+  --color-landing-white-16: var(--landing-white-16);
+  --color-landing-white-20: var(--landing-white-20);
+
+  --shadow-landing-popover: var(--landing-shadow-popover);
+
+  /* Fonts */
   --font-sans: var(--font-neue-montreal);
   --font-mono: var(--font-fragment-mono);
   --font-head: var(--font-playfair-display);
 
+  /* Animations */
   --animate-fade-in: fade-in var(--tw-duration, 200ms) ease-out;
   --animate-fade-out: fade-out var(--tw-duration, 200ms) ease-out;
 
