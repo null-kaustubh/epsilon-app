@@ -1,0 +1,347 @@
+basePath: /
+definitions:
+  db.Space:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      icon_url:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  db.UpsertBlockParams:
+    type: object
+  handler.createSpaceRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  handler.getSpaceResponse:
+    properties:
+      blocks:
+        items:
+          $ref: '#/definitions/handler.swaggerBlock'
+        type: array
+      space:
+        $ref: '#/definitions/db.Space'
+    type: object
+  handler.loginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handler.registerRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  handler.swaggerBlock:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      h:
+        type: integer
+      id:
+        type: string
+      space_id:
+        type: string
+      style: {}
+      type:
+        type: string
+      updated_at:
+        type: string
+      w:
+        type: integer
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  handler.updateSpaceRequest:
+    properties:
+      description:
+        type: string
+      icon_url:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Your API description
+  title: API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Register payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register user
+      tags:
+      - auth
+  /spaces:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Space'
+            type: array
+      security:
+      - CookieAuth: []
+      summary: List spaces
+      tags:
+      - spaces
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Space payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createSpaceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Space'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Create space
+      tags:
+      - spaces
+  /spaces/{slug}:
+    delete:
+      parameters:
+      - description: Space slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Delete space
+      tags:
+      - spaces
+    get:
+      parameters:
+      - description: Space slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.getSpaceResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Get space by slug
+      tags:
+      - spaces
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Space slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Update payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateSpaceRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Update space
+      tags:
+      - spaces
+  /spaces/{slug}/blocks:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Space slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: Blocks array
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/db.UpsertBlockParams'
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Save blocks
+      tags:
+      - spaces
+securityDefinitions:
+  CookieAuth:
+    in: cookie
+    name: session_id
+    type: apiKey
+swagger: "2.0"
