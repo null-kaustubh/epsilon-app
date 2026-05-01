@@ -40,6 +40,51 @@
 
   /* shadow */
   --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+  --landing-background: #f0ede8; /* warm off-white page */
+  --landing-surface: #ebe8e3; /* barely lifted */
+  --landing-surface-2: #e5e2dd;
+  --landing-surface-3: #dedad4;
+  --landing-surface-4: #d8d4ce;
+  --landing-surface-5: #d1cdc7;
+
+  /* Cards */
+  --landing-card: #eceae5;
+  --landing-card-hover: #e8e5e0;
+  --landing-popover: #f2f0eb;
+  --landing-overlay: #dedad4;
+
+  /* Borders — very subtle */
+  --landing-border: #d4d0ca;
+  --landing-border-muted: #dbd8d2;
+  --landing-border-strong: #c4c0b9;
+
+  /* Text */
+  --landing-foreground: #0f0f0f;
+  --landing-foreground-soft: #1a1a1a;
+  --landing-text-secondary: #4a4a4a;
+  --landing-text-muted: #737373;
+  --landing-text-dim: #a0a0a0;
+  --landing-text-faint: #c4c4c4;
+
+  /* Brand — warm black (matches the b&w ref) */
+  --landing-primary: #111111;
+  --landing-primary-hover: #2a2a2a;
+  --landing-primary-soft: #444444;
+
+  /* Accent panels */
+  --landing-accent-surface: #e8e5df;
+  --landing-accent-surface-2: #e2dfd9;
+
+  /* Whites */
+  --landing-white-5: rgba(0, 0, 0, 0.04);
+  --landing-white-8: rgba(0, 0, 0, 0.06);
+  --landing-white-12: rgba(0, 0, 0, 0.09);
+  --landing-white-16: rgba(0, 0, 0, 0.12);
+  --landing-white-20: rgba(0, 0, 0, 0.16);
+
+  /* Shadow */
+  --landing-shadow-popover: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
 [data-color-theme="dark"] {
@@ -72,51 +117,6 @@
   --selection-foreground: #0f0f10;
 
   --shadow-popover: 0 0 40px rgba(0, 0, 0, 0.6);
-
-  --landing-background: #0a0a0b; /* true Linear black */
-  --landing-surface: #111113; /* barely lifted */
-  --landing-surface-2: #141416;
-  --landing-surface-3: #18181b;
-  --landing-surface-4: #1c1c1f;
-  --landing-surface-5: #202023;
-
-  /* Cards */
-  --landing-card: #1a1a1d;
-  --landing-card-hover: #1e1e21;
-  --landing-popover: #18181b;
-  --landing-overlay: #242427;
-
-  /* Borders — very subtle */
-  --landing-border: #27272a;
-  --landing-border-muted: #222225;
-  --landing-border-strong: #323235;
-
-  /* Text */
-  --landing-foreground: #ffffff;
-  --landing-foreground-soft: #f4f4f5;
-  --landing-text-secondary: #a1a1aa;
-  --landing-text-muted: #71717a;
-  --landing-text-dim: #52525b;
-  --landing-text-faint: #3f3f46;
-
-  /* Brand — Linear violet */
-  --landing-primary: #5e6ad2;
-  --landing-primary-hover: #6872e5;
-  --landing-primary-soft: #8b97ff;
-
-  /* Accent panels */
-  --landing-accent-surface: #1e2035;
-  --landing-accent-surface-2: #232440;
-
-  /* Whites */
-  --landing-white-5: rgba(255, 255, 255, 0.05);
-  --landing-white-8: rgba(255, 255, 255, 0.08);
-  --landing-white-12: rgba(255, 255, 255, 0.12);
-  --landing-white-16: rgba(255, 255, 255, 0.16);
-  --landing-white-20: rgba(255, 255, 255, 0.2);
-
-  /* Shadow */
-  --landing-shadow-popover: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {
