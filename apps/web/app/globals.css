@@ -41,7 +41,7 @@
   /* shadow */
   --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.08);
 
-  --landing-background: #f0ede8; /* warm off-white page */
+  --landing-background: #f4f1ec; /* warm off-white page */
   --landing-surface: #ebe8e3; /* barely lifted */
   --landing-surface-2: #e5e2dd;
   --landing-surface-3: #dedad4;
@@ -73,7 +73,7 @@
   --landing-primary-soft: #444444;
 
   /* Accent panels */
-  --landing-accent-surface: #e8e5df;
+  --landing-accent-surface: #f77824;
   --landing-accent-surface-2: #e2dfd9;
 
   /* Whites */
@@ -195,6 +195,8 @@
   --font-sans: var(--font-neue-montreal);
   --font-mono: var(--font-fragment-mono);
   --font-head: var(--font-playfair-display);
+  --font-bodoni: var(--font-bodoniM);
+  --font-inter: var(--font-interY);
 
   /* Animations */
   --animate-fade-in: fade-in var(--tw-duration, 200ms) ease-out;

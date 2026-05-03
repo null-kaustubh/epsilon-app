@@ -15,11 +15,10 @@ import {
 
 const FONT_STEP = 4;
 const MIN_FONT = 20;
-const MAX_FONT = 72;
+const MAX_FONT = 96;
 
 const COLOR_SWATCHES = [
-  { value: "default", label: "Default", hex: "#ebe8e3" },
-  { value: "#111111", label: "Black", hex: "#111111" },
+  { value: "default", label: "Default", hex: "#1A1A1A" },
   { value: "#c04a4a", label: "Red", hex: "#c04a4a" },
   { value: "#d4924e", label: "Orange", hex: "#d4924e" },
   { value: "#c9a84c", label: "Yellow", hex: "#c9a84c" },

@@ -1,7 +1,12 @@
 import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Fragment_Mono, Playfair_Display } from "next/font/google";
+import {
+  Bodoni_Moda,
+  Fragment_Mono,
+  Playfair_Display,
+  Inter,
+} from "next/font/google";
 import clsx from "clsx";
 import ThemeProvider, { Theme } from "../context/ThemeProvider";
 import { cookies } from "next/headers";
@@ -18,6 +23,19 @@ const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-playfair-display",
+});
+
+const bodoniModa = Bodoni_Moda({
+  subsets: ["latin"],
+  weight: ["400", "400"],
+  style: ["normal", "italic"],
+  variable: "--font-bodoniM",
+});
+
+const inter = Inter({
+  weight: ["400", "500", "600", "700", "800", "900"],
+  style: ["normal"],
+  variable: "--font-interY",
 });
 
 export const metadata: Metadata = {
@@ -84,6 +102,8 @@ export default async function RootLayout({
         neueMontreal.variable,
         fragmentMono.variable,
         playfairDisplay.variable,
+        bodoniModa.variable,
+        inter.variable,
       )}
       data-color-theme={theme}
     >

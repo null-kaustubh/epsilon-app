@@ -4,11 +4,10 @@ import { useCallback, useRef, useState } from "react";
 import LandingToolbar, { LandingToolbarState } from "./LandingToolbar";
 import Image from "next/image";
 
-const DEFAULT_TEXT = "Ideas. Notes. Clarity.\nWherever your mind goes.";
+const DEFAULT_TEXT = "Notes that become you.";
 
 const COLOR_HEX_MAP: Record<string, string | undefined> = {
-  default: undefined,
-  "#111111": "#111111",
+  default: "#1a1a1a",
   "#c04a4a": "#c04a4a",
   "#d4924e": "#d4924e",
   "#c9a84c": "#c9a84c",
@@ -23,9 +22,9 @@ export default function EditableHero() {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const [toolbar, setToolbar] = useState<LandingToolbarState>({
-    fontSize: 54,
+    fontSize: 72,
     color: "default",
-    align: "center",
+    align: "left",
   });
 
   const [activeFormats, setActiveFormats] = useState<Set<FormatCmd>>(new Set());
@@ -86,18 +85,39 @@ export default function EditableHero() {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* ② Background image */}
-      <Image
-        src="/ascii-art.webp"
-        alt="Epsilon background"
-        fill
-        sizes="100vw"
-        priority
-        quality={90}
-        className="object-cover object-center"
-      />
+      {/* SVG container — replaces <Image> */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Main collage: woman + floating cards */}
+        <Image
+          src="/Untitled_design.svg"
+          alt="Epsilon collage"
+          width={1152}
+          height={768}
+          unoptimized
+          priority
+          className="absolute right-0 top-0 h-full w-auto max-w-none"
+        />
+        {/* Stair decoration */}
+        <Image
+          src="/stair.svg"
+          alt="Stair decoration"
+          width={1152}
+          height={768}
+          unoptimized
+          priority
+          className="absolute bottom-20 right-20 h-[30%] w-auto max-w-none opacity-90"
+        />
+      </div>
 
-      <div className="relative z-2 flex h-full flex-col items-center justify-center gap-4">
+      <div className="relative z-2 flex h-full flex-col items-center justify-center gap-4 -pl-10 max-w-[40%]">
+        {/* Floating toolbar */}
+        <LandingToolbar
+          state={toolbar}
+          onChange={handleChange}
+          onFormat={handleFormat}
+          activeFormats={activeFormats}
+        />
+
         {/* Editable heading */}
         <div className="relative group">
           <h1
@@ -109,35 +129,30 @@ export default function EditableHero() {
             onMouseUp={syncFormats}
             onFocus={syncFormats}
             style={{
-              fontSize: `${toolbar.fontSize}px`,
               textAlign: toolbar.align,
-              color: COLOR_HEX_MAP[toolbar.color] ?? undefined,
+              color: COLOR_HEX_MAP[toolbar.color] ?? "#1a1a1a",
+              fontSize: `${toolbar.fontSize}px`,
             }}
             className="
-            whitespace-pre-wrap wrap-break-word text-center font-sans font-normal
-            leading-[1.12] text-landing-surface outline-none
-            min-w-50 max-w-175 px-3 py-2
+            whitespace-pre-wrap wrap-break-word text-left font-inter font-medium
+            leading-[1.12] outline-none
+            w-150 min-h-40 px-3 py-2
             rounded-sm border-2 border-dashed border-landing-border
-            transition-[color] cursor-text
+            transition-[color] cursor-text overflow-hidden
           "
             data-placeholder={DEFAULT_TEXT}
           >
-            {DEFAULT_TEXT}
+            Notes that <br />
+            <span className="font-bodoni italic font-normal">
+              become <span className="text-landing-accent-surface ">you.</span>
+            </span>
           </h1>
         </div>
 
-        <div className="text-balance text-center w-140 font-mono">
-          Combine note-taking, idea tracking, and daily planning in one smart
-          notebook, ready whenever inspiration hits.
+        <div className="text-balance text-left w-150 font-mono text-landing-foreground">
+          A block-based canvas that lets you shape ideas your way. No rigid
+          layouts. Just infinite freedom to think and create.
         </div>
-
-        {/* Floating toolbar */}
-        <LandingToolbar
-          state={toolbar}
-          onChange={handleChange}
-          onFormat={handleFormat}
-          activeFormats={activeFormats}
-        />
       </div>
     </section>
   );
