@@ -4,10 +4,14 @@ import (
 	"database/sql"
 	"net/http"
 
+	_ "api-golang/docs"
+
 	"api-golang/internal/handler"
 	"api-golang/internal/middleware"
 	"api-golang/internal/repository"
 	"api-golang/internal/service"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func New(db *sql.DB) http.Handler {
@@ -44,6 +48,9 @@ func New(db *sql.DB) http.Handler {
 	mux.Handle("DELETE /spaces/{slug}", auth(http.HandlerFunc(spaceHandler.DeleteSpace)))
 	mux.Handle("PATCH /spaces/{slug}/blocks", auth(http.HandlerFunc(spaceHandler.SaveBlocks)))
 	mux.Handle("DELETE /spaces/{slug}/blocks/{blockId}", auth(http.HandlerFunc(spaceHandler.DeleteBlock)))
+
+	// swagger
+	mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
 
 	// wrap middleware
 	return middleware.Chain(

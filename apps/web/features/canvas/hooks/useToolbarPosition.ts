@@ -1,4 +1,3 @@
-// features/canvas/hooks/useToolbarPosition.ts
 import { useEffect, useState, RefObject } from "react";
 
 export function useToolbarPosition(

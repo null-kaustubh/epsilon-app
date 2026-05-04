@@ -16,7 +16,6 @@ export default function ImageBlockEditor({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const imageAreaRef = useRef<HTMLDivElement | null>(null);
 
-  // Keeping a local copy so the preview updates immediately after file selection.
   const [localSrc, setLocalSrc] = useState<string>(value);
   const measureImgRef = useRef<HTMLImageElement | null>(null);
   const [measureWidthPx, setMeasureWidthPx] = useState<number>(0);
@@ -47,7 +46,6 @@ export default function ImageBlockEditor({
       setMeasureWidthPx(el.clientWidth);
     });
     ro.observe(el);
-    // Prime the width immediately.
     setMeasureWidthPx(el.clientWidth);
     return () => ro.disconnect();
   }, []);
@@ -84,8 +82,6 @@ export default function ImageBlockEditor({
         ref={imageAreaRef}
         className="relative h-full w-full rounded-sm overflow-hidden"
       >
-        {/* Hidden measurement: scale the image to the same width as the visible container,
-            and use its natural height to drive the grid row calculation. */}
         {localSrc ? (
           <img
             ref={measureImgRef}

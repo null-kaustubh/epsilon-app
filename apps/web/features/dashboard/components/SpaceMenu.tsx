@@ -72,7 +72,7 @@ export default function SpaceMenu({ onRename, onDelete }: SpaceMenuProps) {
             e.preventDefault();
             e.stopPropagation();
             setOpen(false);
-            onRename(); // just calls () => void, no args
+            onRename();
           }}
           className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
           aria-label="Rename space"

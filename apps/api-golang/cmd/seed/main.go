@@ -87,7 +87,6 @@ func main() {
 	}
 
 	// --- Blocks ---
-	// TODO: Adjust content, positions, and sizes to your liking
 	blocks := []struct {
 		id           uuid.UUID
 		typ, content string

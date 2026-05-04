@@ -40,6 +40,24 @@
 
   /* shadow */
   --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+  --landing-background: #f4f1ec;
+  --landing-surface: #f5f2ec;
+  --landing-surface-2: #efe9df;
+  --landing-surface-3: #f6f2eb;
+
+  /* Borders — very subtle */
+  --landing-border: #e6dfd6;
+
+  /* Text */
+  --landing-foreground: #0f0f0f;
+  --landing-foreground-soft: #1a1a1a;
+
+  /* Accent panels */
+  --landing-accent-surface: #f77824;
+
+  /* Shadow */
+  --landing-shadow-popover: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
 [data-color-theme="dark"] {
@@ -72,51 +90,6 @@
   --selection-foreground: #0f0f10;
 
   --shadow-popover: 0 0 40px rgba(0, 0, 0, 0.6);
-
-  --landing-background: #0a0a0b; /* true Linear black */
-  --landing-surface: #111113; /* barely lifted */
-  --landing-surface-2: #141416;
-  --landing-surface-3: #18181b;
-  --landing-surface-4: #1c1c1f;
-  --landing-surface-5: #202023;
-
-  /* Cards */
-  --landing-card: #1a1a1d;
-  --landing-card-hover: #1e1e21;
-  --landing-popover: #18181b;
-  --landing-overlay: #242427;
-
-  /* Borders — very subtle */
-  --landing-border: #27272a;
-  --landing-border-muted: #222225;
-  --landing-border-strong: #323235;
-
-  /* Text */
-  --landing-foreground: #ffffff;
-  --landing-foreground-soft: #f4f4f5;
-  --landing-text-secondary: #a1a1aa;
-  --landing-text-muted: #71717a;
-  --landing-text-dim: #52525b;
-  --landing-text-faint: #3f3f46;
-
-  /* Brand — Linear violet */
-  --landing-primary: #5e6ad2;
-  --landing-primary-hover: #6872e5;
-  --landing-primary-soft: #8b97ff;
-
-  /* Accent panels */
-  --landing-accent-surface: #1e2035;
-  --landing-accent-surface-2: #232440;
-
-  /* Whites */
-  --landing-white-5: rgba(255, 255, 255, 0.05);
-  --landing-white-8: rgba(255, 255, 255, 0.08);
-  --landing-white-12: rgba(255, 255, 255, 0.12);
-  --landing-white-16: rgba(255, 255, 255, 0.16);
-  --landing-white-20: rgba(255, 255, 255, 0.2);
-
-  /* Shadow */
-  --landing-shadow-popover: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {
@@ -156,38 +129,13 @@
   --color-landing-surface: var(--landing-surface);
   --color-landing-surface-2: var(--landing-surface-2);
   --color-landing-surface-3: var(--landing-surface-3);
-  --color-landing-surface-4: var(--landing-surface-4);
-  --color-landing-surface-5: var(--landing-surface-5);
-
-  --color-landing-card: var(--landing-card);
-  --color-landing-card-hover: var(--landing-card-hover);
-  --color-landing-popover: var(--landing-popover);
-  --color-landing-overlay: var(--landing-overlay);
 
   --color-landing-border: var(--landing-border);
-  --color-landing-border-muted: var(--landing-border-muted);
-  --color-landing-border-strong: var(--landing-border-strong);
 
   --color-landing-foreground: var(--landing-foreground);
   --color-landing-foreground-soft: var(--landing-foreground-soft);
 
-  --color-landing-text-secondary: var(--landing-text-secondary);
-  --color-landing-text-muted: var(--landing-text-muted);
-  --color-landing-text-dim: var(--landing-text-dim);
-  --color-landing-text-faint: var(--landing-text-faint);
-
-  --color-landing-primary: var(--landing-primary);
-  --color-landing-primary-hover: var(--landing-primary-hover);
-  --color-landing-primary-soft: var(--landing-primary-soft);
-
   --color-landing-accent-surface: var(--landing-accent-surface);
-  --color-landing-accent-surface-2: var(--landing-accent-surface-2);
-
-  --color-landing-white-5: var(--landing-white-5);
-  --color-landing-white-8: var(--landing-white-8);
-  --color-landing-white-12: var(--landing-white-12);
-  --color-landing-white-16: var(--landing-white-16);
-  --color-landing-white-20: var(--landing-white-20);
 
   --shadow-landing-popover: var(--landing-shadow-popover);
 
@@ -195,6 +143,8 @@
   --font-sans: var(--font-neue-montreal);
   --font-mono: var(--font-fragment-mono);
   --font-head: var(--font-playfair-display);
+  --font-bodoni: var(--font-bodoniM);
+  --font-inter: var(--font-interY);
 
   /* Animations */
   --animate-fade-in: fade-in var(--tw-duration, 200ms) ease-out;
@@ -285,7 +235,7 @@ body {
   }
 }
 
-/* ─── Canvas grid — subtle dashed grid ─── */
+/* ─── Canvas grid ─── */
 .canvas-wrapper {
   background-color: var(--background);
   background-image: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 28 0 L 0 0 0 28' fill='none' stroke='%23c4b8aa' stroke-width='0.25' stroke-dasharray='3 4'/%3E%3C/svg%3E");
@@ -301,7 +251,7 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 28 0 L 0 0 0 28' fill='none' stroke='%23484848' stroke-width='0.25' stroke-dasharray='3 4'/%3E%3C/svg%3E");
 }
 
-/* ─── Placeholder (drop preview) ─── */
+/* ─── Placeholder ─── */
 .react-grid-placeholder {
   background: transparent !important;
   border: 1.5px dashed var(--accent) !important;
@@ -346,7 +296,6 @@ body {
 
 /* ─── Reset ALL handle styles — wipe RGL/react-resizable defaults ─── */
 .react-resizable-handle {
-  /* Strip the default SVG background and sizing RGL injects */
   background-image: none !important;
   background: var(--accent) !important;
 
@@ -355,15 +304,12 @@ body {
   height: 7px !important;
   padding: 0 !important;
 
-  /* react-resizable sets -10px margins for its 20px handles.
-     Since we shrink the handle, those stale margins offset centering. */
   margin: 0 !important;
 
   border-radius: 50% !important;
   border: 1.5px solid var(--background) !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
 
-  /* Use absolute positioning anchored via inset shortcuts below */
   position: absolute !important;
 
   opacity: 0;
@@ -371,13 +317,11 @@ body {
   z-index: 20;
 }
 
-/* Kill the ::after pseudo RGL uses for the SVG arrow */
 .react-resizable-handle::after {
   display: none !important;
 }
 
 /* ─── Corners ─── */
-/* anchor to the corner with inset, then shift back half the dot size */
 .react-resizable-handle-nw {
   top: 0 !important;
   left: 0 !important;
@@ -404,7 +348,6 @@ body {
 }
 
 /* ─── Edge midpoints ─── */
-/* left/right: 50% + translateX(-50%) = true center regardless of block width */
 .react-resizable-handle-n {
   top: 0 !important;
   left: 50% !important;
@@ -435,7 +378,6 @@ body {
   user-select: none !important;
 }
 
-/* react-grid-layout cursor/handle desync fixes */
 .react-grid-layout {
   position: relative;
 }
@@ -480,7 +422,6 @@ body {
   counter-increment: line;
   display: block;
   padding-right: 1.5rem;
-  /* Prevent wrap-glitch by giving each shiki "line" a stable height. */
   line-height: 1.25rem;
   min-height: 1.25rem;
   padding-left: 3rem;
@@ -554,7 +495,6 @@ body {
   margin: 0 !important;
 }
 
-/* shiki wraps output in <pre class="shiki"> inside rsce's <pre> */
 .rsce-wrapper .shiki {
   background: transparent !important;
   margin: 0 !important;
@@ -569,4 +509,27 @@ body {
 code,
 pre {
   font-family: var(--font-mono, monospace);
+}
+
+.blinking-cursor {
+  display: inline-block;
+  width: 2px;
+  color: transparent;
+  border-left: 2px solid #1a1a1a;
+  margin-left: 2px;
+  animation: blink 1.1s step-start infinite;
+}
+
+h1:focus .blinking-cursor {
+  display: none;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }

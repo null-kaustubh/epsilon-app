@@ -19,7 +19,6 @@ export default function LanguageBadge({ ext }: { ext: string }) {
       ? `${base}/${effectiveExt}-dark.svg`
       : `${base}/${effectiveExt}.svg`;
 
-  // reset failure when src changes
   useEffect(() => {
     setFailed(false);
   }, [src]);

@@ -80,7 +80,7 @@ export function useCanvasBlocks(
     syncRafRef.current = requestAnimationFrame(() => {
       syncRafRef.current = null;
       const latest = layoutsRef.current;
-      setLayouts(latest); // commit ref → state, not the other way around
+      setLayouts(latest);
     });
   }, []);
 
@@ -108,14 +108,11 @@ export function useCanvasBlocks(
 
     setBlocks((prev) => [...prev, newBlock]);
 
-    // update both
     layoutsRef.current = nextLayouts;
     setLayouts(nextLayouts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Batch "auto-grow" updates so rendering many blocks doesn't trigger
-  // dozens of synchronous layout state commits.
   const pendingGrowRef = useRef<Map<string, number>>(new Map());
   const growRafRef = useRef<number | null>(null);
 
@@ -195,8 +192,6 @@ export function useCanvasBlocks(
 
   const handleDeleteBlock = useCallback(
     async (id: string) => {
-      // Remove only the clicked block item + its layout entry.
-      // `compactType={null}` ensures other blocks don't reflow after deletion.
       pendingGrowRef.current.delete(id);
 
       setBlocks((prev) => prev.filter((b) => b.id !== id));
@@ -210,11 +205,9 @@ export function useCanvasBlocks(
         return nextLayouts;
       });
 
-      // only hit API if block was persisted
-      if (!savedBlockIdsRef.current.has(id)) return; // ← key line
+      if (!savedBlockIdsRef.current.has(id)) return;
       savedBlockIdsRef.current.delete(id);
 
-      // then delete from DB
       try {
         await spacesApi.deleteBlock(slug, id);
       } catch {

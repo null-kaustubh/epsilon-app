@@ -11,7 +11,7 @@ export default function Page() {
         }}
       />
 
-      <div data-color-theme="dark">
+      <div data-color-theme="light">
         <Landing />
       </div>
     </>

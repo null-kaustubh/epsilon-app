@@ -52,7 +52,7 @@ export default function CanvasToolbar({
           borderBottomRightRadius: isOpen ? 16 : 20,
         }}
       >
-        {/* CLOSED STATE (NOTCH) */}
+        {/* CLOSED STATE */}
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}

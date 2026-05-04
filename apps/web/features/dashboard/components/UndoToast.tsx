@@ -43,7 +43,6 @@ export default function UndoToast({
     };
   }, [duration]);
 
-  // UndoToast — return just the toast div, no portal, no fixed:
   return (
     <>
       <div

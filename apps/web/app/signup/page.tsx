@@ -53,7 +53,6 @@ export default function SignUpPage() {
     try {
       await register(email, password, username);
 
-      // backend sets the session cookie via Set-Cookie header — nothing to do manually
       router.push("/home");
     } catch (err: unknown) {
       setError(err instanceof ApiError ? err.message : "Something went wrong.");

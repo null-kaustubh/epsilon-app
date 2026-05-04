@@ -12,8 +12,6 @@ export const BLOCK_DEFAULT_H_PX = 180;
 export const CODE_BLOCK_W = 8;
 export const CODE_BLOCK_H = 6;
 
-// Keep block sizing consistent across laptop/desktop by preventing the grid from
-// shrinking below the design width; narrower viewports will scroll horizontally.
 export const CANVAS_MIN_WIDTH_PX = 1870;
 
 export function visibleCols(viewportWidth: number): number {
