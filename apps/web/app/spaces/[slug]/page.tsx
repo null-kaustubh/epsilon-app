@@ -20,7 +20,7 @@ async function getSpace(slug: string) {
     if (!res.ok) return null;
 
     const json = await res.json();
-    return json.data ?? json; // unwrap the data envelope
+    return json.data ?? json;
   } catch {
     return null;
   }

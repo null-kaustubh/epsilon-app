@@ -61,7 +61,6 @@ const MarkdownBlockEditor = forwardRef<MarkdownEditorHandle, BaseEditorProps>(
       const hasWrapAfter = draftValue.slice(end, end + wl) === wrapper;
 
       if (hasWrapBefore && hasWrapAfter) {
-        // already wrapped → remove
         const next =
           draftValue.slice(0, start - wl) +
           selected +
@@ -74,7 +73,6 @@ const MarkdownBlockEditor = forwardRef<MarkdownEditorHandle, BaseEditorProps>(
         return;
       }
 
-      // not wrapped → add
       const next = before + wrapper + selected + wrapper + after;
       setDraftValue(next);
       onChangeAction(next);
@@ -115,7 +113,6 @@ const MarkdownBlockEditor = forwardRef<MarkdownEditorHandle, BaseEditorProps>(
             setDraftValue(next);
             onChangeAction(next);
 
-            // 🔥 resize immediately on typing
             e.target.style.height = "auto";
             e.target.style.height = e.target.scrollHeight + "px";
           }}

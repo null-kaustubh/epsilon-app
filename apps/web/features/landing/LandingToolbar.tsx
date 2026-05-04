@@ -19,12 +19,12 @@ const MAX_FONT = 96;
 
 const COLOR_SWATCHES = [
   { value: "default", label: "Default", hex: "#1A1A1A" },
-  { value: "#c04a4a", label: "Red", hex: "#c04a4a" },
-  { value: "#d4924e", label: "Orange", hex: "#d4924e" },
-  { value: "#c9a84c", label: "Yellow", hex: "#c9a84c" },
-  { value: "#3d8f5f", label: "Green", hex: "#3d8f5f" },
-  { value: "#4477c4", label: "Blue", hex: "#4477c4" },
-  { value: "#8a5fc7", label: "Purple", hex: "#8a5fc7" },
+  { value: "#e05555", label: "Red", hex: "#e05555" },
+  { value: "#f77824", label: "Orange", hex: "#f77824" },
+  { value: "#f0c93a", label: "Yellow", hex: "#f0c93a" },
+  { value: "#42b872", label: "Green", hex: "#42b872" },
+  { value: "#4d8fe0", label: "Blue", hex: "#4d8fe0" },
+  { value: "#a06ee0", label: "Purple", hex: "#a06ee0" },
 ] as const;
 
 type SwatchValue = (typeof COLOR_SWATCHES)[number]["value"];
@@ -39,7 +39,6 @@ export interface LandingToolbarState {
 interface LandingToolbarProps {
   state: LandingToolbarState;
   onChange: (next: Partial<LandingToolbarState>) => void;
-  /** execCommand wrapper — called with command name */
   onFormat: (cmd: "bold" | "italic" | "underline" | "strikeThrough") => void;
   activeFormats?: Set<"bold" | "italic" | "underline" | "strikeThrough">;
 }
@@ -64,17 +63,23 @@ export default function LandingToolbar({
   );
 
   return (
-    <div className="bg-landing-surface-5 rounded-full px-2 py-2">
-      <div
-        onMouseDown={prevent}
-        className="
-        inline-flex items-center gap-2
-        rounded-full px-2 py-2 cursor-default
-        bg-landing-accent-surface
+    <div
+      onMouseDown={prevent}
+      className="
+        rounded-full bg-landing-surface overflow-x-auto z-20
+        shadow-[0_10px_40px_rgba(28,28,28,0.08),0_4px_12px_rgba(28,28,28,0.05)]
+        border border-landing-border
       "
-      >
+      style={
+        {
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        } as React.CSSProperties
+      }
+    >
+      <div className="flex flex-nowrap items-center gap-1 px-2 py-2 w-max">
         {/* Font size */}
-        <div className="flex items-center gap-0.5 rounded-full">
+        <div className="flex items-center gap-0.5 rounded-full shrink-0 mr-1">
           <TBtn
             title="Decrease size"
             onClick={() => adjSize(-FONT_STEP)}
@@ -95,7 +100,7 @@ export default function LandingToolbar({
         </div>
 
         {/* Color swatches */}
-        <div className="flex items-center gap-1 rounded-full bg-landing-surface-5 backdrop-blur-2xl px-2 py-2">
+        <div className="flex items-center gap-1 rounded-full bg-landing-surface-3 backdrop-blur-2xl px-2 py-2 shrink-0 shadow-[0_1px_5px_rgba(0,0,0,0.16),0_0_0_1px_rgba(0,0,0,0.05)] border border-landing-border">
           {COLOR_SWATCHES.map((s) => (
             <button
               key={s.value}
@@ -105,19 +110,19 @@ export default function LandingToolbar({
               onClick={() => onChange({ color: s.value })}
               className="
             relative h-5 w-5 shrink-0 rounded-full
-            border border-landing-accent-surface transition-transform hover:scale-110
+            border border-landing-surface transition-transform hover:scale-110
             "
               style={{ backgroundColor: s.hex ?? "#111" }}
             >
               {state.color === s.value && (
-                <span className="absolute inset-0 rounded-full ring-2 ring-neutral-900 ring-offset-1 ring-offset-landing-accent-surface" />
+                <span className="absolute inset-0 rounded-full ring-2 ring-neutral-900 ring-offset-1 ring-offset-landing-surface" />
               )}
             </button>
           ))}
         </div>
 
         {/* Format */}
-        <div className="flex items-center gap-0.5 rounded-full px-2 py-1">
+        <div className="flex items-center gap-1 rounded-full px-2 shrink-0">
           <TBtn
             title="Bold"
             onClick={() => onFormat("bold")}
@@ -149,7 +154,7 @@ export default function LandingToolbar({
         </div>
 
         {/* Align */}
-        <div className="flex items-center gap-0.5 rounded-full bg-landing-surface-5 backdrop-blur-sm px-1 py-1">
+        <div className="flex items-center gap-0.5 rounded-full bg-landing-surface-3 px-1 py-1 shrink-0 shadow-[0_1px_5px_rgba(0,0,0,0.16),0_0_0_1px_rgba(0,0,0,0.05)] border border-landing-border">
           <TBtn
             title="Align left"
             onClick={() => onChange({ align: "left" })}
@@ -202,9 +207,9 @@ function TBtn({
       className={`
         flex h-8 w-8 items-center justify-center rounded-full
         text-landing-foreground-soft transition-[color]
-        hover:bg-landing-background bg-landing-surface-5 backdrop-blur-2xl
-        disabled:pointer-events-none disabled:opacity-25 cursor-pointer
-        ${active ? "bg-neutral-100" : ""}
+        hover:bg-landing-surface-2 hover:border hover:border-landing-border bg-landing-surface-3 backdrop-blur-2xl
+        disabled:pointer-events-none disabled:opacity-25 cursor-pointer shadow-[0_2px_4px_rgba(0,0,0,0.16),0_0_0_1px_rgba(0,0,0,0.05)]
+        ${active ? "bg-white shadow-[0_2px_6px_rgba(28,28,28,0.16)]" : ""}
       `}
     >
       {children}

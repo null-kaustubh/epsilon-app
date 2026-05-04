@@ -67,7 +67,6 @@ export default function SpaceCard({
     setDraftDesc(space.description ?? "");
     setDraftIcon(space.icon_url ?? "");
     setRenaming(true);
-    // focus name input after render
     setTimeout(() => nameRef.current?.focus(), 0);
   };
 
@@ -95,7 +94,6 @@ export default function SpaceCard({
       return;
     }
 
-    // skip if nothing changed
     const unchanged =
       trimName === space.name &&
       desc.trim() === (space.description ?? "") &&
@@ -251,8 +249,8 @@ export default function SpaceCard({
             e.stopPropagation();
             onCancel?.();
           }}
-          className="shrink-0 self-start mt-0.5 p-1.5 rounded-md 
-               text-muted-foreground hover:text-destructive 
+          className="shrink-0 self-start mt-0.5 p-1.5 rounded-md
+               text-muted-foreground hover:text-destructive
                hover:bg-destructive/10 transition-colors cursor-pointer"
           aria-label="Cancel"
         >
@@ -265,7 +263,6 @@ export default function SpaceCard({
   return (
     <>
       {renaming ? (
-        // Not a link while editing so clicks don't navigate
         <div className="group block">{cardContent}</div>
       ) : (
         <Link

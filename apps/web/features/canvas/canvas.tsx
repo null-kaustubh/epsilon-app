@@ -25,7 +25,9 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
   const { ref, width } = useContainerWidth();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
   const viewportWidthRef = useRef(0);
-  useEffect(() => { viewportWidthRef.current = width; }, [width])
+  useEffect(() => {
+    viewportWidthRef.current = width;
+  }, [width]);
 
   const {
     blocks,
@@ -58,7 +60,6 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
   });
 
   const [mode, setMode] = useState<"cursor" | "delete">("cursor");
-  // Avoid mounting RGL with a guessed width (causes a visible "jump" as it re-measures).
   const gridWidth = useMemo(() => {
     if (width <= 0) return 0;
     return Math.max(CANVAS_MIN_WIDTH_PX, Math.floor(width));
@@ -82,7 +83,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
 
       <Link
         href={"/home"}
-        className="fixed top-3 right-18 z-50 p-2 rounded-xl 
+        className="fixed top-3 right-18 z-50 p-2 rounded-xl
                  bg-background/80 backdrop-blur-md border shadow-sm
                  hover:bg-muted/70 transition-opacity cursor-pointer"
       >
@@ -92,10 +93,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
       <ThemeToggle />
 
       <div className="canvas-scroll h-full overflow-x-auto overflow-y-scroll p-4 [scrollbar-gutter:stable]">
-        <div
-          ref={ref}
-          className="w-full"
-        >
+        <div ref={ref} className="w-full">
           {gridWidth > 0 ? (
             <CanvasGrid
               blocks={blocks}

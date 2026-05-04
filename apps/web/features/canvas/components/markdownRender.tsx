@@ -106,7 +106,7 @@ export function parseMarkdownBlocks(content: string): ReactNode[] {
           style={{
             margin: "0 0 4px 0",
             paddingLeft: "1.25rem",
-            listStyleType: "disc", // ← was missing, no bullets showed
+            listStyleType: "disc",
           }}
         >
           {items.map((item, idx) => (

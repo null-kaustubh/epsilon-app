@@ -107,6 +107,14 @@ export default async function RootLayout({
       )}
       data-color-theme={theme}
     >
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="https://assets.kaustubh.cloud/epsilon/epsilon.svg"
+          type="image/svg+xml"
+        />
+      </head>
       <body suppressHydrationWarning>
         <ThemeProvider initialTheme={theme}>{children}</ThemeProvider>
       </body>

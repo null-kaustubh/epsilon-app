@@ -73,7 +73,6 @@ export default function BlockEditToolbar({
   );
 
   if (!pos) return null;
-  // prevent toolbar clicks from blurring the editor
 
   const toolbar = (
     <div

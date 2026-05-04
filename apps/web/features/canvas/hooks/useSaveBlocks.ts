@@ -34,7 +34,6 @@ export function useSaveBlocks({
     const currentLayouts = layoutsRef.current;
     const lgItems = currentLayouts.lg ?? [];
 
-    // merge block content with live layout positions
     const payload: UpsertBlockPayload[] = currentBlocks.map((block) => {
       const layoutItem = lgItems.find((item) => item.i === block.id);
       return {
@@ -62,7 +61,6 @@ export function useSaveBlocks({
     }
   }, [slug, spaceId, layoutsRef, savedBlockIdsRef, onStatusChange]);
 
-  // Ctrl+S handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {

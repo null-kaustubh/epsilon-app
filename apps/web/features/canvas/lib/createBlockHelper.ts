@@ -18,9 +18,7 @@ export type Block = {
   style?: BlockStyle;
 };
 
-/**
- * Creates a new block at the given (x, y).
- * Position is determined by the caller (Canvas) using findNextAvailablePosition
+
  * so that the block never overlaps existing items regardless of their current
  * dragged positions.
  */

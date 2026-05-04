@@ -49,7 +49,6 @@ export default function CodeBlockEditor({
     [onChangeAction],
   );
 
-  // Keep highlighted HTML in sync for react-simple-code-editor's highlight prop
   useEffect(() => {
     let cancelled = false;
     const lang = langFromFilename(payload.filename);
@@ -101,7 +100,6 @@ export default function CodeBlockEditor({
 
     textarea.focus();
 
-    // move cursor to end (optional but feels right)
     const len = textarea.value.length;
     textarea.setSelectionRange(len, len);
   }, []);
@@ -145,7 +143,6 @@ export default function CodeBlockEditor({
           value={payload.code}
           onValueChange={(code) => persist({ ...payload, code })}
           highlight={() => highlightedHtml}
-          // Slightly more left padding helps prevent text/caret clipping at narrow widths.
           padding={{ top: 12, right: 12, bottom: 12, left: 16 }}
           onKeyDown={(e) => {
             if (e.key === "Escape") onRequestCloseAction();
@@ -156,7 +153,6 @@ export default function CodeBlockEditor({
             lineHeight: "22px",
             minHeight: "100%",
           }}
-          // Ensure soft-wrapping in the textarea matches Shiki's wrapped rendering.
           textareaClassName="block-editor code-editor-textarea outline-none"
           preClassName="rsce-pre"
         />

@@ -33,7 +33,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   const json = await res.json().catch(() => null);
-  return (json?.data ?? json) as T; // ← unwrap the data envelope
+  return (json?.data ?? json) as T;
 }
 
 export const api = {

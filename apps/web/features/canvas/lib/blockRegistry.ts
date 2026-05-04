@@ -16,7 +16,6 @@ export interface BaseViewProps {
   blockStyle?: BlockStyle;
   onGrowAction: (id: string, contentHeightPx: number) => void;
   onRequestEditAction?: () => void;
-  /** Optional: update block content from view mode (e.g. todo checkboxes). */
   onChangeContentAction?: (next: string) => void;
 }
 

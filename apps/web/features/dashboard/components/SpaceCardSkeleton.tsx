@@ -1,7 +1,6 @@
 export function SpaceCardSkeleton() {
   return (
     <div className="flex items-start gap-3 p-3 rounded-lg border border-border w-full bg-secondary animate-pulse">
-      {/* matches w-23 h-23 rounded-md */}
       <div className="w-23 h-23 rounded-md bg-muted shrink-0" />
       <div className="flex-1 flex flex-col gap-2 pt-1 min-w-0">
         {/* name */}
