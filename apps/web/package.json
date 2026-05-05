@@ -26,6 +26,7 @@
     "react-simple-code-editor": "^0.14.1",
     "schema-dts": "^2.0.0",
     "shiki": "^4.0.2",
+    "sonner": "^2.0.7",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

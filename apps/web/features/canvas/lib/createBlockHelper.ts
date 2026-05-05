@@ -18,7 +18,7 @@ export type Block = {
   style?: BlockStyle;
 };
 
-
+/*
  * so that the block never overlaps existing items regardless of their current
  * dragged positions.
  */
