@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"api-golang/internal/response"
@@ -25,6 +26,15 @@ type registerRequest struct {
 type loginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type forgotPasswordRequest struct {
+	Email string `json:"email"`
+}
+
+type resetPasswordRequest struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"new_password"`
 }
 
 // --- REGISTER ---
@@ -134,6 +144,70 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 		"id":       user.ID.String(),
 		"email":    user.Email,
 		"username": user.Username,
+	})
+}
+
+// --- FORGOT PASSWORD ---
+// @Summary      Forgot password
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        body body forgotPasswordRequest true "Email"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  map[string]string
+// @Router       /auth/forgot-password [post]
+func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var req forgotPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	if err := h.service.ForgotPassword(r.Context(), req.Email); err != nil {
+		if errors.Is(err, service.ErrInvalidEmail) {
+			response.Error(w, http.StatusBadRequest, "invalid email address")
+			return
+		}
+		response.Error(w, http.StatusInternalServerError, "something went wrong")
+		return
+	}
+
+	response.JSON(w, http.StatusOK, map[string]string{
+		"message": "if this email exists, a reset link has been sent",
+	})
+}
+
+// --- RESET PASSWORD ---
+// @Summary      Reset password
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        body body resetPasswordRequest true "Token + new password"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  map[string]string
+// @Router       /auth/reset-password [post]
+func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var req resetPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	if err := h.service.ResetPassword(r.Context(), req.Token, req.NewPassword); err != nil {
+		if errors.Is(err, service.ErrInvalidOrExpiredToken) {
+			response.Error(w, http.StatusBadRequest, "invalid or expired reset token")
+			return
+		}
+		if errors.Is(err, service.ErrWeakPassword) {
+			response.Error(w, http.StatusBadRequest, "password does not meet requirements")
+			return
+		}
+		response.Error(w, http.StatusInternalServerError, "something went wrong")
+		return
+	}
+
+	response.JSON(w, http.StatusOK, map[string]string{
+		"message": "password updated successfully",
 	})
 }
 

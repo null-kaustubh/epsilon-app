@@ -12,6 +12,7 @@ import ThemeProvider, { Theme } from "../context/ThemeProvider";
 import { cookies } from "next/headers";
 import { neueMontreal } from "../assets/fonts/fonts";
 import { SITE_INFO } from "../config/site";
+import { Toaster } from "sonner";
 
 const fragmentMono = Fragment_Mono({
   subsets: ["latin"],
@@ -117,6 +118,21 @@ export default async function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider initialTheme={theme}>{children}</ThemeProvider>
+        <Toaster
+          position="bottom-center"
+          richColors
+          toastOptions={{
+            style: {
+              background: "var(--secondary)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
+              borderRadius: "12px",
+              padding: "14px 16px",
+              backdropFilter: "blur(12px)",
+              boxShadow: "var(--shadow-popover)",
+            },
+          }}
+        />
       </body>
     </html>
   );

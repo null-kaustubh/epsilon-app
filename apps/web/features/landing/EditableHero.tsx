@@ -346,7 +346,10 @@ export default function EditableHero() {
         </div>
         {/* CTA Buttons */}
         <div className="flex items-center gap-3 z-20">
-          <button className="flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity">
+          <Link
+            href={"/signup"}
+            className="flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity"
+          >
             Start for free
             <svg
               width="12"
@@ -363,7 +366,7 @@ export default function EditableHero() {
                 strokeLinejoin="round"
               />
             </svg>
-          </button>
+          </Link>
 
           <button className="flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full">
             <span className="flex items-center justify-center w-9 h-9 rounded-full border border-landing-foreground-soft">

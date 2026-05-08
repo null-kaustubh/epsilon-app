@@ -25,6 +25,14 @@ type Block struct {
 	Style     json.RawMessage `json:"style"`
 }
 
+type PasswordReset struct {
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expires_at"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type SchemaMigration struct {
 	Version int64 `json:"version"`
 	Dirty   bool  `json:"dirty"`
