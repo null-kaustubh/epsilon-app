@@ -6,7 +6,7 @@ export type NavItem = {
 export const SITE_INFO = {
   name: "epsilon",
   url: "http://localhost:3000", //add link here
-  ogImage: "",
+  ogImage: "https://assets.kaustubh.cloud/images/epsilonog.png",
   description:
     "A fully customizable canvas workspace for individuals to create organized spaces using different types of blocks. Design your workspace your way with complete freedom to arrange, structure, and shape ideas without the clutter.",
   keywords: [
@@ -52,9 +52,3 @@ export const GITHUB_USERNAME = "null-kaustubh";
 export const SOURCE_CODE_GITHUB_REPO = "null-kaustubh/epsilon-app.git";
 export const SOURCE_CODE_GITHUB_URL =
   "https://github.com/null-kaustubh/epsilon-app.git";
-
-export const UTM_PARAMS = {
-  utm_source: "kaustubh.cloud",
-  utm_medium: "portfolio_website",
-  utm_campaign: "referral",
-};

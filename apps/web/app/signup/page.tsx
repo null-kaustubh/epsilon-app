@@ -86,6 +86,8 @@ export default function SignUpPage() {
     }
   };
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   return (
     <div
       className="min-h-screen flex items-center justify-center px-6 py-10"
@@ -132,8 +134,16 @@ export default function SignUpPage() {
 
           {/* OAuth */}
           <div className="flex flex-col gap-2.5 mb-5">
-            <OAuthButton icon={<GoogleIcon />} label="Continue with Google" />
-            <OAuthButton icon={<GitHubIcon />} label="Continue with GitHub" />
+            <OAuthButton
+              icon={<GoogleIcon />}
+              label="Continue with Google"
+              href={`${API_URL}/auth/oauth/google`}
+            />
+            <OAuthButton
+              icon={<GitHubIcon />}
+              label="Continue with GitHub"
+              href={`${API_URL}/auth/oauth/github`}
+            />
           </div>
 
           {/* Divider */}

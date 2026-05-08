@@ -28,7 +28,7 @@ const playfairDisplay = Playfair_Display({
 
 const bodoniModa = Bodoni_Moda({
   subsets: ["latin"],
-  weight: ["400", "400"],
+  weight: ["400", "400", "600"],
   style: ["normal", "italic"],
   variable: "--font-bodoniM",
 });
@@ -70,7 +70,11 @@ export const metadata: Metadata = {
         height: 630,
         alt: "Epsilon structured customizable canvas workspace",
       },
-      { url: "/og-alt.png", width: 1200, height: 630 },
+      {
+        url: "https://assets.kaustubh.cloud/images/epsilonog.png",
+        width: 1200,
+        height: 630,
+      },
     ],
   },
   twitter: {

@@ -7,6 +7,7 @@ import (
 
 	_ "api-golang/docs"
 
+	"api-golang/internal/config"
 	"api-golang/internal/email"
 	"api-golang/internal/handler"
 	"api-golang/internal/middleware"
@@ -16,12 +17,12 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-func New(db *sql.DB, emailSvc *email.EmailService, appURL string) http.Handler {
+func New(db *sql.DB, emailSvc *email.EmailService, cfg *config.Config) http.Handler {
 	mux := http.NewServeMux()
 
 	// --- auth ---
 	authRepo := repository.NewPostgresAuthRepository(db)
-	authService := service.NewAuthService(authRepo, emailSvc, appURL)
+	authService := service.NewAuthService(authRepo, emailSvc, cfg.FrontendURL)
 	authHandler := handler.NewAuthHandler(authService)
 
 	// --- spaces ---
@@ -33,6 +34,23 @@ func New(db *sql.DB, emailSvc *email.EmailService, appURL string) http.Handler {
 	loginLimiter := middleware.NewEndpointLimiter(time.Minute/5, 3) // 5/min burst 3
 	signupLimiter := middleware.NewEndpointLimiter(time.Hour/10, 3) // 10/hr burst 3
 	forgotLimiter := middleware.NewEndpointLimiter(time.Hour/5, 2)  // 5/hr burst 2
+
+	// --- oauth ---
+	oauthHandler := handler.NewOAuthHandler(
+		authService,
+		cfg.GoogleClientID,
+		cfg.GoogleClientSecret,
+		cfg.GitHubClientID,
+		cfg.GitHubClientSecret,
+		cfg.BackendURL,
+		cfg.FrontendURL,
+	)
+
+	// oauth routes — no rate limiter, providers throttle themselves
+	mux.HandleFunc("GET /auth/oauth/google", oauthHandler.GoogleLogin)
+	mux.HandleFunc("GET /auth/oauth/google/callback", oauthHandler.GoogleCallback)
+	mux.HandleFunc("GET /auth/oauth/github", oauthHandler.GitHubLogin)
+	mux.HandleFunc("GET /auth/oauth/github/callback", oauthHandler.GitHubCallback)
 
 	auth := middleware.AuthMiddleware(authService)
 

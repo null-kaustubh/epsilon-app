@@ -41,6 +41,23 @@ func (r *PostgresAuthRepository) CreateUser(ctx context.Context, user db.User) e
 	return nil
 }
 
+func (r *PostgresAuthRepository) CreateOAuthUser(ctx context.Context, user db.User) error {
+	_, err := r.queries.CreateOAuthUser(ctx, db.CreateOAuthUserParams{
+		ID:         user.ID,
+		Email:      user.Email,
+		Username:   user.Username,
+		Provider:   user.Provider,
+		ProviderID: user.ProviderID,
+	})
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+			return ErrUserExists
+		}
+		return err
+	}
+	return nil
+}
+
 func (r *PostgresAuthRepository) CheckUsernameExists(ctx context.Context, username string) (bool, error) {
 	return r.queries.CheckUsernameExists(ctx, username)
 }
@@ -82,6 +99,20 @@ func (r *PostgresAuthRepository) GetUserByID(ctx context.Context, id string) (db
 		return db.User{}, err
 	}
 
+	return u, nil
+}
+
+func (r *PostgresAuthRepository) GetUserByProviderID(ctx context.Context, provider, providerID string) (db.User, error) {
+	u, err := r.queries.GetUserByProviderID(ctx, db.GetUserByProviderIDParams{
+		Provider:   provider,
+		ProviderID: sql.NullString{String: providerID, Valid: true},
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return db.User{}, ErrUserNotFound
+		}
+		return db.User{}, err
+	}
 	return u, nil
 }
 
@@ -139,7 +170,7 @@ func (r *PostgresAuthRepository) DeletePasswordResetByToken(ctx context.Context,
 
 func (r *PostgresAuthRepository) UpdateUserPassword(ctx context.Context, userID uuid.UUID, passwordHash string) error {
 	return r.queries.UpdateUserPassword(ctx, db.UpdateUserPasswordParams{
-		PasswordHash: passwordHash,
+		PasswordHash: sql.NullString{String: passwordHash, Valid: true},
 		ID:           userID,
 	})
 }

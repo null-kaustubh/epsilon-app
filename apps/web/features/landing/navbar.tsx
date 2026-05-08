@@ -5,7 +5,7 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 py-3">
       <Link
         href="/"
-        className="cursor-pointer font-head text-4xl text-landing-foreground select-none"
+        className="cursor-pointer font-bodoni font-bold text-4xl text-landing-foreground select-none"
       >
         EPSILON
       </Link>

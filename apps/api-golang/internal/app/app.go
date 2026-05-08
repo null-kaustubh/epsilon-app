@@ -30,7 +30,7 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	r := router.New(dbConn, emailSvc, cfg.AppURL)
+	r := router.New(dbConn, emailSvc, cfg)
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,

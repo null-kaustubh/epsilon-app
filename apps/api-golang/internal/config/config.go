@@ -5,10 +5,15 @@ import (
 )
 
 type Config struct {
-	Port         string
-	DBURL        string
-	ResendAPIKey string
-	AppURL       string
+	Port               string
+	DBURL              string
+	ResendAPIKey       string
+	FrontendURL        string
+	GoogleClientID     string
+	GoogleClientSecret string
+	GitHubClientID     string
+	GitHubClientSecret string
+	BackendURL         string
 }
 
 func Load() (*Config, error) {
@@ -23,9 +28,14 @@ func Load() (*Config, error) {
 	}
 
 	return &Config{
-		Port:         port,
-		DBURL:        dbURL,
-		ResendAPIKey: os.Getenv("RESEND_API_KEY"),
-		AppURL:       os.Getenv("APP_URL"),
+		Port:               port,
+		DBURL:              dbURL,
+		ResendAPIKey:       os.Getenv("RESEND_API_KEY"),
+		FrontendURL:        os.Getenv("FRONTEND_URL"),
+		BackendURL:         os.Getenv("BACKEND_URL"),
+		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		GitHubClientID:     os.Getenv("GITHUB_CLIENT_ID"),
+		GitHubClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 	}, nil
 }
