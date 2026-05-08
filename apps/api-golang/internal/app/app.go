@@ -9,6 +9,7 @@ import (
 	"api-golang/internal/config"
 	"api-golang/internal/db"
 	sqlcdb "api-golang/internal/db/sqlc"
+	"api-golang/internal/email"
 	"api-golang/internal/router"
 )
 
@@ -22,13 +23,14 @@ func New() (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("config load failed: %w", err)
 	}
+	emailSvc := email.New(cfg.ResendAPIKey)
 
 	dbConn, err := db.NewPostgresDB(cfg.DBURL)
 	if err != nil {
 		return nil, err
 	}
 
-	r := router.New(dbConn)
+	r := router.New(dbConn, emailSvc, cfg.AppURL)
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,

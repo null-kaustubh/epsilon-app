@@ -5,8 +5,10 @@ import (
 )
 
 type Config struct {
-	Port  string
-	DBURL string
+	Port         string
+	DBURL        string
+	ResendAPIKey string
+	AppURL       string
 }
 
 func Load() (*Config, error) {
@@ -21,7 +23,9 @@ func Load() (*Config, error) {
 	}
 
 	return &Config{
-		Port:  port,
-		DBURL: dbURL,
+		Port:         port,
+		DBURL:        dbURL,
+		ResendAPIKey: os.Getenv("RESEND_API_KEY"),
+		AppURL:       os.Getenv("APP_URL"),
 	}, nil
 }

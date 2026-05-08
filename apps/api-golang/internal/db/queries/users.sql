@@ -14,3 +14,6 @@ SELECT * FROM users WHERE lower(username) = lower($1);
 
 -- name: CheckUsernameExists :one
 SELECT EXISTS(SELECT 1 FROM users WHERE lower(username) = lower($1)) AS exists;
+
+-- name: UpdateUserPassword :exec
+UPDATE users SET password_hash = $1 WHERE id = $2;

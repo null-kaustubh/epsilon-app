@@ -41,6 +41,19 @@ CREATE TABLE public.blocks (
 
 
 --
+-- Name: password_resets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.password_resets (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    token text NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -100,6 +113,22 @@ ALTER TABLE ONLY public.blocks
 
 
 --
+-- Name: password_resets password_resets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.password_resets
+    ADD CONSTRAINT password_resets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: password_resets password_resets_token_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.password_resets
+    ADD CONSTRAINT password_resets_token_key UNIQUE (token);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -147,6 +176,20 @@ CREATE INDEX idx_blocks_space_id ON public.blocks USING btree (space_id);
 
 
 --
+-- Name: idx_password_resets_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_password_resets_token ON public.password_resets USING btree (token);
+
+
+--
+-- Name: idx_password_resets_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_password_resets_user_id ON public.password_resets USING btree (user_id);
+
+
+--
 -- Name: idx_sessions_expires_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -187,6 +230,14 @@ CREATE UNIQUE INDEX users_username_unique ON public.users USING btree (lower(use
 
 ALTER TABLE ONLY public.blocks
     ADD CONSTRAINT blocks_space_id_fkey FOREIGN KEY (space_id) REFERENCES public.spaces(id) ON DELETE CASCADE;
+
+
+--
+-- Name: password_resets password_resets_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.password_resets
+    ADD CONSTRAINT password_resets_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

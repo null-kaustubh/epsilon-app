@@ -61,6 +61,7 @@ export default function SignInPage() {
     <div
       className="min-h-screen flex items-center justify-center px-6 py-10"
       style={{ background: "var(--background)" }}
+      data-color-theme="dark"
     >
       <div
         className="w-full max-w-300 h-200 flex overflow-hidden"
@@ -312,24 +313,9 @@ export default function SignInPage() {
                         transition-all duration-200
                         ${
                           canSubmit && !loading
-                            ? "cursor-pointer hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
-                            : "cursor-not-allowed"
+                            ? "cursor-pointer bg-secondary/60 hover:bg-background transition-[color] text-foreground border border-border"
+                            : "cursor-not-allowed bg-secondary/60 text-muted-foreground/60 border border-border"
                         }`}
-              style={
-                canSubmit && !loading
-                  ? {
-                      background: "var(--accent)",
-                      color: "var(--accent-foreground)",
-                      boxShadow:
-                        "0 4px 22px color-mix(in srgb, var(--accent) 32%, transparent)",
-                    }
-                  : {
-                      background: "var(--secondary)",
-                      color: "var(--muted-foreground)",
-                      border: "1px solid var(--border)",
-                      opacity: 0.6,
-                    }
-              }
             >
               {loading ? (
                 <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />

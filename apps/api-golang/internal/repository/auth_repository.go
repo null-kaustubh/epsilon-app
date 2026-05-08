@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	db "api-golang/internal/db/sqlc"
 
@@ -113,4 +114,32 @@ func (r *PostgresAuthRepository) DeleteSession(ctx context.Context, id string) e
 
 func (r *PostgresAuthRepository) DeleteSessionsByUserID(ctx context.Context, userID uuid.UUID) error {
 	return r.queries.DeleteSessionsByUserID(ctx, userID)
+}
+
+func (r *PostgresAuthRepository) CreatePasswordReset(ctx context.Context, userID uuid.UUID, token string, expiresAt time.Time) error {
+	_, err := r.queries.CreatePasswordReset(ctx, db.CreatePasswordResetParams{
+		UserID:    userID,
+		Token:     token,
+		ExpiresAt: expiresAt,
+	})
+	return err
+}
+
+func (r *PostgresAuthRepository) GetPasswordResetByToken(ctx context.Context, token string) (db.PasswordReset, error) {
+	return r.queries.GetPasswordResetByToken(ctx, token)
+}
+
+func (r *PostgresAuthRepository) DeletePasswordResetsByUserID(ctx context.Context, userID uuid.UUID) error {
+	return r.queries.DeletePasswordResetsByUserID(ctx, userID)
+}
+
+func (r *PostgresAuthRepository) DeletePasswordResetByToken(ctx context.Context, token string) error {
+	return r.queries.DeletePasswordResetByToken(ctx, token)
+}
+
+func (r *PostgresAuthRepository) UpdateUserPassword(ctx context.Context, userID uuid.UUID, passwordHash string) error {
+	return r.queries.UpdateUserPassword(ctx, db.UpdateUserPasswordParams{
+		PasswordHash: passwordHash,
+		ID:           userID,
+	})
 }

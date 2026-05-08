@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"api-golang/internal/app"
+
+	"github.com/joho/godotenv"
 )
 
 // @title           Epsilon-API
@@ -15,6 +17,8 @@ import (
 // @in cookie
 // @name session_id
 func main() {
+	godotenv.Load()
+
 	application, err := app.New()
 	if err != nil {
 		log.Fatalf("failed to initialize app: %v", err)
