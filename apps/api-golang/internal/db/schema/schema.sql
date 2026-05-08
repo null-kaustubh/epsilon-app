@@ -98,9 +98,12 @@ CREATE TABLE public.spaces (
 CREATE TABLE public.users (
     id uuid NOT NULL,
     email text NOT NULL,
-    password_hash text NOT NULL,
+    password_hash text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    username text DEFAULT ''::text NOT NULL
+    username text DEFAULT ''::text NOT NULL,
+    provider text DEFAULT 'local'::text NOT NULL,
+    provider_id text,
+    CONSTRAINT chk_password_or_oauth CHECK ((((provider = 'local'::text) AND (password_hash IS NOT NULL)) OR ((provider <> 'local'::text) AND (password_hash IS NULL))))
 );
 
 
@@ -215,6 +218,13 @@ CREATE INDEX idx_spaces_user_id ON public.spaces USING btree (user_id);
 --
 
 CREATE UNIQUE INDEX users_email_unique ON public.users USING btree (lower(email));
+
+
+--
+-- Name: users_provider_provider_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_provider_provider_id_idx ON public.users USING btree (provider, provider_id) WHERE (provider_id IS NOT NULL);
 
 
 --

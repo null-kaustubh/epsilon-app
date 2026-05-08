@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"encoding/json"
 	"time"
 
@@ -57,9 +58,11 @@ type Space struct {
 }
 
 type User struct {
-	ID           uuid.UUID `json:"id"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"password_hash"`
-	CreatedAt    time.Time `json:"created_at"`
-	Username     string    `json:"username"`
+	ID           uuid.UUID      `json:"id"`
+	Email        string         `json:"email"`
+	PasswordHash sql.NullString `json:"password_hash"`
+	CreatedAt    time.Time      `json:"created_at"`
+	Username     string         `json:"username"`
+	Provider     string         `json:"provider"`
+	ProviderID   sql.NullString `json:"provider_id"`
 }

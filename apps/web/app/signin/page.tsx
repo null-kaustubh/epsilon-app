@@ -57,6 +57,8 @@ export default function SignInPage() {
     }
   };
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   return (
     <div
       className="min-h-screen flex items-center justify-center px-6 py-10"
@@ -215,8 +217,16 @@ export default function SignInPage() {
 
           {/* OAuth */}
           <div className="flex flex-col gap-2.5 mb-5">
-            <OAuthButton icon={<GoogleIcon />} label="Sign in with Google" />
-            <OAuthButton icon={<GitHubIcon />} label="Sign in with GitHub" />
+            <OAuthButton
+              icon={<GoogleIcon />}
+              label="Sign in with Google"
+              href={`${API_URL}/auth/oauth/google`}
+            />
+            <OAuthButton
+              icon={<GitHubIcon />}
+              label="Sign in with GitHub"
+              href={`${API_URL}/auth/oauth/github`}
+            />
           </div>
 
           {/* Divider */}

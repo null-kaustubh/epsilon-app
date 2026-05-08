@@ -32,8 +32,8 @@ func (e *EmailService) SendWelcome(toEmail, username string) {
 
 }
 
-func (e *EmailService) SendPasswordReset(toEmail, token, appURL string) {
-	link := fmt.Sprintf("%s/reset-password?token=%s", appURL, token)
+func (e *EmailService) SendPasswordReset(toEmail, token, frontendURL string) {
+	link := fmt.Sprintf("%s/reset-password?token=%s", frontendURL, token)
 	_, err := e.client.Emails.Send(&resend.SendEmailRequest{
 		From:    e.from,
 		To:      []string{toEmail},

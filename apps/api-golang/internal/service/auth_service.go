@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"math/big"
 	"regexp"
 	"time"
 
@@ -22,14 +25,17 @@ var (
 	ErrUsernameTaken         = errors.New("username already taken")
 	ErrInvalidOrExpiredToken = errors.New("invalid or expired reset token")
 	ErrInvalidEmail          = errors.New("invalid email address")
+	ErrEmailConflict         = errors.New("email already registered with a different login method")
 )
 
 // --- INTERFACE ---
 
 type AuthRepository interface {
 	CreateUser(ctx context.Context, user db.User) error
+	CreateOAuthUser(ctx context.Context, user db.User) error
 	GetUserByEmail(ctx context.Context, email string) (db.User, error)
 	GetUserByID(ctx context.Context, id string) (db.User, error)
+	GetUserByProviderID(ctx context.Context, provider, providerID string) (db.User, error)
 	CreateSession(ctx context.Context, session db.Session) error
 	GetSession(ctx context.Context, id string) (db.Session, error)
 	DeleteSession(ctx context.Context, id string) error
@@ -43,13 +49,13 @@ type AuthRepository interface {
 }
 
 type AuthService struct {
-	repo   AuthRepository
-	email  *email.EmailService
-	appURL string
+	repo        AuthRepository
+	email       *email.EmailService
+	frontendURL string
 }
 
-func NewAuthService(repo AuthRepository, email *email.EmailService, appURL string) *AuthService {
-	return &AuthService{repo: repo, email: email, appURL: appURL}
+func NewAuthService(repo AuthRepository, email *email.EmailService, frontendURL string) *AuthService {
+	return &AuthService{repo: repo, email: email, frontendURL: frontendURL}
 }
 
 var (
@@ -142,8 +148,9 @@ func (s *AuthService) Register(ctx context.Context, email, password, username st
 	user := db.User{
 		ID:           uuid.New(),
 		Email:        email,
-		PasswordHash: hashPassword(password),
+		PasswordHash: sql.NullString{String: hashPassword(password), Valid: true},
 		Username:     username,
+		Provider:     "local",
 		CreatedAt:    time.Now(),
 	}
 
@@ -151,19 +158,8 @@ func (s *AuthService) Register(ctx context.Context, email, password, username st
 		return db.User{}, "", err
 	}
 
-	sessionID, err := generateSessionID()
+	sessionID, err := s.createSession(ctx, user.ID)
 	if err != nil {
-		return db.User{}, "", err
-	}
-
-	session := db.Session{
-		ID:        sessionID,
-		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
-		CreatedAt: time.Now(),
-	}
-
-	if err := s.repo.CreateSession(ctx, session); err != nil {
 		return db.User{}, "", err
 	}
 
@@ -180,30 +176,77 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (db.Use
 		return db.User{}, "", ErrInvalidCredentials
 	}
 
-	if !comparePassword(user.PasswordHash, password) {
+	// Block OAuth users from password login
+	if user.Provider != "local" || !user.PasswordHash.Valid {
 		return db.User{}, "", ErrInvalidCredentials
 	}
 
-	sessionID, err := generateSessionID()
-	if err != nil {
-		return db.User{}, "", err
-	}
-
-	session := db.Session{
-		ID:        sessionID,
-		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
-		CreatedAt: time.Now(),
+	if !comparePassword(user.PasswordHash.String, password) {
+		return db.User{}, "", ErrInvalidCredentials
 	}
 
 	// invalidate all previous sessions
 	s.repo.DeleteSessionsByUserID(ctx, user.ID)
 
-	if err := s.repo.CreateSession(ctx, session); err != nil {
+	sessionID, err := s.createSession(ctx, user.ID)
+	if err != nil {
 		return db.User{}, "", err
 	}
 
 	return user, sessionID, nil
+}
+
+// --- OAUTH LOGIN ---
+
+type OAuthUserInfo struct {
+	ProviderID string
+	Email      string
+	Username   string
+}
+
+func (s *AuthService) OAuthLogin(ctx context.Context, provider string, info OAuthUserInfo) (db.User, string, bool, error) {
+	isNew := false
+
+	user, err := s.repo.GetUserByProviderID(ctx, provider, info.ProviderID)
+	if err != nil {
+		// Check if email already exists under a local account
+		if _, emailErr := s.repo.GetUserByEmail(ctx, info.Email); emailErr == nil {
+			return db.User{}, "", false, ErrEmailConflict
+		}
+
+		isNew = true
+		username := sanitizeUsername(info.Username)
+		for i := 0; i < 5; i++ {
+			exists, _ := s.repo.CheckUsernameExists(ctx, username)
+			if !exists {
+				break
+			}
+			n, _ := rand.Int(rand.Reader, big.NewInt(9000))
+			username = fmt.Sprintf("%s%d", sanitizeUsername(info.Username), n.Int64()+1000)
+		}
+
+		user = db.User{
+			ID:         uuid.New(),
+			Email:      info.Email,
+			Username:   username,
+			Provider:   provider,
+			ProviderID: sql.NullString{String: info.ProviderID, Valid: true},
+			CreatedAt:  time.Now(),
+		}
+		if err := s.repo.CreateOAuthUser(ctx, user); err != nil {
+			return db.User{}, "", false, err
+		}
+	}
+
+	sessionID, err := s.createSession(ctx, user.ID)
+	if err != nil {
+		return db.User{}, "", false, err
+	}
+
+	if isNew {
+		go s.email.SendWelcome(user.Email, user.Username)
+	}
+	return user, sessionID, isNew, nil
 }
 
 // --- GET USER FROM SESSION ---
@@ -246,6 +289,10 @@ func (s *AuthService) ForgotPassword(ctx context.Context, email string) error {
 		return nil
 	}
 
+	if user.Provider != "local" {
+		return nil // OAuth user, silently ignore
+	}
+
 	token, err := generateResetToken()
 	if err != nil {
 		return err
@@ -258,7 +305,7 @@ func (s *AuthService) ForgotPassword(ctx context.Context, email string) error {
 		return err
 	}
 
-	go s.email.SendPasswordReset(user.Email, token, s.appURL)
+	go s.email.SendPasswordReset(user.Email, token, s.frontendURL)
 
 	return nil
 }
@@ -292,4 +339,39 @@ func (s *AuthService) ResetPassword(ctx context.Context, token, newPassword stri
 	s.repo.DeleteSessionsByUserID(ctx, user.ID)
 
 	return nil
+}
+
+// --- HELPERS ---
+
+var nonAlphanumeric = regexp.MustCompile(`[^a-zA-Z0-9_]`)
+
+func sanitizeUsername(name string) string {
+	u := nonAlphanumeric.ReplaceAllString(name, "")
+	if len(u) < 3 {
+		u += "user"
+	}
+	if len(u) > 28 {
+		u = u[:28]
+	}
+	return u
+}
+
+func (s *AuthService) createSession(ctx context.Context, userID uuid.UUID) (string, error) {
+	sessionID, err := generateSessionID()
+	if err != nil {
+		return "", err
+	}
+
+	session := db.Session{
+		ID:        sessionID,
+		UserID:    userID,
+		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+		CreatedAt: time.Now(),
+	}
+
+	if err := s.repo.CreateSession(ctx, session); err != nil {
+		return "", err
+	}
+
+	return sessionID, nil
 }

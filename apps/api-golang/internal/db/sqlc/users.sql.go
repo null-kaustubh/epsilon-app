@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -22,17 +24,54 @@ func (q *Queries) CheckUsernameExists(ctx context.Context, lower string) (bool, 
 	return exists, err
 }
 
+const createOAuthUser = `-- name: CreateOAuthUser :one
+INSERT INTO users (id, email, username, provider, provider_id, created_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, email, password_hash, created_at, username, provider, provider_id
+`
+
+type CreateOAuthUserParams struct {
+	ID         uuid.UUID      `json:"id"`
+	Email      string         `json:"email"`
+	Username   string         `json:"username"`
+	Provider   string         `json:"provider"`
+	ProviderID sql.NullString `json:"provider_id"`
+	CreatedAt  time.Time      `json:"created_at"`
+}
+
+func (q *Queries) CreateOAuthUser(ctx context.Context, arg CreateOAuthUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createOAuthUser,
+		arg.ID,
+		arg.Email,
+		arg.Username,
+		arg.Provider,
+		arg.ProviderID,
+		arg.CreatedAt,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.Username,
+		&i.Provider,
+		&i.ProviderID,
+	)
+	return i, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, email, password_hash, username)
 VALUES ($1, $2, $3, $4)
-RETURNING id, email, password_hash, created_at, username
+RETURNING id, email, password_hash, created_at, username, provider, provider_id
 `
 
 type CreateUserParams struct {
-	ID           uuid.UUID `json:"id"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"password_hash"`
-	Username     string    `json:"username"`
+	ID           uuid.UUID      `json:"id"`
+	Email        string         `json:"email"`
+	PasswordHash sql.NullString `json:"password_hash"`
+	Username     string         `json:"username"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -49,12 +88,14 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.PasswordHash,
 		&i.CreatedAt,
 		&i.Username,
+		&i.Provider,
+		&i.ProviderID,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, created_at, username FROM users WHERE email = $1
+SELECT id, email, password_hash, created_at, username, provider, provider_id FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -66,12 +107,14 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.PasswordHash,
 		&i.CreatedAt,
 		&i.Username,
+		&i.Provider,
+		&i.ProviderID,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, password_hash, created_at, username FROM users WHERE id = $1
+SELECT id, email, password_hash, created_at, username, provider, provider_id FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -83,12 +126,41 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.PasswordHash,
 		&i.CreatedAt,
 		&i.Username,
+		&i.Provider,
+		&i.ProviderID,
+	)
+	return i, err
+}
+
+const getUserByProviderID = `-- name: GetUserByProviderID :one
+SELECT id, email, password_hash, created_at, username, provider, provider_id FROM users
+WHERE provider = $1
+  AND provider_id = $2
+LIMIT 1
+`
+
+type GetUserByProviderIDParams struct {
+	Provider   string         `json:"provider"`
+	ProviderID sql.NullString `json:"provider_id"`
+}
+
+func (q *Queries) GetUserByProviderID(ctx context.Context, arg GetUserByProviderIDParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByProviderID, arg.Provider, arg.ProviderID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.Username,
+		&i.Provider,
+		&i.ProviderID,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, email, password_hash, created_at, username FROM users WHERE lower(username) = lower($1)
+SELECT id, email, password_hash, created_at, username, provider, provider_id FROM users WHERE lower(username) = lower($1)
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, lower string) (User, error) {
@@ -100,6 +172,8 @@ func (q *Queries) GetUserByUsername(ctx context.Context, lower string) (User, er
 		&i.PasswordHash,
 		&i.CreatedAt,
 		&i.Username,
+		&i.Provider,
+		&i.ProviderID,
 	)
 	return i, err
 }
@@ -109,8 +183,8 @@ UPDATE users SET password_hash = $1 WHERE id = $2
 `
 
 type UpdateUserPasswordParams struct {
-	PasswordHash string    `json:"password_hash"`
-	ID           uuid.UUID `json:"id"`
+	PasswordHash sql.NullString `json:"password_hash"`
+	ID           uuid.UUID      `json:"id"`
 }
 
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
