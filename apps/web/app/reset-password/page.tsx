@@ -80,25 +80,25 @@ function ResetPasswordForm() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center px-6 py-10 bg-background"
+      className="min-h-dvh flex flex-col items-center px-4 pt-[max(2.5rem,env(safe-area-inset-top,0px))] pb-8 sm:px-6 sm:py-10 bg-background"
       data-color-theme="dark"
     >
-      <div className="absolute top-6">
-        <span className="text-2xl font-medium tracking-tight text-foreground">
+      <div className="absolute top-[max(1.5rem,env(safe-area-inset-top,0px))] left-0 right-0 flex justify-center pointer-events-none">
+        <span className="text-xl sm:text-2xl font-medium tracking-tight text-foreground pointer-events-auto">
           epsilon
         </span>
       </div>
 
       {/* Center content */}
-      <div className="flex flex-col items-center justify-center w-full flex-1">
+      <div className="flex flex-col items-center justify-center w-full flex-1 pt-10 sm:pt-0">
         <>
-          <h1 className="text-3xl font-inter font-semibold tracking-tight mb-6 text-center text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-inter font-semibold tracking-tight mb-4 sm:mb-6 text-center text-foreground px-1">
             Reset your password
           </h1>
         </>
 
         {/* Card */}
-        <div className="w-full max-w-sm rounded-xl p-6 bg-secondary/40 border border-border">
+        <div className="w-full max-w-sm rounded-xl p-4 sm:p-6 bg-secondary/40 border border-border">
           <form
             onSubmit={handleSubmit}
             className="flex flex-col gap-4"
@@ -114,7 +114,7 @@ function ResetPasswordForm() {
                   placeholder="New password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="ep-input pr-10"
+                  className="ep-input pr-10 text-[13px] sm:text-sm"
                 />
                 <button
                   type="button"
@@ -140,7 +140,7 @@ function ResetPasswordForm() {
                 {requirements.map((r) => (
                   <span
                     key={r.label}
-                    className="text-[11px] flex items-center gap-1 transition-colors duration-200"
+                    className="text-[10px] sm:text-[11px] flex items-center gap-1 transition-colors duration-200"
                     style={{
                       color: r.met
                         ? "var(--success)"
@@ -164,7 +164,7 @@ function ResetPasswordForm() {
                   placeholder="Confirm password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  className="ep-input pr-10"
+                  className="ep-input pr-10 text-[13px] sm:text-sm"
                 />
                 <button
                   type="button"
@@ -187,7 +187,7 @@ function ResetPasswordForm() {
             {/* Mismatch hint */}
             {confirm.length > 0 && !confirmValid && (
               <p
-                className="text-[12px] -mt-1"
+                className="text-[11px] sm:text-xs -mt-1"
                 style={{ color: "var(--destructive)" }}
               >
                 Passwords don&apos;t match
@@ -197,8 +197,8 @@ function ResetPasswordForm() {
             <button
               type="submit"
               disabled={!canSubmit || loading}
-              className={`w-full rounded-lg py-2.5 px-5 mt-1
-                text-sm font-semibold font-inter flex items-center justify-center
+              className={`w-full rounded-lg py-2.5 px-4 sm:px-5 mt-1
+                text-[13px] sm:text-sm font-semibold font-inter flex items-center justify-center
                 transition-all duration-200
               ${
                 canSubmit && !loading
@@ -217,7 +217,7 @@ function ResetPasswordForm() {
       </div>
 
       <p
-        className="mt-6 text-[13px]"
+        className="mt-5 sm:mt-6 text-xs sm:text-[13px]"
         style={{ color: "var(--muted-foreground)" }}
       >
         <Link
@@ -237,7 +237,7 @@ function ResetPasswordForm() {
           border: 1px solid var(--border);
           border-radius: 0.5rem;
           padding: 0.5rem 2.25rem 0.5rem 0.75rem;
-          font-size: 0.875rem;
+          line-height: 1.5;
           outline: none;
           caret-color: var(--accent);
           transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;

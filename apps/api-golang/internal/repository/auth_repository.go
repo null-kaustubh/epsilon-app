@@ -48,6 +48,7 @@ func (r *PostgresAuthRepository) CreateOAuthUser(ctx context.Context, user db.Us
 		Username:   user.Username,
 		Provider:   user.Provider,
 		ProviderID: user.ProviderID,
+		CreatedAt:  user.CreatedAt,
 	})
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {

@@ -69,7 +69,7 @@ func (h *OAuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSessionCookie(w, sessionID)
-	http.Redirect(w, r, h.frontendURL, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, h.frontendURL+"/home", http.StatusTemporaryRedirect)
 }
 
 // --- GITHUB ---
@@ -93,7 +93,7 @@ func (h *OAuthHandler) GitHubCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSessionCookie(w, sessionID)
-	http.Redirect(w, r, h.frontendURL, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, h.frontendURL+"/home", http.StatusTemporaryRedirect)
 }
 
 // --- SHARED CALLBACK LOGIC ---

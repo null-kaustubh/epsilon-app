@@ -7,6 +7,14 @@ import Link from "next/link";
 
 const DEFAULT_TEXT = "Notes that become you.";
 
+declare global {
+  interface Window {
+    Supademo?: {
+      open: (id: string) => void;
+    };
+  }
+}
+
 const COLOR_HEX_MAP: Record<string, string | undefined> = {
   default: "#1a1a1a",
   "#e05555": "#e05555",
@@ -97,6 +105,10 @@ export default function EditableHero() {
       return merged;
     });
   }, []);
+
+  const openDemo = () => {
+    window.Supademo?.open("cmp3zx0zp0mml5lqm72t41zng");
+  };
 
   return (
     <section className="relative w-full min-h-screen bg-landing-background">
@@ -250,7 +262,10 @@ export default function EditableHero() {
             </svg>
           </Link>
 
-          <button className="flex group items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full cursor-pointer hover:text-landing-foreground-soft/70 transition-[color]">
+          <button
+            onClick={openDemo}
+            className="flex group items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full cursor-pointer hover:text-landing-foreground-soft/70 transition-[color]"
+          >
             <span className="flex items-center justify-center w-10 h-10 rounded-full border border-landing-foreground group-hover:border-landing-foreground/70">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -368,7 +383,10 @@ export default function EditableHero() {
             </svg>
           </Link>
 
-          <button className="flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full">
+          <button
+            onClick={openDemo}
+            className="flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full"
+          >
             <span className="flex items-center justify-center w-9 h-9 rounded-full border border-landing-foreground-soft">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -6,7 +6,7 @@ export type NavItem = {
 export const SITE_INFO = {
   name: "epsilon",
   url: "http://localhost:3000", //add link here
-  ogImage: "https://assets.kaustubh.cloud/images/epsilonog.png",
+  ogImage: process.env.NEXT_PUBLIC_OG_IMAGE!,
   description:
     "A fully customizable canvas workspace for individuals to create organized spaces using different types of blocks. Design your workspace your way with complete freedom to arrange, structure, and shape ideas without the clutter.",
   keywords: [

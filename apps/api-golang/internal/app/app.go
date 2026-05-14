@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -71,7 +72,9 @@ func (a *App) startCleanupJob(ctx context.Context, queries *sqlcdb.Queries) {
 		for {
 			select {
 			case <-ticker.C:
-				queries.DeleteExpiredSessions(ctx)
+				if err := queries.DeleteExpiredSessions(ctx); err != nil {
+					log.Println("cleanup job failed:", err)
+				}
 			case <-ctx.Done():
 				return
 			}
