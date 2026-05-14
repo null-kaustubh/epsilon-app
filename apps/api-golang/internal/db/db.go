@@ -16,8 +16,8 @@ func NewPostgresDB(dsn string) (*sql.DB, error) {
 	}
 
 	// connection pool config (important)
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(25)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
 	// verify connection

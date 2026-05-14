@@ -17,6 +17,8 @@ type SpaceCardProps = {
   isPendingDelete?: boolean;
 };
 
+const defaultIcon = process.env.NEXT_PUBLIC_DEFAULT_SPACE_ICON!;
+
 const ICON_COLORS = [
   "bg-accent/20 text-accent",
   "bg-success/20 text-success",
@@ -56,7 +58,7 @@ export default function SpaceCard({
   const nameRef = useRef<HTMLInputElement>(null);
   const idx = hashName(space.name) % ICON_COLORS.length;
   const containerRef = useRef<HTMLDivElement>(null);
-  const [draftIcon, setDraftIcon] = useState(space.icon_url ?? "");
+  const [draftIcon, setDraftIcon] = useState(space.icon_url ?? defaultIcon);
   const fileRef = useRef<HTMLInputElement>(null);
   const isPickingFile = useRef(false);
 
@@ -65,7 +67,7 @@ export default function SpaceCard({
   const startRename = () => {
     setDraftName(space.name);
     setDraftDesc(space.description ?? "");
-    setDraftIcon(space.icon_url ?? "");
+    setDraftIcon(space.icon_url || defaultIcon);
     setRenaming(true);
     setTimeout(() => nameRef.current?.focus(), 0);
   };
@@ -90,14 +92,14 @@ export default function SpaceCard({
       }
       setDraftName(space.name);
       setDraftDesc(space.description ?? "");
-      setDraftIcon(space.icon_url ?? "");
+      setDraftIcon(space.icon_url || defaultIcon);
       return;
     }
 
     const unchanged =
       trimName === space.name &&
       desc.trim() === (space.description ?? "") &&
-      icon === (space.icon_url ?? "");
+      icon === (space.icon_url || defaultIcon);
     if (unchanged) return;
 
     onRename?.(trimName, desc.trim(), icon);
@@ -115,7 +117,7 @@ export default function SpaceCard({
       }
       setDraftName(space.name);
       setDraftDesc(space.description ?? "");
-      setDraftIcon(space.icon_url ?? "");
+      setDraftIcon(space.icon_url || defaultIcon);
       setRenaming(false);
     }
     e.stopPropagation();
@@ -148,10 +150,12 @@ export default function SpaceCard({
             : undefined
         }
       >
-        {(renaming ? draftIcon : space.icon_url) ? (
+        {(renaming ? draftIcon : space.icon_url || defaultIcon) ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={(renaming ? draftIcon : space.icon_url) as string}
+            src={
+              (renaming ? draftIcon : space.icon_url || defaultIcon) as string
+            }
             alt={space.name}
             className="w-full h-full object-cover"
           />

@@ -22,7 +22,7 @@ func Load() (*Config, error) {
 		port = "8080"
 	}
 
-	dbURL := os.Getenv("DATABASE_URL")
+	dbURL := os.Getenv("DATABASE_NEON")
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/epsilon?sslmode=disable"
 	}

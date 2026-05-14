@@ -13,6 +13,7 @@ import { cookies } from "next/headers";
 import { neueMontreal } from "../assets/fonts/fonts";
 import { SITE_INFO } from "../config/site";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 const fragmentMono = Fragment_Mono({
   subsets: ["latin"],
@@ -136,6 +137,10 @@ export default async function RootLayout({
               boxShadow: "var(--shadow-popover)",
             },
           }}
+        />
+        <Script
+          src="https://script.supademo.com/supademo.js"
+          strategy="afterInteractive"
         />
       </body>
     </html>

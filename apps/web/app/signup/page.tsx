@@ -9,6 +9,7 @@ import Link from "next/link";
 import OAuthButton from "../../features/auth/OAuthButton";
 import Field from "../../features/auth/Field";
 import InputWrap from "../../features/auth/InputWrap";
+import Image from "next/image";
 
 const checks = [
   {
@@ -87,42 +88,46 @@ export default function SignUpPage() {
   };
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const LOGO_URL = process.env.NEXT_PUBLIC_LOGO_WHITE_IMAGE!;
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-6 py-10"
-      style={{ background: "var(--background)" }}
+      className="flex flex-col items-center justify-start lg:justify-center px-2 min-h-0 h-dvh overflow-y-auto overscroll-y-contain touch-pan-y pt-[max(2rem,env(safe-area-inset-top,0px))] pb-[max(2rem,env(safe-area-inset-bottom,0px))] lg:px-6 lg:py-10"
+      style={{
+        background: "var(--background)",
+        WebkitOverflowScrolling: "touch",
+      }}
       data-color-theme="dark"
     >
       <div
-        className="w-full max-w-300 h-200 flex overflow-hidden"
+        className="shrink-0 w-full max-w-300 flex overflow-visible lg:overflow-hidden lg:border lg:border-border lg:shadow-[0_20px_60px_rgba(0,0,0,0.25)]"
         style={{
           background: "var(--background)",
-          border: "1px solid var(--border)",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
         }}
       >
-        {/* ════════════════════════════════════════
-          LEFT PANEL — form
-      ════════════════════════════════════════ */}
         <div
-          className="w-full lg:w-110 xl:w-120 shrink-0
-                   flex flex-col justify-center px-10 xl:px-14 py-12 overflow-y-auto"
+          className="w-full lg:w-110 xl:w-120 shrink-0 flex flex-col justify-center px-6 lg:px-10 xl:px-14 py-10 lg:py-12"
           style={{
             animation: "panelIn 0.45s cubic-bezier(0.22,1,0.36,1) both",
           }}
         >
-          {/* Logo */}
           <div className="mb-8">
             <span
-              className="text-3xl font-inter font-medium tracking-tight"
+              className="text-3xl font-inter font-medium tracking-tight flex items-center"
               style={{ color: "var(--foreground)" }}
             >
-              <span style={{ color: "var(--accent)" }}>Ɛ</span> epsilon
+              <Image
+                src={LOGO_URL}
+                alt="logo"
+                width={40}
+                height={40}
+                className="pt-1.5"
+                unoptimized
+              />
+              <p>epsilon</p>
             </span>
           </div>
 
-          {/* Heading */}
           <div className="mb-7">
             <h1
               className="text-2xl font-inter font-semibold tracking-tight leading-tight mb-1.5"
@@ -132,7 +137,6 @@ export default function SignUpPage() {
             </h1>
           </div>
 
-          {/* OAuth */}
           <div className="flex flex-col gap-2.5 mb-5">
             <OAuthButton
               icon={<GoogleIcon />}
@@ -146,7 +150,6 @@ export default function SignUpPage() {
             />
           </div>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 mb-5">
             <div
               className="flex-1 h-px"
@@ -164,13 +167,11 @@ export default function SignUpPage() {
             />
           </div>
 
-          {/* Form */}
           <form
             onSubmit={handleSubmit}
             className="flex flex-col gap-4"
             noValidate
           >
-            {/* Email */}
             <Field label="Email" htmlFor="email">
               <InputWrap
                 indicator={
@@ -188,7 +189,6 @@ export default function SignUpPage() {
               </InputWrap>
             </Field>
 
-            {/* Username */}
             <Field
               label="Username"
               htmlFor="username"
@@ -220,7 +220,6 @@ export default function SignUpPage() {
               </InputWrap>
             </Field>
 
-            {/* Password */}
             <Field label="Password" htmlFor="password">
               <InputWrap>
                 <input
@@ -249,7 +248,6 @@ export default function SignUpPage() {
                 </button>
               </InputWrap>
 
-              {/* Strength grid */}
               <div
                 className={`grid grid-cols-2 gap-x-4 gap-y-1.5 overflow-hidden
                           transition-all duration-300
@@ -276,7 +274,6 @@ export default function SignUpPage() {
               </div>
             </Field>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={!canSubmit || loading}
@@ -403,18 +400,6 @@ export default function SignUpPage() {
                   Replace this panel with your hero artwork
                 </p>
               </div>
-            </div>
-
-            {/* Bottom text — keep or adapt */}
-            <div className="absolute bottom-8 left-8 right-8 z-10 pointer-events-none">
-              <p
-                className="text-[22px] font-semibold leading-snug"
-                style={{ color: "var(--foreground)" }}
-              >
-                Font management.
-                <br />
-                <span style={{ color: "var(--accent)" }}>Perfected.</span>
-              </p>
             </div>
           </div>
         </div>

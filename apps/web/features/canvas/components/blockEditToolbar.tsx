@@ -22,12 +22,12 @@ const DEFAULT_FONT = 14;
 
 const COLOR_SWATCHES = [
   { value: undefined, label: "Default" },
-  { value: "#c04a4a", label: "Red" },
-  { value: "#d4924e", label: "Orange" },
-  { value: "#c9a84c", label: "Yellow" },
-  { value: "#5a9e6f", label: "Green" },
-  { value: "#5589d4", label: "Blue" },
-  { value: "#8a5fc7", label: "Purple" },
+  { value: "#e05555", label: "Red" },
+  { value: "#f77824", label: "Orange" },
+  { value: "#f0c93a", label: "Yellow" },
+  { value: "#42b872", label: "Green" },
+  { value: "#4d8fe0", label: "Blue" },
+  { value: "#a06ee0", label: "Purple" },
   { value: "#c45c7a", label: "Pink" },
 ] as const;
 

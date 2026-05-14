@@ -99,7 +99,7 @@ export function RecentlyVisited({
             <p className="text-sm text-muted-foreground">No recent spaces.</p>
           ) : (
             recentSpaces.map((space) => (
-              <div key={space.id} className="shrink-0 w-90">
+              <div key={space.id} className="shrink-0 sm:w-90 w-full">
                 <SpaceCard
                   space={space}
                   onClick={() => addRecent(space.slug, space.name)}
