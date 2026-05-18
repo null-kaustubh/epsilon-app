@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"strings"
 )
 
 type Config struct {
@@ -14,28 +16,63 @@ type Config struct {
 	GitHubClientID     string
 	GitHubClientSecret string
 	BackendURL         string
+	Production         bool
+	CookieSecure       bool
+	TrustedProxy       bool
 }
 
 func Load() (*Config, error) {
+	env := strings.ToLower(strings.TrimSpace(os.Getenv("ENV")))
+	production := env == "production"
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	dbURL := os.Getenv("DATABASE_NEON")
+	cookieSecure := production
+	if v := os.Getenv("COOKIE_SECURE"); v != "" {
+		cookieSecure = v == "true" || v == "1"
+	}
+
+	trustedProxy := os.Getenv("TRUST_PROXY") == "true" || os.Getenv("TRUST_PROXY") == "1"
+
+	dbURL := os.Getenv("DATABASE_URL")
+	if production && dbURL == "" {
+		return nil, fmt.Errorf("DATABASE_URL is required when ENV=production")
+	}
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/epsilon?sslmode=disable"
+	}
+	if production && strings.Contains(dbURL, "sslmode=disable") {
+		return nil, fmt.Errorf("DATABASE_URL must not use sslmode=disable in production")
+	}
+
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if production && frontendURL == "" {
+		return nil, fmt.Errorf("FRONTEND_URL is required when ENV=production")
+	}
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
+
+	backendURL := os.Getenv("BACKEND_URL")
+	if production && backendURL == "" {
+		return nil, fmt.Errorf("BACKEND_URL is required when ENV=production")
 	}
 
 	return &Config{
 		Port:               port,
 		DBURL:              dbURL,
 		ResendAPIKey:       os.Getenv("RESEND_API_KEY"),
-		FrontendURL:        os.Getenv("FRONTEND_URL"),
-		BackendURL:         os.Getenv("BACKEND_URL"),
+		FrontendURL:        frontendURL,
+		BackendURL:         backendURL,
 		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 		GitHubClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 		GitHubClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
+		Production:         production,
+		CookieSecure:       cookieSecure,
+		TrustedProxy:       trustedProxy,
 	}, nil
 }

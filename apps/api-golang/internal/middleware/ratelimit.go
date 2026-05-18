@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -17,7 +19,12 @@ type ipLimiter struct {
 
 var (
 	globalLimiters sync.Map
+	trustProxy     bool
 )
+
+func InitRateLimit(trustedProxy bool) {
+	trustProxy = trustedProxy
+}
 
 func getGlobalLimiter(ip string) *rate.Limiter {
 	val, ok := globalLimiters.Load(ip)
@@ -59,25 +66,28 @@ func RateLimit(next http.Handler) http.Handler {
 }
 
 func realIP(r *http.Request) string {
-	if ip := r.Header.Get("CF-Connecting-IP"); ip != "" {
+	if !trustProxy {
+		return remoteAddrHost(r)
+	}
+	if ip := strings.TrimSpace(r.Header.Get("CF-Connecting-IP")); ip != "" {
 		return ip
 	}
-	if ip := r.Header.Get("X-Real-IP"); ip != "" {
+	if ip := strings.TrimSpace(r.Header.Get("X-Real-IP")); ip != "" {
 		return ip
 	}
 	if ip := r.Header.Get("X-Forwarded-For"); ip != "" {
-		for i := 0; i < len(ip); i++ {
-			if ip[i] == ',' {
-				return ip[:i]
-			}
+		if i := strings.IndexByte(ip, ','); i >= 0 {
+			return strings.TrimSpace(ip[:i])
 		}
-		return ip
+		return strings.TrimSpace(ip)
 	}
-	host := r.RemoteAddr
-	for i := len(host) - 1; i >= 0; i-- {
-		if host[i] == ':' {
-			return host[:i]
-		}
+	return remoteAddrHost(r)
+}
+
+func remoteAddrHost(r *http.Request) string {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
 	}
 	return host
 }

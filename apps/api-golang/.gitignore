@@ -1,0 +1,8 @@
+# Local / server env (never commit secrets)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Go build output
+bin/

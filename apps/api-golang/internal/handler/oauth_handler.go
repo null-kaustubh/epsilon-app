@@ -48,45 +48,55 @@ func NewOAuthHandler(
 	}
 }
 
-// --- GOOGLE ---
+func (h *OAuthHandler) beginOAuth(w http.ResponseWriter, r *http.Request, cfg *oauth2.Config) {
+	state, err := generateOAuthState()
+	if err != nil {
+		http.Error(w, "failed to start oauth", http.StatusInternalServerError)
+		return
+	}
+
+	setOAuthStateCookie(w, state)
+	url := cfg.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
 
 func (h *OAuthHandler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
-	url := h.googleConfig.AuthCodeURL("state", oauth2.AccessTypeOnline)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	h.beginOAuth(w, r, h.googleConfig)
 }
 
 func (h *OAuthHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	user, err := h.handleCallback(r, h.googleConfig, fetchGoogleUser)
-	if err != nil {
-		h.redirectWithError(w, r, err)
-		return
-	}
-
-	_, sessionID, _, err := h.service.OAuthLogin(r.Context(), "google", *user)
-	if err != nil {
-		h.redirectWithError(w, r, err)
-		return
-	}
-
-	setSessionCookie(w, sessionID)
-	http.Redirect(w, r, h.frontendURL+"/home", http.StatusTemporaryRedirect)
+	h.finishOAuth(w, r, h.googleConfig, "google", fetchGoogleUser)
 }
 
-// --- GITHUB ---
-
 func (h *OAuthHandler) GitHubLogin(w http.ResponseWriter, r *http.Request) {
-	url := h.githubConfig.AuthCodeURL("state", oauth2.AccessTypeOnline)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	h.beginOAuth(w, r, h.githubConfig)
 }
 
 func (h *OAuthHandler) GitHubCallback(w http.ResponseWriter, r *http.Request) {
-	user, err := h.handleCallback(r, h.githubConfig, fetchGitHubUser)
+	h.finishOAuth(w, r, h.githubConfig, "github", fetchGitHubUser)
+}
+
+func (h *OAuthHandler) finishOAuth(
+	w http.ResponseWriter,
+	r *http.Request,
+	cfg *oauth2.Config,
+	provider string,
+	fetchUser func(ctx context.Context, token *oauth2.Token) (*service.OAuthUserInfo, error),
+) {
+	defer clearOAuthStateCookie(w)
+
+	if err := validateOAuthState(r); err != nil {
+		h.redirectWithError(w, r, err)
+		return
+	}
+
+	user, err := h.handleCallback(r, cfg, fetchUser)
 	if err != nil {
 		h.redirectWithError(w, r, err)
 		return
 	}
 
-	_, sessionID, _, err := h.service.OAuthLogin(r.Context(), "github", *user)
+	_, sessionID, _, err := h.service.OAuthLogin(r.Context(), provider, *user)
 	if err != nil {
 		h.redirectWithError(w, r, err)
 		return
@@ -95,8 +105,6 @@ func (h *OAuthHandler) GitHubCallback(w http.ResponseWriter, r *http.Request) {
 	setSessionCookie(w, sessionID)
 	http.Redirect(w, r, h.frontendURL+"/home", http.StatusTemporaryRedirect)
 }
-
-// --- SHARED CALLBACK LOGIC ---
 
 func (h *OAuthHandler) handleCallback(
 	r *http.Request,
@@ -116,18 +124,16 @@ func (h *OAuthHandler) handleCallback(
 	return fetchUser(r.Context(), token)
 }
 
-// --- REDIRECT WITH ERROR ---
-
-// Redirects to frontend with ?error=... so the UI can show a message
 func (h *OAuthHandler) redirectWithError(w http.ResponseWriter, r *http.Request, err error) {
 	msg := "something_went_wrong"
 	if errors.Is(err, service.ErrEmailConflict) {
 		msg = "email_conflict"
 	}
-	http.Redirect(w, r, h.frontendURL+"/login?error="+msg, http.StatusTemporaryRedirect)
+	if errors.Is(err, errInvalidOAuthState) {
+		msg = "invalid_oauth_state"
+	}
+	http.Redirect(w, r, h.frontendURL+"/signin?error="+msg, http.StatusTemporaryRedirect)
 }
-
-// --- GOOGLE USER FETCH ---
 
 type googleUserResponse struct {
 	Sub   string `json:"sub"`
@@ -160,8 +166,6 @@ func fetchGoogleUser(ctx context.Context, token *oauth2.Token) (*service.OAuthUs
 	}, nil
 }
 
-// --- GITHUB USER FETCH ---
-
 type githubUserResponse struct {
 	ID    int    `json:"id"`
 	Login string `json:"login"`
@@ -177,7 +181,6 @@ type githubEmailResponse struct {
 func fetchGitHubUser(ctx context.Context, token *oauth2.Token) (*service.OAuthUserInfo, error) {
 	client := oauth2.NewClient(ctx, oauth2.StaticTokenSource(token))
 
-	// fetch profile
 	resp, err := client.Get("https://api.github.com/user")
 	if err != nil {
 		return nil, err
@@ -195,9 +198,6 @@ func fetchGitHubUser(ctx context.Context, token *oauth2.Token) (*service.OAuthUs
 	}
 
 	email := u.Email
-
-	// GitHub users can have private emails — email field above will be empty
-	// in that case, fetch from the emails endpoint
 	if email == "" {
 		email, err = fetchGitHubPrimaryEmail(client)
 		if err != nil {

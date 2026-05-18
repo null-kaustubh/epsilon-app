@@ -1,0 +1,53 @@
+name: Security & Quality
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  audit-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Yarn audit
+        run: yarn audit --level moderate
+        continue-on-error: true
+
+      - name: Lint web
+        run: yarn workspace web lint
+
+      - name: Typecheck web
+        run: yarn workspace web check-types
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          cache-dependency-path: apps/api-golang/go.sum
+
+      - name: Go vet
+        working-directory: apps/api-golang
+        run: go vet ./...
+
+      - name: Go build
+        working-directory: apps/api-golang
+        run: go build -o /dev/null ./...
+
+      - name: Govulncheck
+        working-directory: apps/api-golang
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+        continue-on-error: true

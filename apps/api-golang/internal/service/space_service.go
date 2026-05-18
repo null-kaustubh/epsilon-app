@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -10,6 +11,16 @@ import (
 	"api-golang/internal/repository"
 
 	"github.com/google/uuid"
+)
+
+const (
+	MaxBlockContentBytes = 512 << 10 // 512 KiB per block
+	MaxIconURLBytes      = 256 << 10 // 256 KiB for icon data URLs in dev
+)
+
+var (
+	ErrContentTooLarge = errors.New("content too large")
+	ErrInvalidIconURL  = errors.New("invalid icon url")
 )
 
 type SpaceRepository interface {
@@ -24,11 +35,15 @@ type SpaceRepository interface {
 }
 
 type SpaceService struct {
-	repo SpaceRepository
+	repo         SpaceRepository
+	allowDataURL bool
 }
 
-func NewSpaceService(repo SpaceRepository) *SpaceService {
-	return &SpaceService{repo: repo}
+func NewSpaceService(repo SpaceRepository, production bool) *SpaceService {
+	return &SpaceService{
+		repo:         repo,
+		allowDataURL: !production,
+	}
 }
 
 var validBlockTypes = map[string]bool{
@@ -75,7 +90,7 @@ func (s *SpaceService) GetSpace(ctx context.Context, slug string, userID uuid.UU
 	}
 
 	if blocks == nil {
-		blocks = []db.Block{} // always return [] never null
+		blocks = []db.Block{}
 	}
 
 	return space, blocks, nil
@@ -87,7 +102,7 @@ func (s *SpaceService) ListSpaces(ctx context.Context, userID uuid.UUID) ([]db.S
 		return nil, err
 	}
 	if spaces == nil {
-		return []db.Space{}, nil // always return empty slice, never null
+		return []db.Space{}, nil
 	}
 	return spaces, nil
 }
@@ -101,6 +116,10 @@ func (s *SpaceService) UpdateSpaceName(ctx context.Context, slug string, userID 
 
 	if len(name) > 100 {
 		return repository.ErrSpaceNameTooLong
+	}
+
+	if err := validateIconURL(iconUrl, s.allowDataURL); err != nil {
+		return err
 	}
 
 	return s.repo.UpdateSpaceName(ctx, db.UpdateSpaceNameParams{
@@ -124,10 +143,16 @@ func (s *SpaceService) SaveBlocks(ctx context.Context, spaceID uuid.UUID, blocks
 		if !validBlockTypes[b.Type] {
 			return repository.ErrInvalidBlockType
 		}
+		if len(b.Content) > MaxBlockContentBytes {
+			return ErrContentTooLarge
+		}
+		if b.Type == "image" && strings.HasPrefix(b.Content, "data:") && !s.allowDataURL {
+			return ErrInvalidIconURL
+		}
 		if b.X < 0 || b.Y < 0 || b.W <= 0 || b.H <= 0 {
 			return fmt.Errorf("invalid block dimensions for block %s", b.ID)
 		}
-		b.SpaceID = spaceID // always enforce server-side, never trust client
+		b.SpaceID = spaceID
 		if err := s.repo.UpsertBlock(ctx, b); err != nil {
 			return err
 		}
@@ -142,12 +167,32 @@ func (s *SpaceService) DeleteBlock(ctx context.Context, blockID uuid.UUID, space
 	})
 }
 
+func validateIconURL(iconURL string, allowDataURL bool) error {
+	if iconURL == "" {
+		return nil
+	}
+	if strings.HasPrefix(iconURL, "data:") {
+		if !allowDataURL {
+			return ErrInvalidIconURL
+		}
+		if len(iconURL) > MaxIconURLBytes {
+			return ErrContentTooLarge
+		}
+		return nil
+	}
+	if !strings.HasPrefix(iconURL, "https://") {
+		return ErrInvalidIconURL
+	}
+	if len(iconURL) > 2048 {
+		return ErrInvalidIconURL
+	}
+	return nil
+}
+
 func generateSlug(name string) string {
 	slug := strings.ToLower(strings.TrimSpace(name))
 	slug = strings.ReplaceAll(slug, " ", "-")
-	// strip any characters that aren't alphanumeric or hyphens
 	slug = nonAlnumRegex.ReplaceAllString(slug, "")
-	// collapse multiple hyphens into one
 	slug = multiDashRegex.ReplaceAllString(slug, "-")
 	slug = strings.Trim(slug, "-")
 
