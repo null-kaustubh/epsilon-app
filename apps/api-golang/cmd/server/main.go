@@ -4,8 +4,7 @@ import (
 	"log"
 
 	"api-golang/internal/app"
-
-	"github.com/joho/godotenv"
+	"api-golang/internal/envload"
 )
 
 // @title           Epsilon-API
@@ -17,7 +16,7 @@ import (
 // @in cookie
 // @name session_id
 func main() {
-	godotenv.Load()
+	envload.Load()
 
 	application, err := app.New()
 	if err != nil {

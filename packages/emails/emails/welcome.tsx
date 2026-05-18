@@ -1,5 +1,4 @@
 import { Heading, Section, Text } from "@react-email/components";
-import * as React from "react";
 
 import { Button } from "../components/Button";
 import { Layout } from "../components/Layout";
@@ -20,7 +19,7 @@ export default function WelcomeEmail({ username, appUrl }: WelcomeEmailProps) {
       </Text>
 
       <Section style={buttonContainer}>
-        <Button href={appUrl}>Open Epsilon</Button>
+        <Button href={`${appUrl}/home`}>Open Epsilon</Button>
       </Section>
 
       <Text style={paragraph}>We’re excited to have you here.</Text>

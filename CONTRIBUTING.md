@@ -59,11 +59,17 @@ yarn install
 
 ### 3. Set up environment variables
 
+Env files are **split by app** (not a single root `.env.local`):
+
 ```bash
-cp .env.example .env.local
+cp apps/api-golang/.env.example apps/api-golang/.env.local
+cp apps/web/.env.example apps/web/.env.local
 ```
 
-This creates a `.env.local` file with the default database URL and port. The scripts read from `.env.local` automatically.
+- **Backend** (`apps/api-golang/.env.local`) — database, OAuth, Resend, `FRONTEND_URL`, etc.
+- **Frontend** (`apps/web/.env.local`) — `NEXT_PUBLIC_*` and `API_URL` only
+
+`yarn db:migrate` and `yarn db:seed` read **`apps/api-golang/.env.local`**.
 
 ### 4. Start the database
 
@@ -191,20 +197,15 @@ This creates `up` and `down` SQL files. Write your schema changes, then run `yar
 
 ## 🔐 Environment Setup
 
-The project uses `.env.local` for local development:
+| Location | Purpose |
+|----------|---------|
+| [`apps/api-golang/.env.example`](apps/api-golang/.env.example) | Backend template — copy to `.env.local` (dev) or `.env` (EC2) |
+| [`apps/web/.env.example`](apps/web/.env.example) | Frontend template — copy to `.env.local` |
+| [`.env.example`](.env.example) | Pointer only — no secrets at repo root |
 
-```bash
-cp .env.example .env.local
-```
+**Production (EC2):** create `apps/api-golang/.env` on the server with `ENV=production`, `DATABASE_URL`, OAuth keys, etc. Or use systemd `EnvironmentFile=` pointing at that path. The Go server loads that directory automatically; process env vars win over the file.
 
-Default values in `.env.example`:
-
-```
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/epsilon?sslmode=disable
-PORT=8080
-```
-
-> **Never commit** `.env.local` or any file containing secrets.
+> **Never commit** `.env`, `.env.local`, or any file containing secrets.
 
 ---
 

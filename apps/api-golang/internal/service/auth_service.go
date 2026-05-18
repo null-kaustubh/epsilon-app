@@ -129,6 +129,10 @@ func generateSessionID() (string, error) {
 // --- REGISTER ---
 
 func (s *AuthService) Register(ctx context.Context, email, password, username string) (db.User, string, error) {
+	if !emailRegex.MatchString(email) {
+		return db.User{}, "", ErrInvalidEmail
+	}
+
 	if err := validatePassword(password); err != nil {
 		return db.User{}, "", err
 	}

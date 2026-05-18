@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+
+	"api-golang/internal/envload"
 
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
@@ -21,6 +24,12 @@ func hashPassword(password string) string {
 }
 
 func main() {
+	envload.Load()
+
+	if strings.EqualFold(strings.TrimSpace(os.Getenv("ENV")), "production") {
+		log.Fatal("refusing to seed: ENV=production is not allowed for db:seed")
+	}
+
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/epsilon?sslmode=disable"
@@ -36,7 +45,7 @@ func main() {
 		log.Fatal("database is not reachable:", err)
 	}
 
-	// Fixed UUIDs so seeding is idempotent
+	// Fixed UUIDs
 	test_user1 := uuid.MustParse("00000000-0000-0000-0000-000000000001")
 	test_user2 := uuid.MustParse("00000000-0000-0000-0000-000000000002")
 	spaceID := uuid.MustParse("00000000-0000-0000-0000-000000000010")

@@ -2,11 +2,11 @@ package handler
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"net/http"
 
 	"api-golang/internal/middleware"
+	"api-golang/internal/request"
 	"api-golang/internal/response"
 	"api-golang/internal/service"
 
@@ -70,7 +70,11 @@ func (h *SpaceHandler) CreateSpace(w http.ResponseWriter, r *http.Request) {
 		Name        string `json:"name"`
 		Description string `json:"description"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" {
+	if err := request.DecodeJSON(w, r, &body); err != nil || body.Name == "" {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
@@ -150,12 +154,24 @@ func (h *SpaceHandler) UpdateSpaceName(w http.ResponseWriter, r *http.Request) {
 		Description string `json:"description"`
 		IconUrl     string `json:"icon_url"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" {
+	if err := request.DecodeJSON(w, r, &body); err != nil || body.Name == "" {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
 	if err := h.service.UpdateSpaceName(r.Context(), slug, userID, body.Name, body.Description, body.IconUrl); err != nil {
+		if errors.Is(err, service.ErrContentTooLarge) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "content too large")
+			return
+		}
+		if errors.Is(err, service.ErrInvalidIconURL) {
+			response.Error(w, http.StatusBadRequest, "invalid icon url")
+			return
+		}
 		response.Error(w, http.StatusInternalServerError, "failed to update space")
 		return
 	}
@@ -207,7 +223,11 @@ func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var blocks []db.UpsertBlockParams
-	if err := json.NewDecoder(r.Body).Decode(&blocks); err != nil {
+	if err := request.DecodeJSON(w, r, &blocks); err != nil {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
@@ -218,7 +238,14 @@ func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.SaveBlocks(r.Context(), space.ID, blocks); err != nil {
-		// validation errors from service are user-facing
+		if errors.Is(err, service.ErrContentTooLarge) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "content too large")
+			return
+		}
+		if errors.Is(err, service.ErrInvalidIconURL) {
+			response.Error(w, http.StatusBadRequest, "invalid image content")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}

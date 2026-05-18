@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
+	"api-golang/internal/repository"
+	"api-golang/internal/request"
 	"api-golang/internal/response"
 	"api-golang/internal/service"
 )
@@ -37,25 +38,28 @@ type resetPasswordRequest struct {
 	NewPassword string `json:"new_password"`
 }
 
-// --- REGISTER ---
-// @Summary      Register user
-// @Tags         auth
-// @Accept       json
-// @Produce      json
-// @Param        body body registerRequest true "Register payload"
-// @Success      200  {object}  map[string]string
-// @Failure      400  {object}  map[string]string
-// @Router       /auth/register [post]
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req registerRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := request.DecodeJSON(w, r, &req); err != nil {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
 	user, sessionID, err := h.service.Register(r.Context(), req.Email, req.Password, req.Username)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, err.Error())
+		if errors.Is(err, repository.ErrUserExists) ||
+			errors.Is(err, service.ErrUsernameTaken) ||
+			errors.Is(err, service.ErrInvalidUsername) ||
+			errors.Is(err, service.ErrWeakPassword) ||
+			errors.Is(err, service.ErrInvalidEmail) {
+			response.Error(w, http.StatusBadRequest, mapRegisterError(err))
+			return
+		}
+		response.Error(w, http.StatusBadRequest, "registration failed")
 		return
 	}
 
@@ -68,18 +72,26 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// --- LOGIN ---
-// @Summary      Login
-// @Tags         auth
-// @Accept       json
-// @Produce      json
-// @Param        body body loginRequest true "Login payload"
-// @Success      200  {object}  map[string]string
-// @Failure      401  {object}  map[string]string
-// @Router       /auth/login [post]
+func mapRegisterError(err error) string {
+	switch {
+	case errors.Is(err, service.ErrWeakPassword):
+		return "password does not meet requirements"
+	case errors.Is(err, service.ErrInvalidUsername):
+		return "invalid username"
+	case errors.Is(err, service.ErrInvalidEmail):
+		return "invalid email address"
+	default:
+		return "registration failed"
+	}
+}
+
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req loginRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := request.DecodeJSON(w, r, &req); err != nil {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
@@ -98,37 +110,18 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// --- LOGOUT ---
-// @Summary      Logout
-// @Tags         auth
-// @Security     CookieAuth
-// @Success      200  {object}  map[string]bool
-// @Router       /auth/logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session_id")
+	cookie, err := r.Cookie(sessionCookieName)
 	if err == nil {
 		h.service.Logout(r.Context(), cookie.Value)
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:   "session_id",
-		Value:  "",
-		MaxAge: -1,
-	})
-
+	clearSessionCookie(w)
 	response.JSON(w, http.StatusOK, true)
 }
 
-// --- ME ---
-// @Summary      Get current user
-// @Tags         auth
-// @Security     CookieAuth
-// @Produce      json
-// @Success      200  {object}  map[string]string
-// @Failure      401  {object}  map[string]string
-// @Router       /auth/me [get]
 func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session_id")
+	cookie, err := r.Cookie(sessionCookieName)
 	if err != nil {
 		response.Error(w, http.StatusUnauthorized, "unauthorized")
 		return
@@ -147,18 +140,13 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// --- FORGOT PASSWORD ---
-// @Summary      Forgot password
-// @Tags         auth
-// @Accept       json
-// @Produce      json
-// @Param        body body forgotPasswordRequest true "Email"
-// @Success      200  {object}  map[string]string
-// @Failure      400  {object}  map[string]string
-// @Router       /auth/forgot-password [post]
 func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	var req forgotPasswordRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := request.DecodeJSON(w, r, &req); err != nil {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
@@ -177,18 +165,13 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// --- RESET PASSWORD ---
-// @Summary      Reset password
-// @Tags         auth
-// @Accept       json
-// @Produce      json
-// @Param        body body resetPasswordRequest true "Token + new password"
-// @Success      200  {object}  map[string]string
-// @Failure      400  {object}  map[string]string
-// @Router       /auth/reset-password [post]
 func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var req resetPasswordRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := request.DecodeJSON(w, r, &req); err != nil {
+		if request.IsBodyTooLarge(err) {
+			response.Error(w, http.StatusRequestEntityTooLarge, "request body too large")
+			return
+		}
 		response.Error(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
@@ -208,19 +191,5 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	response.JSON(w, http.StatusOK, map[string]string{
 		"message": "password updated successfully",
-	})
-}
-
-// --- COOKIE ---
-
-func setSessionCookie(w http.ResponseWriter, sessionID string) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_id",
-		Value:    sessionID,
-		Path:     "/",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Secure:   false,
-		MaxAge:   7 * 24 * 60 * 60,
 	})
 }
