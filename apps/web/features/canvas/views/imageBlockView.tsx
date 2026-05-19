@@ -6,19 +6,15 @@ import { BaseViewProps } from "../lib/blockRegistry";
 import { Plus } from "phosphor-react";
 
 export default function ImageBlockView({
-  blockId,
   content,
   onRequestEditAction,
 }: BaseViewProps) {
   const [ratio, setRatio] = useState<number | null>(null);
 
-  const handleLoad = useCallback(
-    (img: HTMLImageElement) => {
-      const r = img.naturalHeight / img.naturalWidth;
-      setRatio(r);
-    },
-    [],
-  );
+  const handleLoad = useCallback((img: HTMLImageElement) => {
+    const r = img.naturalHeight / img.naturalWidth;
+    setRatio(r);
+  }, []);
 
   if (!content) {
     return (
