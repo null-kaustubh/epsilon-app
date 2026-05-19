@@ -1,58 +1,159 @@
-# Turborepo Tailwind CSS starter
+# Epsilon
 
-This Turborepo starter is maintained by the Turborepo core team.
+Epsilon is a block-based workspace for notes, canvases, and lightweight project boards. Users authenticate, create **spaces**, and arrange **blocks** (text, markdown, images, code, todos) on a drag-and-drop canvas.
 
-## Using this example
+This repository is a **Turborepo monorepo**: a Next.js frontend, a Go REST API, PostgreSQL, and shared packages.
 
-Run the following command:
+## Architecture
 
-```sh
-npx create-turbo@latest -e with-tailwind
+```text
+┌─────────────────┐     credentials + cookies      ┌──────────────────┐
+│  apps/web       │ ─────────────────────────────► │  apps/api-golang │
+│  Next.js 16     │         REST / JSON            │  Go 1.26         │
+└─────────────────┘                                └────────┬─────────┘
+                                                              │
+                                                              ▼
+                                                    ┌──────────────────┐
+                                                    │  PostgreSQL 16   │
+                                                    │  (Docker local)  │
+                                                    └──────────────────┘
 ```
 
-## What's inside?
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| Frontend | `apps/web` | UI, canvas, auth pages, route protection (`proxy.ts`) |
+| API | `apps/api-golang` | Auth, spaces, blocks, sessions, OAuth |
+| Data | `apps/api-golang/internal/db` | Migrations (golang-migrate), queries (sqlc) |
+| Emails | `packages/emails` | React Email templates + local render service |
 
-This Turborepo includes the following packages/apps:
+Backend pattern: **handler → service → repository → sqlc**.
 
-### Apps and Packages
+## Prerequisites
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+| Tool | Version | Notes |
+|------|---------|--------|
+| Node.js | ≥ 18 | Frontend and tooling |
+| Yarn | 1.22.x | Package manager |
+| Go | 1.26+ | API server |
+| Docker | Latest | Local PostgreSQL |
+| golang-migrate | Latest | `yarn db:migrate` |
+| sqlc | Latest | `yarn db:generate` |
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Optional: `pg_dump` (for `yarn db:schema`), `psql` (manual DB inspection).
 
-### Building packages/ui
+See [CONTRIBUTING.md](CONTRIBUTING.md) for install commands.
 
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.ts`. This was chosen for several reasons:
+## Quick start
 
-- Make sharing one `tailwind.config.ts` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
+```bash
+git clone <repo-url>
+cd epsilon-app
+yarn install
 
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.ts` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
+# Environment (split by app — no secrets at repo root)
+cp apps/api-golang/.env.example apps/api-golang/.env.local
+cp apps/web/.env.example apps/web/.env.local
 
-For example, in [tailwind.config.ts](packages/tailwind-config/tailwind.config.ts):
+# Database
+yarn db:up
+yarn db:sync
+yarn db:seed   # optional demo data
 
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
+# Run frontend + API + email render service
+yarn dev
 ```
 
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
+| Service | URL |
+|---------|-----|
+| Web | http://localhost:3000 |
+| API | http://localhost:8080 |
+| API health | http://localhost:8080/health |
+| Swagger (dev only) | http://localhost:8080/swagger/ |
+| Email render | http://localhost:3001 |
 
-### Utilities
+## Environment variables
 
-This Turborepo has some additional tools already setup for you:
+Configuration is **per application**, not in a single root `.env.local`.
 
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+| File | Copy to | Contains |
+|------|---------|----------|
+| [`apps/api-golang/.env.example`](apps/api-golang/.env.example) | `.env.local` (dev) or `.env` (server) | `DATABASE_URL`, OAuth, Resend, `ENV`, URLs |
+| [`apps/web/.env.example`](apps/web/.env.example) | `.env.local` | `NEXT_PUBLIC_API_URL`, `API_URL`, public assets |
+| [`.env.example`](.env.example) | — | Documentation pointer only |
+
+Root scripts (`yarn db:migrate`, `yarn db:seed`) read **`apps/api-golang/.env.local`**.
+
+### Production checklist
+
+Set on the server (e.g. EC2) in `apps/api-golang/.env` or via systemd `EnvironmentFile`:
+
+- `ENV=production`
+- `DATABASE_URL` with TLS (`sslmode=require`)
+- `FRONTEND_URL`, `BACKEND_URL` (HTTPS)
+- `COOKIE_SECURE=true`, `TRUST_PROXY=true` (behind reverse proxy)
+- OAuth and `RESEND_API_KEY`
+- `EMAIL_RENDER_URL` pointing to an **internal** email render service (not public internet)
+
+Do **not** run `yarn db:seed` in production.
+
+## Development commands
+
+```bash
+yarn dev              # web + api + email render (parallel)
+yarn build            # production build (all workspaces)
+yarn lint             # ESLint across monorepo
+yarn check-types      # TypeScript (web)
+
+yarn db:up            # start Postgres container
+yarn db:migrate       # apply migrations
+yarn db:generate      # sqlc codegen
+yarn db:sync          # migrate + schema dump + generate
+yarn db:seed          # demo users/spaces (dev only)
+yarn db:reset         # destroy and recreate local DB
+yarn format           # Prettier
+```
+
+## Project structure
+
+```text
+apps/
+  web/                 # Next.js frontend
+  api-golang/          # Go REST API
+    cmd/server/        # entrypoint
+    internal/
+      handler/         # HTTP handlers
+      service/         # business logic
+      repository/      # data access
+      middleware/      # auth, CORS, rate limit, security headers
+      db/migrations/   # SQL migrations
+packages/
+  ui/                  # shared React components
+  emails/              # email templates + render server
+docker-compose.yml     # local PostgreSQL
+turbo.json             # Turborepo pipeline
+.github/workflows/     # CI (lint, typecheck, audit)
+```
+
+## Authentication
+
+- **Session cookies** (`session_id`), HttpOnly, server-side storage in Postgres
+- **Local** email/password (Argon2id)
+- **OAuth** Google and GitHub
+- Protected routes on the web app via `apps/web/proxy.ts`
+
+## CI
+
+On push/PR to `main` or `dev`, [`.github/workflows/security.yml`](.github/workflows/security.yml) runs:
+
+- `yarn workspace web lint` (zero warnings)
+- `yarn workspace web check-types`
+- `go vet` / `go build`
+- `yarn audit` and `govulncheck` (informational)
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup, database workflow, and contribution guidelines.
+
+## License
+
+Private / project-specific — see repository settings for license terms.
