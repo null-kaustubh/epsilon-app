@@ -3,6 +3,14 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "epsilon-uploads-prod.s3.ap-south-1.amazonaws.com",
+      },
+    ],
+  },
   allowedDevOrigins: ["192.168.29.106"],
   async headers() {
     return [

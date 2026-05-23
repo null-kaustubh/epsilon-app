@@ -15,7 +15,7 @@ export default function AuthCallback() {
   return (
     <div className="flex items-center justify-center h-full font-inter flex-col gap-2 text-lg">
       <DotmSquare5 />
-      <span>setting things up for you....</span>
+      <span>signing you in....</span>
     </div>
   );
 }
