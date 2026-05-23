@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Check, Plus } from "phosphor-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseEditorProps } from "../lib/blockRegistry";
+import { uploadImage } from "@/lib/upload";
 
 export default function ImageBlockEditor({
   value,
@@ -63,18 +64,22 @@ export default function ImageBlockEditor({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => {
+        onChange={async (e) => {
           const file = e.target.files?.[0];
           if (!file) return;
 
-          const reader = new FileReader();
-          reader.onload = () => {
-            const next = typeof reader.result === "string" ? reader.result : "";
-            if (!next) return;
-            setLocalSrc(next);
-            onChangeAction(next);
-          };
-          reader.readAsDataURL(file);
+          const preview = URL.createObjectURL(file);
+          setLocalSrc(preview);
+
+          try {
+            const fileUrl = await uploadImage(file, "blocks");
+            setLocalSrc(fileUrl);
+            onChangeAction(fileUrl);
+          } catch {
+            setLocalSrc(value);
+          }
+
+          e.target.value = "";
         }}
       />
 

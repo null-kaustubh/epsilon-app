@@ -2,6 +2,7 @@ package router
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 	"time"
 
@@ -79,6 +80,19 @@ func New(db *sql.DB, emailSvc *email.EmailService, cfg *config.Config) http.Hand
 	mux.Handle("DELETE /spaces/{slug}", auth(http.HandlerFunc(spaceHandler.DeleteSpace)))
 	mux.Handle("PATCH /spaces/{slug}/blocks", auth(http.HandlerFunc(spaceHandler.SaveBlocks)))
 	mux.Handle("DELETE /spaces/{slug}/blocks/{blockId}", auth(http.HandlerFunc(spaceHandler.DeleteBlock)))
+
+	uploadSvc, err := service.NewUploadService(cfg.S3Bucket, cfg.AWSRegion)
+	if err != nil {
+		if cfg.Production {
+			log.Fatal("s3 init failed:", err)
+		} else {
+			log.Println("s3 init skipped (no creds):", err)
+		}
+	}
+	if uploadSvc != nil {
+		uploadHandler := handler.NewUploadHandler(uploadSvc)
+		mux.Handle("GET /upload-url", auth(http.HandlerFunc(uploadHandler.GetUploadURL)))
+	}
 
 	if !cfg.Production {
 		mux.Handle("GET /swagger/", httpSwagger.WrapHandler)

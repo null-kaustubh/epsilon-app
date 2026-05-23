@@ -6,6 +6,7 @@ import { Space } from "../../../lib/spaces";
 import { cn } from "../../../lib/utils";
 import SpaceMenu from "./SpaceMenu";
 import { X } from "phosphor-react";
+import { uploadImage } from "@/lib/upload";
 
 type SpaceCardProps = {
   space: Space;
@@ -176,18 +177,20 @@ export default function SpaceCard({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => {
+        onChange={async (e) => {
           const file = e.target.files?.[0];
           isPickingFile.current = false;
           if (!file) return;
 
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result =
-              typeof reader.result === "string" ? reader.result : "";
-            if (result) setDraftIcon(result);
-          };
-          reader.readAsDataURL(file);
+          const localPreview = URL.createObjectURL(file);
+          setDraftIcon(localPreview);
+
+          try {
+            const fileUrl = await uploadImage(file, "spaces");
+            setDraftIcon(fileUrl);
+          } catch {
+            setDraftIcon(space.icon_url || defaultIcon);
+          }
 
           e.target.value = "";
         }}

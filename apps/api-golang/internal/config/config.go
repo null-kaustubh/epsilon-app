@@ -19,6 +19,8 @@ type Config struct {
 	Production         bool
 	CookieSecure       bool
 	TrustedProxy       bool
+	S3Bucket           string
+	AWSRegion          string
 }
 
 func Load() (*Config, error) {
@@ -74,5 +76,7 @@ func Load() (*Config, error) {
 		Production:         production,
 		CookieSecure:       cookieSecure,
 		TrustedProxy:       trustedProxy,
+		S3Bucket:           os.Getenv("S3_BUCKET"),
+		AWSRegion:          os.Getenv("AWS_REGION"),
 	}, nil
 }
