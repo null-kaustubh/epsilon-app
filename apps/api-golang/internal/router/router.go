@@ -70,7 +70,7 @@ func New(db *sql.DB, emailSvc *email.EmailService, cfg *config.Config) http.Hand
 		http.HandlerFunc(authHandler.ResetPassword)).ServeHTTP)
 
 	mux.Handle("GET /auth/me", middleware.AuthMiddleware(authService)(http.HandlerFunc(authHandler.Me)))
-	mux.Handle("POST /auth/logout", middleware.AuthMiddleware(authService)(http.HandlerFunc(authHandler.Logout)))
+	mux.HandleFunc("POST /auth/logout", authHandler.Logout)
 
 	mux.Handle("POST /spaces", auth(http.HandlerFunc(spaceHandler.CreateSpace)))
 	mux.Handle("GET /spaces", auth(http.HandlerFunc(spaceHandler.ListSpaces)))
