@@ -11,6 +11,7 @@ import (
 type contextKey string
 
 const UserIDKey contextKey = "user_id"
+const UserKey contextKey = "auth_user"
 
 func AuthMiddleware(authService *service.AuthService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -36,6 +37,7 @@ func AuthMiddleware(authService *service.AuthService) func(http.Handler) http.Ha
 			}
 
 			ctx := context.WithValue(r.Context(), UserIDKey, user.ID)
+			ctx = context.WithValue(ctx, UserKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

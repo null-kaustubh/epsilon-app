@@ -39,6 +39,11 @@ func setSessionCookie(w http.ResponseWriter, sessionID string) {
 		Secure:   cookieSecure,
 		MaxAge:   sessionMaxAge,
 	}
+	// CHIPS: required for credentialed cross-origin fetch in Brave and Safari
+	// when the API is on a different origin than the web app.
+	if cookieSecure && cookieDomain != "" {
+		c.Partitioned = true
+	}
 	applyCookieDomain(c)
 	http.SetCookie(w, c)
 }
