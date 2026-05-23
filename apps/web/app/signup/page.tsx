@@ -67,7 +67,7 @@ export default function SignUpPage() {
       });
 
       setTimeout(() => {
-        router.push("/home");
+        router.push("/auth/callback");
       }, 1200);
     } catch (err: unknown) {
       const message =
