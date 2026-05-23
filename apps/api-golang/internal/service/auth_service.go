@@ -242,6 +242,8 @@ func (s *AuthService) OAuthLogin(ctx context.Context, provider string, info OAut
 		}
 	}
 
+	s.repo.DeleteSessionsByUserID(ctx, user.ID)
+
 	sessionID, err := s.createSession(ctx, user.ID)
 	if err != nil {
 		return db.User{}, "", false, err

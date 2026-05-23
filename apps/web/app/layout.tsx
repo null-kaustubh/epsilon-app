@@ -49,6 +49,21 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_INFO.name}`,
     default: `Epsilon | Structured Canvas for Your Ideas`,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+      },
+    ],
+    shortcut: "/favicon.ico",
+  },
+  manifest: "/site.webmanifest",
   description: SITE_INFO.description,
   keywords: SITE_INFO.keywords,
   authors: [
