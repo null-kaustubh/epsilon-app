@@ -28,14 +28,18 @@ async function getUser(
   session: string,
 ): Promise<{ id: string; email: string; username: string } | null> {
   try {
-    const res = await fetch(`${process.env.API_URL}/auth/me`, {
+    const url = `${process.env.API_URL}/auth/me`;
+    console.log("getUser url:", url, "session:", session?.slice(0, 10));
+    const res = await fetch(url, {
       headers: { Cookie: `session_id=${session}` },
       cache: "no-store",
     });
+    console.log("getUser status:", res.status);
     if (!res.ok) return null;
     const json = await res.json();
     return json.data ?? json;
-  } catch {
+  } catch (e) {
+    console.log("getUser error:", e);
     return null;
   }
 }
