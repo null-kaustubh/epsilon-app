@@ -1,6 +1,10 @@
 package middleware
 
-import "net/http"
+import (
+	"net/http"
+	"net/url"
+	"strings"
+)
 
 func CORS(allowedOrigin string) func(http.Handler) http.Handler {
 	allowed := map[string]bool{
@@ -10,6 +14,7 @@ func CORS(allowedOrigin string) func(http.Handler) http.Handler {
 	if allowedOrigin != "http://localhost:3000" {
 		allowed["http://localhost:3000"] = true
 	}
+	addWWWVariants(allowed, allowedOrigin)
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -31,4 +36,25 @@ func CORS(allowedOrigin string) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func addWWWVariants(allowed map[string]bool, origin string) {
+	u, err := url.Parse(origin)
+	if err != nil || u.Scheme == "" || u.Host == "" {
+		return
+	}
+	host := u.Hostname()
+	if strings.HasPrefix(host, "www.") {
+		alt := *u
+		alt.Host = strings.TrimPrefix(u.Host, "www.")
+		allowed[alt.String()] = true
+		return
+	}
+	alt := *u
+	if u.Port() != "" {
+		alt.Host = "www." + u.Host
+	} else {
+		alt.Host = "www." + host
+	}
+	allowed[alt.String()] = true
 }

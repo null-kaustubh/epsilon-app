@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import HomeContent from "../../features/dashboard/components/HomeContent";
 import { Space } from "../../lib/spaces";
 import { redirect } from "next/navigation";
+import { serverFetch } from "../../lib/server-api";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +13,17 @@ async function getSession() {
 
 async function getSpaces(session: string): Promise<Space[]> {
   try {
-    const res = await fetch(`${process.env.API_URL}/spaces`, {
-      headers: { Cookie: `session_id=${session}` },
-      cache: "no-store",
+    const res = await serverFetch("/spaces", session, {
+      signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error("[home] GET /spaces failed:", res.status);
+      return [];
+    }
     const json = await res.json();
     return json.data ?? json ?? [];
-  } catch {
+  } catch (err) {
+    console.error("[home] GET /spaces error:", err);
     return [];
   }
 }
@@ -28,16 +32,17 @@ async function getUser(
   session: string,
 ): Promise<{ id: string; email: string; username: string } | null> {
   try {
-    const url = `${process.env.API_URL}/auth/me`;
-    const res = await fetch(url, {
-      headers: { Cookie: `session_id=${session}` },
-      cache: "no-store",
-      signal: AbortSignal.timeout(10000),
+    const res = await serverFetch("/auth/me", session, {
+      signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("[home] GET /auth/me failed:", res.status);
+      return null;
+    }
     const json = await res.json();
     return json.data ?? json;
-  } catch {
+  } catch (err) {
+    console.error("[home] GET /auth/me error:", err);
     return null;
   }
 }

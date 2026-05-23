@@ -4,11 +4,13 @@ VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
 
 -- name: GetSpaceBySlug :one
-SELECT * FROM spaces
+SELECT id, user_id, name, slug, created_at, updated_at, description, icon_url
+FROM spaces
 WHERE slug = $1 AND user_id = $2;
 
 -- name: ListSpaces :many
-SELECT * FROM spaces
+SELECT id, user_id, name, slug, created_at, updated_at, description, icon_url
+FROM spaces
 WHERE user_id = $1
 ORDER BY created_at DESC;
 

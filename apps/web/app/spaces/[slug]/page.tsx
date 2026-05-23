@@ -2,26 +2,29 @@ import { notFound } from "next/navigation";
 import Canvas from "../../../features/canvas/canvas";
 import TrackRecent from "../../../features/dashboard/components/TrackRecent";
 import { cookies } from "next/headers";
+import { serverFetch } from "../../../lib/server-api";
 
 export const dynamic = "force-dynamic";
 
 async function getSpace(slug: string) {
   try {
     const cookieStore = await cookies();
-    const session = cookieStore.get("session_id");
+    const session = cookieStore.get("session_id")?.value;
+    if (!session) return null;
 
-    const res = await fetch(`${process.env.API_URL}/spaces/${slug}`, {
-      headers: {
-        Cookie: `session_id=${session?.value ?? ""}`,
-      },
-      cache: "no-store",
+    const res = await serverFetch(`/spaces/${encodeURIComponent(slug)}`, session, {
+      signal: AbortSignal.timeout(15000),
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`[space] GET /spaces/${slug} failed:`, res.status);
+      return null;
+    }
 
     const json = await res.json();
     return json.data ?? json;
-  } catch {
+  } catch (err) {
+    console.error(`[space] GET /spaces/${slug} error:`, err);
     return null;
   }
 }

@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"net"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -18,6 +20,7 @@ type Config struct {
 	BackendURL         string
 	Production         bool
 	CookieSecure       bool
+	CookieDomain       string
 	TrustedProxy       bool
 	S3Bucket           string
 	AWSRegion          string
@@ -63,6 +66,11 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("BACKEND_URL is required when ENV=production")
 	}
 
+	cookieDomain := strings.TrimSpace(os.Getenv("COOKIE_DOMAIN"))
+	if cookieDomain == "" {
+		cookieDomain = cookieDomainFromURL(frontendURL)
+	}
+
 	return &Config{
 		Port:               port,
 		DBURL:              dbURL,
@@ -75,8 +83,30 @@ func Load() (*Config, error) {
 		GitHubClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 		Production:         production,
 		CookieSecure:       cookieSecure,
+		CookieDomain:       cookieDomain,
 		TrustedProxy:       trustedProxy,
 		S3Bucket:           os.Getenv("S3_BUCKET"),
 		AWSRegion:          os.Getenv("AWS_REGION"),
 	}, nil
+}
+
+// cookieDomainFromURL returns a registrable domain with leading dot (e.g. ".epsilonapp.site")
+// for cross-subdomain cookies, or empty for localhost / IP (host-only cookies).
+func cookieDomainFromURL(frontendURL string) string {
+	u, err := url.Parse(frontendURL)
+	if err != nil {
+		return ""
+	}
+	host := u.Hostname()
+	if host == "" || host == "localhost" || net.ParseIP(host) != nil {
+		return ""
+	}
+	if strings.HasPrefix(host, "www.") {
+		host = host[4:]
+	}
+	parts := strings.Split(host, ".")
+	if len(parts) < 2 {
+		return ""
+	}
+	return "." + strings.Join(parts[len(parts)-2:], ".")
 }

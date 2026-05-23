@@ -13,36 +13,48 @@ const (
 	oauthStateMaxAge     = 600
 )
 
-var cookieSecure bool
+var (
+	cookieSecure bool
+	cookieDomain string
+)
 
-func InitCookies(secure bool) {
+func InitCookies(secure bool, domain string) {
 	cookieSecure = secure
+	cookieDomain = domain
+}
+
+func applyCookieDomain(c *http.Cookie) {
+	if cookieDomain != "" {
+		c.Domain = cookieDomain
+	}
 }
 
 func setSessionCookie(w http.ResponseWriter, sessionID string) {
-	http.SetCookie(w, &http.Cookie{
+	c := &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    sessionID,
 		Path:     "/",
-		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   sessionMaxAge,
-	})
+	}
+	applyCookieDomain(c)
+	http.SetCookie(w, c)
 }
 
 func clearSessionCookie(w http.ResponseWriter) {
-	http.SetCookie(w, &http.Cookie{
+	c := &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    "",
 		Path:     "/",
-		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   -1,
-	})
+	}
+	applyCookieDomain(c)
+	http.SetCookie(w, c)
 }
 
 func generateOAuthState() (string, error) {
@@ -54,29 +66,31 @@ func generateOAuthState() (string, error) {
 }
 
 func setOAuthStateCookie(w http.ResponseWriter, state string) {
-	http.SetCookie(w, &http.Cookie{
+	c := &http.Cookie{
 		Name:     oauthStateCookieName,
 		Value:    state,
 		Path:     "/",
-		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   oauthStateMaxAge,
-	})
+	}
+	applyCookieDomain(c)
+	http.SetCookie(w, c)
 }
 
 func clearOAuthStateCookie(w http.ResponseWriter) {
-	http.SetCookie(w, &http.Cookie{
+	c := &http.Cookie{
 		Name:     oauthStateCookieName,
 		Value:    "",
 		Path:     "/",
-		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   -1,
-	})
+	}
+	applyCookieDomain(c)
+	http.SetCookie(w, c)
 }
 
 func validateOAuthState(r *http.Request) error {
