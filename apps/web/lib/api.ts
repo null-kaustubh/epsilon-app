@@ -7,6 +7,8 @@ export class ApiError extends Error {
   }
 }
 
+import { getBrowserApiBase } from "./api-base";
+
 export type AuthUser = {
   id: string;
   email: string;
@@ -14,7 +16,7 @@ export type AuthUser = {
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const BASE_URL = getBrowserApiBase();
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
     credentials: "include",

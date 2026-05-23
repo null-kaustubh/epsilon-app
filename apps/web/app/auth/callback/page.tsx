@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DotmSquare5 } from "@/components/ui/dotm-square-5";
+import { getBrowserApiBase } from "@/lib/api-base";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 const MAX_ATTEMPTS = 20;
 const RETRY_MS = 250;
 
 async function sessionReady(): Promise<boolean> {
-  const res = await fetch(`${API_URL}/auth/me`, {
+  const res = await fetch(`${getBrowserApiBase()}/auth/me`, {
     credentials: "include",
     cache: "no-store",
   });

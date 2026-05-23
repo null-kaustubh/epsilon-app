@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 
+	db "api-golang/internal/db/sqlc"
+	"api-golang/internal/middleware"
 	"api-golang/internal/repository"
 	"api-golang/internal/request"
 	"api-golang/internal/response"
@@ -63,6 +65,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	clearSessionCookie(w)
 	setSessionCookie(w, sessionID)
 
 	response.JSON(w, http.StatusOK, map[string]string{
@@ -102,6 +105,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	clearSessionCookie(w)
 	setSessionCookie(w, sessionID)
 
 	response.JSON(w, http.StatusOK, map[string]string{
@@ -121,14 +125,8 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie(sessionCookieName)
-	if err != nil {
-		response.Error(w, http.StatusUnauthorized, "unauthorized")
-		return
-	}
-
-	user, err := h.service.GetUserFromSession(r.Context(), cookie.Value)
-	if err != nil {
+	user, ok := r.Context().Value(middleware.UserKey).(db.User)
+	if !ok {
 		response.Error(w, http.StatusUnauthorized, "unauthorized")
 		return
 	}

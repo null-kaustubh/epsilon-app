@@ -222,7 +222,9 @@ If you still see `ListSpaces error: pq: bind message...` after deploy:
 | Web guard | `proxy.ts` requires cookie on `/home` and `/spaces/*` |
 | API guard | `AuthMiddleware` on mutating and private reads |
 
-Cookie attributes in production: `Secure`, `SameSite=None`, domain from `COOKIE_DOMAIN` or derived from `FRONTEND_URL` (required for cross-origin Vercel → EC2).
+Cookie attributes in production: `Secure`, `SameSite=None`, `Partitioned` (CHIPS), domain from `COOKIE_DOMAIN` or derived from `FRONTEND_URL`.
+
+**Brave / strict browsers:** the web app calls the API through **`/api/*`** (Next.js rewrite) so session cookies are first-party. Direct `fetch` from the site to `api.yourdomain.com` is often blocked by Brave Shields even when a cookie appears in DevTools. OAuth still starts on the API host; after redirect, `/auth/callback` uses the same-origin `/api` path.
 
 ## Object storage (S3)
 
