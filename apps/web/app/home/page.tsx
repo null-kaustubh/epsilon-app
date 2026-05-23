@@ -29,17 +29,15 @@ async function getUser(
 ): Promise<{ id: string; email: string; username: string } | null> {
   try {
     const url = `${process.env.API_URL}/auth/me`;
-    console.log("getUser url:", url, "session:", session?.slice(0, 10));
     const res = await fetch(url, {
       headers: { Cookie: `session_id=${session}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(10000),
     });
-    console.log("getUser status:", res.status);
     if (!res.ok) return null;
     const json = await res.json();
     return json.data ?? json;
-  } catch (e) {
-    console.log("getUser error:", e);
+  } catch {
     return null;
   }
 }
