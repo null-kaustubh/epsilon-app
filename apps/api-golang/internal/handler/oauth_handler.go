@@ -103,7 +103,7 @@ func (h *OAuthHandler) finishOAuth(
 	}
 
 	setSessionCookie(w, sessionID)
-	http.Redirect(w, r, h.frontendURL+"/home", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, h.frontendURL+"/auth/callback", http.StatusTemporaryRedirect)
 }
 
 func (h *OAuthHandler) handleCallback(
