@@ -30,7 +30,7 @@ func getGlobalLimiter(ip string) *rate.Limiter {
 	val, ok := globalLimiters.Load(ip)
 	if !ok {
 		l := &ipLimiter{
-			limiter:  rate.NewLimiter(rate.Every(time.Minute/60), 20),
+			limiter:  rate.NewLimiter(rate.Every(time.Minute/120), 60),
 			lastSeen: time.Now(),
 		}
 		globalLimiters.Store(ip, l)
@@ -56,6 +56,13 @@ func RateLimit(next http.Handler) http.Handler {
 	}()
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// High-frequency session checks (Vercel RSC + proxy) must not share the
+		// global IP bucket with mutating API traffic.
+		if r.URL.Path == "/health" || r.URL.Path == "/auth/me" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		ip := realIP(r)
 		if !getGlobalLimiter(ip).Allow() {
 			response.Error(w, http.StatusTooManyRequests, "too many requests")

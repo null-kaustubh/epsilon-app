@@ -21,7 +21,7 @@ import (
 func New(db *sql.DB, emailSvc *email.EmailService, cfg *config.Config) http.Handler {
 	mux := http.NewServeMux()
 
-	handler.InitCookies(cfg.CookieSecure)
+	handler.InitCookies(cfg.CookieSecure, cfg.CookieDomain)
 	middleware.InitRateLimit(cfg.TrustedProxy)
 
 	authRepo := repository.NewPostgresAuthRepository(db)

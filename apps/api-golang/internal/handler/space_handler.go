@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"database/sql"
 	"errors"
 	"log"
 	"net/http"
 
 	"api-golang/internal/middleware"
+	"api-golang/internal/repository"
 	"api-golang/internal/request"
 	"api-golang/internal/response"
 	"api-golang/internal/service"
@@ -124,10 +124,11 @@ func (h *SpaceHandler) GetSpace(w http.ResponseWriter, r *http.Request) {
 
 	space, blocks, err := h.service.GetSpace(r.Context(), slug, userID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, repository.ErrSpaceNotFound) {
 			response.Error(w, http.StatusNotFound, "space not found")
 			return
 		}
+		log.Printf("GetSpace error: %v", err)
 		response.Error(w, http.StatusInternalServerError, "failed to fetch space")
 		return
 	}
@@ -216,7 +217,7 @@ func (h *SpaceHandler) SaveBlocks(w http.ResponseWriter, r *http.Request) {
 
 	space, _, err := h.service.GetSpace(r.Context(), slug, userID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, repository.ErrSpaceNotFound) {
 			response.Error(w, http.StatusNotFound, "space not found")
 			return
 		}
@@ -277,7 +278,7 @@ func (h *SpaceHandler) DeleteBlock(w http.ResponseWriter, r *http.Request) {
 
 	space, _, err := h.service.GetSpace(r.Context(), slug, userID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, repository.ErrSpaceNotFound) {
 			response.Error(w, http.StatusNotFound, "space not found")
 			return
 		}

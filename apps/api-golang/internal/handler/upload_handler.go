@@ -1,13 +1,15 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"api-golang/internal/middleware"
+	"api-golang/internal/response"
 	"api-golang/internal/service"
+
+	"github.com/google/uuid"
 )
 
 type UploadHandler struct {
@@ -30,24 +32,28 @@ func (h *UploadHandler) GetUploadURL(w http.ResponseWriter, r *http.Request) {
 
 	ext, ok := allowedTypes[contentType]
 	if !ok {
-		http.Error(w, "unsupported content type", http.StatusBadRequest)
+		response.Error(w, http.StatusBadRequest, "unsupported content type")
 		return
 	}
 
 	if folder != "spaces" && folder != "blocks" {
-		http.Error(w, "invalid folder", http.StatusBadRequest)
+		response.Error(w, http.StatusBadRequest, "invalid folder")
 		return
 	}
 
-	userID := fmt.Sprintf("%v", r.Context().Value(middleware.UserIDKey))
-	key := fmt.Sprintf("%s/%s/%d.%s", folder, userID, time.Now().UnixNano(), ext)
+	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	key := fmt.Sprintf("%s/%s/%d.%s", folder, userID.String(), time.Now().UnixNano(), ext)
 
 	result, err := h.service.GeneratePresignedURL(r.Context(), key, contentType)
 	if err != nil {
-		http.Error(w, "failed to generate upload url", http.StatusInternalServerError)
+		response.Error(w, http.StatusInternalServerError, "failed to generate upload url")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	response.JSON(w, http.StatusOK, result)
 }

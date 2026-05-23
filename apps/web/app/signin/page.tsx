@@ -38,9 +38,7 @@ export default function SignInPage() {
         },
       });
 
-      setTimeout(() => {
-        router.push("/auth/callback");
-      }, 1000);
+      router.push("/auth/callback");
     } catch (err: unknown) {
       const message =
         err instanceof ApiError ? err.message : "Something went wrong.";
