@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 
 	"api-golang/internal/middleware"
@@ -100,6 +101,7 @@ func (h *SpaceHandler) ListSpaces(w http.ResponseWriter, r *http.Request) {
 
 	spaces, err := h.service.ListSpaces(r.Context(), userID)
 	if err != nil {
+		log.Printf("ListSpaces error: %v", err)
 		response.Error(w, http.StatusInternalServerError, "failed to fetch spaces")
 		return
 	}
