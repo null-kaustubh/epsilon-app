@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	sessionCookieName   = "session_id"
+	sessionCookieName    = "session_id"
 	oauthStateCookieName = "oauth_state"
-	sessionMaxAge       = 7 * 24 * 60 * 60
-	oauthStateMaxAge    = 600
+	sessionMaxAge        = 7 * 24 * 60 * 60
+	oauthStateMaxAge     = 600
 )
 
 var cookieSecure bool
@@ -24,8 +24,9 @@ func setSessionCookie(w http.ResponseWriter, sessionID string) {
 		Name:     sessionCookieName,
 		Value:    sessionID,
 		Path:     "/",
+		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   sessionMaxAge,
 	})
@@ -36,8 +37,9 @@ func clearSessionCookie(w http.ResponseWriter) {
 		Name:     sessionCookieName,
 		Value:    "",
 		Path:     "/",
+		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   -1,
 	})
@@ -56,8 +58,9 @@ func setOAuthStateCookie(w http.ResponseWriter, state string) {
 		Name:     oauthStateCookieName,
 		Value:    state,
 		Path:     "/",
+		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   oauthStateMaxAge,
 	})
@@ -68,8 +71,9 @@ func clearOAuthStateCookie(w http.ResponseWriter) {
 		Name:     oauthStateCookieName,
 		Value:    "",
 		Path:     "/",
+		Domain:   ".epsilonapp.site",
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 		Secure:   cookieSecure,
 		MaxAge:   -1,
 	})
