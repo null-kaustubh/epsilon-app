@@ -39,7 +39,7 @@ export default function SignInPage() {
       });
 
       setTimeout(() => {
-        router.push("/home");
+        router.push("/auth/callback");
       }, 1000);
     } catch (err: unknown) {
       const message =
