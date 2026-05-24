@@ -14,6 +14,7 @@ import { neueMontreal } from "../assets/fonts/fonts";
 import { SITE_INFO } from "../config/site";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import PostHogProvider from "@/components/posthogProvider";
 
 const fragmentMono = Fragment_Mono({
   subsets: ["latin"],
@@ -137,7 +138,9 @@ export default async function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <ThemeProvider initialTheme={theme}>{children}</ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider initialTheme={theme}>{children}</ThemeProvider>
+        </PostHogProvider>
         <Toaster
           position="bottom-center"
           richColors
