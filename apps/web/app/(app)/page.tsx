@@ -1,5 +1,6 @@
 import { WebApplication, WithContext } from "schema-dts";
 import Landing from "../../features/landing/mainLanding";
+import { SITE_INFO } from "../../config/site";
 
 export default function Page() {
   return (
@@ -23,8 +24,8 @@ function getPageJsonLd(): WithContext<WebApplication> {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Epsilon",
-    url: "https://yourdomain.com", // to add links
-    image: "https://epsilon.app/og.png", // to add links
+    url: SITE_INFO.url,
+    image: SITE_INFO.ogImage,
     applicationCategory: "ProductivityApplication",
     operatingSystem: "Web",
     browserRequirements: "Requires JavaScript. Requires HTML5.",
@@ -50,7 +51,7 @@ function getPageJsonLd(): WithContext<WebApplication> {
     },
     potentialAction: {
       "@type": "UseAction",
-      target: "https://epsilon.app", // change with domain
+      target: SITE_INFO.url,
     },
     featureList: [
       "Create multiple personal spaces",
