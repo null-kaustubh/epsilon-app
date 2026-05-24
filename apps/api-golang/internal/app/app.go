@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"api-golang/internal/config"
@@ -12,6 +13,8 @@ import (
 	sqlcdb "api-golang/internal/db/sqlc"
 	"api-golang/internal/email"
 	"api-golang/internal/router"
+
+	sentry "github.com/getsentry/sentry-go"
 )
 
 type App struct {
@@ -24,6 +27,17 @@ func New() (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("config load failed: %w", err)
 	}
+
+	if cfg.Production {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:              os.Getenv("SENTRY_DSN_BACKEND"),
+			TracesSampleRate: 1.0,
+			Environment:      "production",
+		}); err != nil {
+			log.Printf("sentry init failed: %v", err)
+		}
+	}
+
 	emailSvc := email.New(cfg.ResendAPIKey)
 
 	dbConn, err := db.NewPostgresDB(cfg.DBURL)
