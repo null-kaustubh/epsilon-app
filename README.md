@@ -51,6 +51,8 @@ flowchart TB
 | PostgreSQL | Neon | Users, sessions, spaces, blocks |
 | S3 | AWS | Space icons and block images (private bucket, HTTPS URLs) |
 | `packages/emails` | Local / internal | React Email templates and render service |
+| PostHog | Cloud | Product analytics (pageviews, client events) |
+| Sentry | Cloud | Error monitoring (Next.js + Go API in production) |
 
 Backend layering: **handler → service → repository → sqlc**.
 
@@ -115,7 +117,9 @@ packages/
   emails/                   Email templates + render server
 docker-compose.yml          Local PostgreSQL only
 turbo.json                  Turborepo pipeline
-.github/workflows/          CI
+.github/workflows/
+  security.yml              Lint, typecheck, Go build, audits
+  deploy.yml                SSH deploy API to EC2 on main
 ```
 
 ## Prerequisites
@@ -174,9 +178,25 @@ Root DB scripts read **`apps/api-golang/.env.local`**.
 ```env
 NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 API_URL=https://api.yourdomain.com
+
+# SEO / metadata (canonical, Open Graph, JSON-LD)
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+NEXT_PUBLIC_OG_IMAGE=https://assets.example.com/og.png
+NEXT_PUBLIC_LOGO_WHITE_IMAGE=
+NEXT_PUBLIC_DEFAULT_SPACE_ICON=
+
+# PostHog (optional — omit keys to disable client analytics)
+NEXT_PUBLIC_POSTHOG_KEY=
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+
+# Sentry (optional — @sentry/nextjs; source maps via build plugin)
+NEXT_PUBLIC_SENTRY_DSN=
+SENTRY_DSN=
 ```
 
 `API_URL` and `NEXT_PUBLIC_API_URL` **must be identical** in production. Server Components use `API_URL`; the browser uses `NEXT_PUBLIC_API_URL`.
+
+PostHog initializes in the root layout (`PostHogProvider`); pageviews are captured on route changes. Sentry uses separate DSNs for browser (`NEXT_PUBLIC_SENTRY_DSN`) and edge/server (`SENTRY_DSN`) via `@sentry/nextjs`.
 
 ### API (EC2)
 
@@ -198,9 +218,14 @@ S3_BUCKET=your-bucket
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
 EMAIL_RENDER_URL=http://127.0.0.1:3001
+
+# Sentry (optional — enabled when ENV=production)
+SENTRY_DSN_BACKEND=
 ```
 
 Do **not** run `yarn db:seed` in production.
+
+In production, the API initializes Sentry when `ENV=production` and `SENTRY_DSN_BACKEND` is set; panics in handlers are reported via recovery middleware.
 
 ### Database (Neon)
 
@@ -238,6 +263,16 @@ Cookie attributes in production: `Secure`, `SameSite=None`, `Partitioned` (CHIPS
 
 Lock down the bucket with IAM least privilege and block public listing; objects are referenced by HTTPS URL after upload.
 
+## Observability
+
+| Tool | Where | Env vars | Behavior |
+|------|--------|----------|----------|
+| **PostHog** | `apps/web` (client) | `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` | Product analytics; manual `$pageview` on navigation |
+| **Sentry (web)** | `apps/web` | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_DSN` | Next.js client, edge, and server errors; wired in `next.config.ts` |
+| **Sentry (API)** | `apps/api-golang` | `SENTRY_DSN_BACKEND` | Production-only init; panic recovery flushed to Sentry |
+
+Leave analytics/error keys empty locally if you do not need them. For Sentry releases and source maps on Vercel, configure the project org/token in the Sentry dashboard and follow `@sentry/nextjs` docs (build plugin is already wrapped in `withSentryConfig`).
+
 ## Development commands
 
 ```bash
@@ -255,25 +290,45 @@ yarn db:reset
 yarn format
 ```
 
-## Deployment sketch
+## Deployment
 
 | Step | Target | Action |
 |------|--------|--------|
 | 1 | Neon | Run migrations (`yarn db:migrate` against prod URL once) |
-| 2 | EC2 | Pull API, set `.env`, `go build`, restart `epsilon-backend.service` |
-| 3 | Vercel | Set `API_URL` / `NEXT_PUBLIC_API_URL`, deploy `apps/web` |
-| 4 | AWS | S3 bucket + IAM user/role for presign credentials on EC2 |
+| 2 | EC2 | Clone repo to e.g. `/home/ubuntu/epsilon-app`, set `apps/api-golang/.env`, enable `epsilon-backend.service` |
+| 3 | GitHub | Add secrets `EC2_HOST`, `EC2_SSH_KEY` for automated API deploys |
+| 4 | Vercel | Connect `apps/web`, set env vars (API URLs, PostHog, Sentry, assets), deploy on push |
+| 5 | AWS | S3 bucket + IAM credentials on EC2 for presign |
 
 Put TLS termination on nginx or ALB in front of the API; set `TRUST_PROXY=true` so rate limits use `X-Forwarded-For`.
 
+### Automated backend deploy
+
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs on **push to `main`** when files under `apps/api-golang/**` change. It SSHs into EC2 and runs:
+
+```bash
+cd /home/ubuntu/epsilon-app
+git pull origin main
+cd apps/api-golang
+go build -o epsilon-server ./cmd/server
+sudo systemctl restart epsilon-backend
+```
+
+Required GitHub Actions secrets:
+
+| Secret | Purpose |
+|--------|---------|
+| `EC2_HOST` | Public hostname or IP of the API server |
+| `EC2_SSH_KEY` | Private key for the `ubuntu` user |
+
+The frontend is **not** deployed by this workflow; use Vercel (or your own pipeline) for `apps/web`.
+
 ## CI
 
-On push/PR to `main` or `dev`, [`.github/workflows/security.yml`](.github/workflows/security.yml) runs:
-
-- `yarn workspace web lint` (zero warnings)
-- `yarn workspace web check-types`
-- `go vet` / `go build`
-- `yarn audit` and `govulncheck` (informational)
+| Workflow | Trigger | What it does |
+|----------|---------|----------------|
+| [`.github/workflows/security.yml`](.github/workflows/security.yml) | Push/PR to `main` or `master` | `yarn workspace web lint`, `check-types`, `go vet` / `go build`, `yarn audit` and `govulncheck` (informational, `continue-on-error`) |
+| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) | Push to `main` (API paths only) | SSH deploy and restart `epsilon-backend` on EC2 |
 
 ## Contributing
 
@@ -281,4 +336,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow, migrations, and conventions
 
 ## License
 
-Private / project-specific. See repository settings for terms.
+This project is licensed under the [MIT License](LICENSE).
+
+Copyright (c) 2026 Kaustubh Sankhe
