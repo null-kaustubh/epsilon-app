@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /signup
+Allow: /signin
+
+Disallow: /home
+Disallow: /spaces/
+Disallow: /auth/
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://epsilonapp.site/sitemap.xml
