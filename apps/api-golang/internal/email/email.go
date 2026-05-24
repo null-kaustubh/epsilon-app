@@ -28,7 +28,7 @@ func New(apiKey string) *EmailService {
 
 	return &EmailService{
 		client:           resend.NewClient(apiKey),
-		from:             "onboarding@resend.dev",
+		from:             "Epsilon <hello@epsilonapp.site>",
 		renderServiceURL: renderURL,
 		httpClient:       &http.Client{Timeout: 5 * time.Second},
 	}
