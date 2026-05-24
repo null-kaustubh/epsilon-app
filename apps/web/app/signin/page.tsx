@@ -74,25 +74,7 @@ export default function SignInPage() {
           background: "var(--background)",
         }}
       >
-        {/* ════════════════════════════════════════
-          LEFT PANEL — floating card (add image inside)
-      ════════════════════════════════════════ */}
         <div className="hidden lg:flex flex-1 items-center justify-center p-3">
-          {/*
-          ┌──────────────────────────────────────────────────────────────┐
-          │  FLOATING IMAGE CARD                                          │
-          │  To add your image, replace the inner placeholder div with:  │
-          │                                                               │
-          │    <Image                                                     │
-          │      src="/your-image.png"                                    │
-          │      alt="..."                                                │
-          │      fill                                                     │
-          │      className="object-cover"                                 │
-          │    />                                                         │
-          │                                                               │
-          │  The card already handles rounded corners + overflow hidden.  │
-          └──────────────────────────────────────────────────────────────┘
-        */}
           <div
             className="relative w-full h-full max-h-[calc(100vh-3rem)] rounded-2xl overflow-hidden"
             style={{
@@ -103,67 +85,17 @@ export default function SignInPage() {
                 "cardFloat 0.55s cubic-bezier(0.22,1,0.36,1) 0.08s both",
             }}
           >
-            {/* Grid texture — remove when you add a real image */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                backgroundImage: `
-                linear-gradient(color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
-                linear-gradient(90deg, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px)
-              `,
-                backgroundSize: "52px 52px",
-              }}
-            />
-
-            {/* Accent glow */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(ellipse 55% 45% at 55% 65%, color-mix(in srgb, var(--accent) 8%, transparent), transparent)",
-              }}
-            />
-
             {/* Image placeholder label */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="text-center select-none">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
-                  style={{
-                    background: "var(--muted)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    style={{ color: "var(--muted-foreground)" }}
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="3" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="m21 15-5-5L5 21" />
-                  </svg>
-                </div>
-                <p
-                  className="text-sm font-medium"
-                  style={{ color: "var(--muted-foreground)" }}
-                >
-                  Your image goes here
-                </p>
-                <p
-                  className="text-xs mt-1"
-                  style={{
-                    color:
-                      "color-mix(in srgb, var(--muted-foreground) 45%, transparent)",
-                  }}
-                >
-                  Replace this panel with your hero artwork
-                </p>
-              </div>
+              <Image
+                src="https://assets.kaustubh.cloud/epsilon/signin_bg.png"
+                alt="signupiamge"
+                fill
+                priority
+                quality={100}
+                sizes="(max-width: 1024px) 0vw, 50vw"
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
@@ -358,19 +290,6 @@ export default function SignInPage() {
           background: var(--background);
           border-color: color-mix(in srgb, var(--ring) 55%, transparent);
           box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 14%, transparent);
-        }
-
-        @keyframes panelIn {
-          from { opacity: 0; transform: translateX(-10px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes cardFloat {
-          from { opacity: 0; transform: translateY(18px) scale(0.975); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes popIn {
-          from { transform: translateY(-50%) scale(0.3); opacity: 0; }
-          to   { transform: translateY(-50%) scale(1);   opacity: 1; }
         }
       `}</style>
       </div>

@@ -162,13 +162,11 @@ export default function EditableHero() {
       {/* Desktop */}
       <div className="hidden md:block absolute inset-y-0 right-0 w-[60%] pointer-events-none">
         <Image
-          src="https://assets.kaustubh.cloud/epsilon/epsilon.svg"
+          src="/epsilon.svg"
           alt="Epsilon collage"
           width={1152}
           height={768}
-          unoptimized
           priority
-          fetchPriority="high"
           className="absolute right-0 top-0 h-full w-auto max-w-none select-none"
         />
       </div>
@@ -440,7 +438,7 @@ export default function EditableHero() {
         <div className="pointer-events-none w-screen -mx-4 relative h-[55vh]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://assets.kaustubh.cloud/epsilon/epsilon.svg"
+            src="/epsilon.svg"
             alt="Epsilon collage"
             loading="lazy"
             fetchPriority="low"

@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "epsilon-uploads-prod.s3.ap-south-1.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "assets.kaustubh.cloud",
+      },
     ],
   },
   allowedDevOrigins: ["192.168.29.106"],
