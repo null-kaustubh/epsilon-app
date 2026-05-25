@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"api-golang/internal/middleware"
@@ -20,6 +21,8 @@ func NewUploadHandler(svc *service.UploadService) *UploadHandler {
 	return &UploadHandler{service: svc}
 }
 
+const maxUploadBytes int64 = 5 << 20 // 5 MiB per image
+
 var allowedTypes = map[string]string{
 	"image/jpeg": "jpg",
 	"image/png":  "png",
@@ -28,6 +31,11 @@ var allowedTypes = map[string]string{
 
 func (h *UploadHandler) GetUploadURL(w http.ResponseWriter, r *http.Request) {
 	contentType := r.URL.Query().Get("content_type")
+	contentLength, err := strconv.ParseInt(r.URL.Query().Get("content_length"), 10, 64)
+	if err != nil || contentLength <= 0 || contentLength > maxUploadBytes {
+		response.Error(w, http.StatusBadRequest, "invalid content length")
+		return
+	}
 	folder := r.URL.Query().Get("folder")
 
 	ext, ok := allowedTypes[contentType]
@@ -49,7 +57,7 @@ func (h *UploadHandler) GetUploadURL(w http.ResponseWriter, r *http.Request) {
 
 	key := fmt.Sprintf("%s/%s/%d.%s", folder, userID.String(), time.Now().UnixNano(), ext)
 
-	result, err := h.service.GeneratePresignedURL(r.Context(), key, contentType)
+	result, err := h.service.GeneratePresignedURL(r.Context(), key, contentType, contentLength)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "failed to generate upload url")
 		return

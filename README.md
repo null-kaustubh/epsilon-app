@@ -255,7 +255,7 @@ Cookie attributes in production: `Secure`, `SameSite=None`, `Partitioned` (CHIPS
 
 | Concern | Implementation |
 |---------|----------------|
-| Access | `GET /upload-url` (authenticated) returns a 15-minute presigned PUT |
+| Access | `GET /upload-url?content_type=&content_length=&folder=` (authenticated) returns a 15-minute presigned PUT signed for the declared byte size (max 5 MiB) |
 | Types | `image/jpeg`, `image/png`, `image/webp` only |
 | Layout | `spaces/{userId}/{nano}.ext` or `blocks/{userId}/{nano}.ext` |
 | Size cap | 5 MiB per object on presigned PUT |
