@@ -25,6 +25,7 @@ const maxUploadBytes int64 = 5 << 20 // 5 MiB per image
 
 var allowedTypes = map[string]string{
 	"image/jpeg": "jpg",
+	"image/jpg":  "jpg",
 	"image/png":  "png",
 	"image/webp": "webp",
 }
@@ -57,7 +58,7 @@ func (h *UploadHandler) GetUploadURL(w http.ResponseWriter, r *http.Request) {
 
 	key := fmt.Sprintf("%s/%s/%d.%s", folder, userID.String(), time.Now().UnixNano(), ext)
 
-	result, err := h.service.GeneratePresignedURL(r.Context(), key, contentType, contentLength)
+	result, err := h.service.GeneratePresignedURL(r.Context(), key, contentLength)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "failed to generate upload url")
 		return
