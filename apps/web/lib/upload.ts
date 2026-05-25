@@ -10,7 +10,7 @@ export async function uploadImage(
   folder: "spaces" | "blocks",
 ): Promise<string> {
   const { uploadUrl, fileUrl } = await api.get<PresignResult>(
-    `/upload-url?content_type=${encodeURIComponent(file.type)}&folder=${folder}`,
+    `/upload-url?content_type=${encodeURIComponent(file.type)}&content_length=${file.size}&folder=${folder}`,
   );
 
   const res = await fetch(uploadUrl, {
@@ -18,7 +18,6 @@ export async function uploadImage(
     body: file,
     headers: {
       "Content-Type": file.type,
-      "Content-Length": file.size.toString(),
     },
   });
 
