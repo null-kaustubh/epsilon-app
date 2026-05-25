@@ -16,7 +16,10 @@ export async function uploadImage(
   const res = await fetch(uploadUrl, {
     method: "PUT",
     body: file,
-    headers: { "Content-Type": file.type },
+    headers: {
+      "Content-Type": file.type,
+      "Content-Length": file.size.toString(),
+    },
   });
 
   if (!res.ok) throw new Error("Upload to S3 failed");
