@@ -48,7 +48,7 @@ type PresignResult struct {
 	Key       string `json:"key"`
 }
 
-func (s *UploadService) GeneratePresignedURL(ctx context.Context, key, contentType string, contentLength int64) (*PresignResult, error) {
+func (s *UploadService) GeneratePresignedURL(ctx context.Context, key string, contentLength int64) (*PresignResult, error) {
 	if strings.Contains(key, "..") {
 		return nil, fmt.Errorf("invalid key")
 	}
@@ -56,11 +56,11 @@ func (s *UploadService) GeneratePresignedURL(ctx context.Context, key, contentTy
 		return nil, fmt.Errorf("invalid content length")
 	}
 
+	// Sign only bucket/key so the browser is not required to match signed
+	// Content-Type or Content-Length (common cause of 403 SignatureDoesNotMatch).
 	req, err := s.presigner.PresignPutObject(ctx, &s3.PutObjectInput{
-		Bucket:        aws.String(s.bucket),
-		Key:           aws.String(key),
-		ContentType:   aws.String(contentType),
-		ContentLength: aws.Int64(contentLength),
+		Bucket: aws.String(s.bucket),
+		Key:    aws.String(key),
 	}, s3.WithPresignExpires(15*time.Minute))
 	if err != nil {
 		return nil, fmt.Errorf("failed to presign: %w", err)
