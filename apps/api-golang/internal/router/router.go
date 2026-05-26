@@ -59,6 +59,7 @@ func New(db *sql.DB, emailSvc *email.EmailService, cfg *config.Config) http.Hand
 
 	auth := middleware.AuthMiddleware(authService)
 
+	handler.InitHealth(db)
 	mux.HandleFunc("GET /health", handler.Health)
 
 	mux.HandleFunc("POST /auth/register", signupLimiter.Middleware(

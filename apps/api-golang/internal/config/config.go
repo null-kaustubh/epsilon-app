@@ -101,9 +101,7 @@ func cookieDomainFromURL(frontendURL string) string {
 	if host == "" || host == "localhost" || net.ParseIP(host) != nil {
 		return ""
 	}
-	if strings.HasPrefix(host, "www.") {
-		host = host[4:]
-	}
+	host = strings.TrimPrefix(host, "www.")
 	parts := strings.Split(host, ".")
 	if len(parts) < 2 {
 		return ""
