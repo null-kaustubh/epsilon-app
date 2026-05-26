@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "apps/api-golang/**"
+      - "packages/emails/**"
 
 jobs:
   deploy:
@@ -23,4 +24,6 @@ jobs:
             cd apps/api-golang
             go build -o epsilon-server ./cmd/server
             sudo systemctl restart epsilon-backend
+            sudo systemctl restart epsilon-emails
             sudo systemctl status epsilon-backend --no-pager
+            sudo systemctl status epsilon-emails --no-pager
