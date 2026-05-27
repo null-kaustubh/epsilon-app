@@ -12,7 +12,7 @@ import { Space, SpaceBlock } from "../../lib/spaces";
 import { useSaveBlocks } from "./hooks/useSaveBlocks";
 import { CANVAS_MIN_WIDTH_PX } from "./lib/gridConstants";
 import { HouseSimple } from "phosphor-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type SaveStatus = "saved" | "saving" | "error";
 
@@ -24,6 +24,7 @@ interface CanvasProps {
 export default function Canvas({ space, initialBlocks }: CanvasProps) {
   const { ref, width } = useContainerWidth();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+  const router = useRouter();
   const viewportWidthRef = useRef(0);
   useEffect(() => {
     viewportWidthRef.current = width;
@@ -50,7 +51,7 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
     setSaveStatus(status);
   }, []);
 
-  useSaveBlocks({
+  const { save } = useSaveBlocks({
     slug: space.slug,
     spaceId: space.id,
     blocks,
@@ -58,6 +59,17 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
     savedBlockIdsRef,
     onStatusChange: handleStatusChange,
   });
+
+  useEffect(() => {
+    const intervalId = window.setInterval(
+      () => {
+        save();
+      },
+      3 * 60 * 1000,
+    );
+
+    return () => window.clearInterval(intervalId);
+  }, [save]);
 
   const [mode, setMode] = useState<"cursor" | "delete">("cursor");
   const gridWidth = useMemo(() => {
@@ -81,18 +93,22 @@ export default function Canvas({ space, initialBlocks }: CanvasProps) {
         onAdd={handleAddBlock}
       />
 
-      <Link
-        href={"/home"}
+      <button
+        type="button"
+        onClick={async () => {
+          await save();
+          router.push("/home");
+        }}
         className="fixed top-3 right-18 z-50 p-2 rounded-xl
                  bg-background/80 backdrop-blur-md border shadow-sm
                  hover:bg-muted/70 transition-opacity cursor-pointer"
       >
         <HouseSimple size={18} />
-      </Link>
+      </button>
 
       <ThemeToggle />
 
-      <div className="canvas-scroll h-full overflow-x-auto overflow-y-scroll p-4 [scrollbar-gutter:stable]">
+      <div className="canvas-scroll h-full overflow-x-auto overflow-y-scroll p-4 scrollbar-gutter-stable">
         <div ref={ref} className="w-full">
           {gridWidth > 0 ? (
             <CanvasGrid
