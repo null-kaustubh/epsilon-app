@@ -30,12 +30,18 @@ func applyCookieDomain(c *http.Cookie) {
 }
 
 func setSessionCookie(w http.ResponseWriter, sessionID string) {
+	sameSite := http.SameSiteNoneMode
+	// Local dev (http://localhost) cannot set SameSite=None without Secure.
+	// Browsers will drop such cookies, causing auth to fail.
+	if !cookieSecure {
+		sameSite = http.SameSiteLaxMode
+	}
 	c := &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    sessionID,
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: sameSite,
 		Secure:   cookieSecure,
 		MaxAge:   sessionMaxAge,
 	}
@@ -49,12 +55,16 @@ func setSessionCookie(w http.ResponseWriter, sessionID string) {
 }
 
 func clearSessionCookie(w http.ResponseWriter) {
+	sameSite := http.SameSiteNoneMode
+	if !cookieSecure {
+		sameSite = http.SameSiteLaxMode
+	}
 	c := &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: sameSite,
 		Secure:   cookieSecure,
 		MaxAge:   -1,
 	}
@@ -71,12 +81,16 @@ func generateOAuthState() (string, error) {
 }
 
 func setOAuthStateCookie(w http.ResponseWriter, state string) {
+	sameSite := http.SameSiteNoneMode
+	if !cookieSecure {
+		sameSite = http.SameSiteLaxMode
+	}
 	c := &http.Cookie{
 		Name:     oauthStateCookieName,
 		Value:    state,
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: sameSite,
 		Secure:   cookieSecure,
 		MaxAge:   oauthStateMaxAge,
 	}
@@ -85,12 +99,16 @@ func setOAuthStateCookie(w http.ResponseWriter, state string) {
 }
 
 func clearOAuthStateCookie(w http.ResponseWriter) {
+	sameSite := http.SameSiteNoneMode
+	if !cookieSecure {
+		sameSite = http.SameSiteLaxMode
+	}
 	c := &http.Cookie{
 		Name:     oauthStateCookieName,
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: sameSite,
 		Secure:   cookieSecure,
 		MaxAge:   -1,
 	}

@@ -25,11 +25,13 @@ export function useSaveBlocks({
   onStatusChange,
 }: UseSaveBlocksOptions) {
   const blocksRef = useRef(blocks);
+  const isSavingRef = useRef(false);
   useEffect(() => {
     blocksRef.current = blocks;
   }, [blocks]);
 
   const save = useCallback(async () => {
+    if (isSavingRef.current) return;
     const currentBlocks = blocksRef.current;
     const currentLayouts = layoutsRef.current;
     const lgItems = currentLayouts.lg ?? [];
@@ -52,12 +54,15 @@ export function useSaveBlocks({
     if (payload.length === 0) return;
 
     onStatusChange("saving");
+    isSavingRef.current = true;
     try {
       await spacesApi.saveBlocks(slug, payload);
       payload.forEach((b) => savedBlockIdsRef.current.add(b.id));
       onStatusChange("saved");
     } catch {
       onStatusChange("error");
+    } finally {
+      isSavingRef.current = false;
     }
   }, [slug, spaceId, layoutsRef, savedBlockIdsRef, onStatusChange]);
 
