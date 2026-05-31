@@ -174,14 +174,27 @@ export default function EditableHero() {
       {/* Desktop layout */}
       <div className="hidden md:flex absolute inset-0 flex-col items-start justify-center pl-25 max-w-[42%] gap-4">
         <div className="flex flex-col items-center gap-3 w-130">
-          <Link href="https://twelve.tools" target="_blank" className="">
-            <Image
-              src="https://twelve.tools/badge0-white.svg"
-              alt="Featured on Twelve Tools"
-              width="125"
-              height="30"
-            />
-          </Link>
+          <div className="flex gap-2">
+            <Link href="https://twelve.tools" target="_blank" className="">
+              <Image
+                src="https://twelve.tools/badge0-white.svg"
+                alt="Epsilon - Featured on Twelve Tools"
+                width="125"
+                height="30"
+              />
+            </Link>
+            <Link
+              href="https://startupfa.me/s/epsilon?utm_source=epsilonapp.site"
+              target="_blank"
+            >
+              <Image
+                src="https://startupfa.me/badges/featured-badge.webp"
+                alt="Epsilon - Featured on Startup Fame"
+                width="105"
+                height="30"
+              />
+            </Link>
+          </div>
           <LandingToolbar
             state={toolbar}
             onChange={handleChange}
@@ -318,18 +331,32 @@ export default function EditableHero() {
         <div style={{ height: "100px" }} />
 
         <div className="w-full flex flex-col gap-3">
-          <Link
-            href="https://twelve.tools"
-            target="_blank"
-            className="z-20 self-center"
-          >
-            <Image
-              src="https://twelve.tools/badge0-white.svg"
-              alt="Featured on Twelve Tools"
-              width="120"
-              height="25"
-            />
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="https://twelve.tools"
+              target="_blank"
+              className="z-20 self-center"
+            >
+              <Image
+                src="https://twelve.tools/badge0-white.svg"
+                alt="Featured on Twelve Tools"
+                width="120"
+                height="25"
+              />
+            </Link>
+            <Link
+              href="https://startupfa.me/s/epsilon?utm_source=epsilonapp.site"
+              target="_blank"
+              className="z-20"
+            >
+              <Image
+                src="https://startupfa.me/badges/featured-badge.webp"
+                alt="Epsilon - Featured on Startup Fame"
+                width="100"
+                height="30"
+              />
+            </Link>
+          </div>
           <div className="flex justify-center">
             <LandingToolbar
               state={toolbar}
