@@ -1,0 +1,16 @@
+# Epsilon
+
+Epsilon is a visual canvas workspace for organizing ideas with flexible, draggable blocks.
+
+## Product
+
+https://epsilonapp.site
+
+## Source
+
+https://github.com/null-kaustubh/epsilon-app
+
+## Policies
+
+https://epsilonapp.site/privacy
+https://epsilonapp.site/terms

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import LandingToolbar, { LandingToolbarState } from "./LandingToolbar";
+import FeaturedBadges from "./FeaturedBadges";
+import LandingLegalNote from "./LandingLegalNote";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -174,27 +176,7 @@ export default function EditableHero() {
       {/* Desktop layout */}
       <div className="hidden md:flex absolute inset-0 flex-col items-start justify-center pl-25 max-w-[42%] gap-4">
         <div className="flex flex-col items-center gap-3 w-130">
-          <div className="flex gap-2">
-            <Link href="https://twelve.tools" target="_blank" className="">
-              <Image
-                src="https://twelve.tools/badge0-white.svg"
-                alt="Epsilon - Featured on Twelve Tools"
-                width="125"
-                height="30"
-              />
-            </Link>
-            <Link
-              href="https://startupfa.me/s/epsilon?utm_source=epsilonapp.site"
-              target="_blank"
-            >
-              <Image
-                src="https://startupfa.me/badges/featured-badge.webp"
-                alt="Epsilon - Featured on Startup Fame"
-                width="105"
-                height="30"
-              />
-            </Link>
-          </div>
+          <FeaturedBadges className="justify-center" />
           <LandingToolbar
             state={toolbar}
             onChange={handleChange}
@@ -301,6 +283,7 @@ export default function EditableHero() {
             Watch demo
           </button>
         </div>
+        <LandingLegalNote className="z-20 w-130 max-w-full pr-2" />
         <Link
           href="https://github.com/sponsors/null-kaustubh"
           target="_blank"
@@ -331,32 +314,7 @@ export default function EditableHero() {
         <div style={{ height: "100px" }} />
 
         <div className="w-full flex flex-col gap-3">
-          <div className="flex gap-2">
-            <Link
-              href="https://twelve.tools"
-              target="_blank"
-              className="z-20 self-center"
-            >
-              <Image
-                src="https://twelve.tools/badge0-white.svg"
-                alt="Featured on Twelve Tools"
-                width="120"
-                height="25"
-              />
-            </Link>
-            <Link
-              href="https://startupfa.me/s/epsilon?utm_source=epsilonapp.site"
-              target="_blank"
-              className="z-20"
-            >
-              <Image
-                src="https://startupfa.me/badges/featured-badge.webp"
-                alt="Epsilon - Featured on Startup Fame"
-                width="100"
-                height="30"
-              />
-            </Link>
-          </div>
+          <FeaturedBadges className="z-20 justify-center" />
           <div className="flex justify-center">
             <LandingToolbar
               state={toolbar}
@@ -422,66 +380,69 @@ export default function EditableHero() {
           layouts. Just infinite freedom to think and create.
         </div>
         {/* CTA Buttons */}
-        <div className="flex items-center gap-3 z-20">
-          <Link
-            href={"/signup"}
-            className="flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity"
-          >
-            Start for free
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+        <div className="flex w-full flex-col items-center gap-3 z-20 px-4">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/signup"
+              className="flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity"
             >
-              <path
-                d="M2 10L10 2M10 2H4M10 2V8"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
-
-          <button
-            onClick={openDemo}
-            className="flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full"
-          >
-            <span className="flex items-center justify-center w-9 h-9 rounded-full border border-landing-foreground-soft">
+              Start for free
               <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="icon icon-tabler icons-tabler-filled icon-tabler-player-play"
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
+                <path
+                  d="M2 10L10 2M10 2H4M10 2V8"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
-            </span>
-            Watch demo
-          </button>
-          <Link
-            href="https://github.com/sponsors/null-kaustubh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="fixed bottom-5 left-5 flex items-center gap-2 text-accent bg-accent-foreground p-2 rounded-lg border border-accent text-xs"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="11"
-              height="11"
-              viewBox="0 0 24 24"
-              fill="currentColor"
+            </Link>
+
+            <button
+              onClick={openDemo}
+              className="flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full"
             >
-              <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" />
-            </svg>
-            Sponsor this Project
-          </Link>
+              <span className="flex items-center justify-center w-9 h-9 rounded-full border border-landing-foreground-soft">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="icon icon-tabler icons-tabler-filled icon-tabler-player-play"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
+                </svg>
+              </span>
+              Watch demo
+            </button>
+          </div>
+          <LandingLegalNote align="center" className="max-w-sm" />
         </div>
+        <Link
+          href="https://github.com/sponsors/null-kaustubh"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-5 left-5 z-20 flex items-center gap-2 text-accent bg-accent-foreground p-2 rounded-lg border border-accent text-xs"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" />
+          </svg>
+          Sponsor this Project
+        </Link>
         <div className="pointer-events-none w-screen -mx-4 relative h-[55vh]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

@@ -7,6 +7,56 @@ const apiOrigin =
   process.env.API_URL?.replace(/\/$/, "") ||
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 
+const apiOriginForCSP = apiOrigin ?? "";
+
+const cspDirectives = {
+  "default-src": ["'self'"],
+  "script-src": [
+    "'self'",
+    "'unsafe-inline'",
+    "https://*.sentry.io",
+    "https://*.supademo.com",
+    "https://*.posthog.com",
+    "https://us-assets.i.posthog.com",
+  ],
+  "style-src": ["'self'", "'unsafe-inline'"],
+  "img-src": [
+    "'self'",
+    "data:",
+    "blob:",
+    "https://*.amazonaws.com",
+    "https://assets.kaustubh.cloud",
+    "https://startupfa.me",
+    "https://twelve.tools",
+    "https://*.sentry.io",
+  ],
+  "font-src": ["'self'", "data:"],
+  "connect-src": [
+    "'self'",
+    apiOriginForCSP,
+    "https://*.ingest.sentry.io",
+    "https://*.ingest.us.sentry.io",
+    "https://*.amazonaws.com",
+    "https://*.supademo.com",
+    "https://*.posthog.com",
+    "https://us.i.posthog.com",
+  ].filter(Boolean),
+  "worker-src": ["'self'", "blob:"],
+  "frame-src": ["https://*.supademo.com"],
+  "object-src": ["'none'"],
+  "frame-ancestors": ["'none'"],
+  "base-uri": ["'self'"],
+  "form-action": ["'self'"],
+  "upgrade-insecure-requests": [],
+};
+
+const buildCSP = (directives: Record<string, string[]>) =>
+  Object.entries(directives)
+    .map(([key, values]) =>
+      values.length ? `${key} ${values.join(" ")}` : key,
+    )
+    .join("; ");
+
 const nextConfig: NextConfig = {
   async rewrites() {
     if (!apiOrigin) return [];
@@ -37,6 +87,12 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
+          {
+            key: isProd
+              ? "Content-Security-Policy"
+              : "Content-Security-Policy-Report-Only",
+            value: buildCSP(cspDirectives),
+          },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

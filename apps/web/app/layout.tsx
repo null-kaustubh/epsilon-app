@@ -14,6 +14,7 @@ import { neueMontreal } from "../assets/fonts/fonts";
 import { SITE_INFO } from "../config/site";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import CookieConsent from "@/components/CookieConsent";
 import PostHogProvider from "@/components/posthogProvider";
 
 const fragmentMono = Fragment_Mono({
@@ -141,6 +142,7 @@ export default async function RootLayout({
         <PostHogProvider>
           <ThemeProvider initialTheme={theme}>{children}</ThemeProvider>
         </PostHogProvider>
+        <CookieConsent />
         <Toaster
           position="bottom-center"
           richColors

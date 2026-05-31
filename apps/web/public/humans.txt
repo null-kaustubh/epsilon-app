@@ -1,0 +1,11 @@
+/* TEAM */
+Developer: Kaustubh Sankhe
+Site: https://kaustubh.cloud
+Twitter: @kaustubh_sankhe
+Contact: hello@epsilonapp.site
+
+/* SITE */
+Last update: 2026/05/31
+Standards: HTML5, CSS3, TypeScript
+Components: Next.js, React, Go, PostgreSQL
+Software: Epsilon — structured canvas workspace

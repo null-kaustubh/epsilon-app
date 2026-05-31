@@ -3,6 +3,8 @@ export type NavItem = {
   href: string;
 };
 
+export const PRIVACY_CONTACT_EMAIL = "hello@epsilonapp.site";
+
 export const SITE_INFO = {
   name: "epsilon",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://epsilonapp.site",
