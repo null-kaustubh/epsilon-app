@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  ANALYTICS_CONSENT_CHANGED,
   getAnalyticsConsent,
   notifyAnalyticsConsentChanged,
   setAnalyticsConsent,
@@ -37,7 +36,7 @@ export default function CookieConsent() {
     <div
       role="dialog"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-[100] border-t border-landing-border bg-landing-surface/95 px-4 py-4 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md sm:px-6"
+      className="fixed inset-x-0 bottom-0 z-100 border-t border-landing-border bg-landing-surface/95 px-4 py-4 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md sm:px-6"
       data-color-theme="light"
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
