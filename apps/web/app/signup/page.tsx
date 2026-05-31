@@ -294,6 +294,29 @@ export default function SignUpPage() {
           </form>
 
           <p
+            className="mt-4 text-center text-[12px] font-inter leading-relaxed"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            By creating an account, you agree to our{" "}
+            <Link
+              href="/terms"
+              className="hover:underline"
+              style={{ color: "var(--accent)" }}
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              className="hover:underline"
+              style={{ color: "var(--accent)" }}
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
+
+          <p
             className="mt-6 text-center text-[13px] font-inter"
             style={{ color: "var(--muted-foreground)" }}
           >
