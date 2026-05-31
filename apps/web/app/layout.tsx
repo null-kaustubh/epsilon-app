@@ -106,6 +106,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  other: {
+    "stackscope-claim": "gctz9ok9",
+  },
 };
 
 export default async function RootLayout({
