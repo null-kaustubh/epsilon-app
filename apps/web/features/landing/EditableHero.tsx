@@ -174,6 +174,14 @@ export default function EditableHero() {
       {/* Desktop layout */}
       <div className="hidden md:flex absolute inset-0 flex-col items-start justify-center pl-25 max-w-[42%] gap-4">
         <div className="flex flex-col items-center gap-3 w-130">
+          <Link href="https://twelve.tools" target="_blank" className="">
+            <Image
+              src="https://twelve.tools/badge0-white.svg"
+              alt="Featured on Twelve Tools"
+              width="125"
+              height="30"
+            />
+          </Link>
           <LandingToolbar
             state={toolbar}
             onChange={handleChange}
@@ -310,6 +318,18 @@ export default function EditableHero() {
         <div style={{ height: "100px" }} />
 
         <div className="w-full flex flex-col gap-3">
+          <Link
+            href="https://twelve.tools"
+            target="_blank"
+            className="z-20 self-center"
+          >
+            <Image
+              src="https://twelve.tools/badge0-white.svg"
+              alt="Featured on Twelve Tools"
+              width="120"
+              height="25"
+            />
+          </Link>
           <div className="flex justify-center">
             <LandingToolbar
               state={toolbar}
@@ -370,7 +390,7 @@ export default function EditableHero() {
             </h1>
           </div>
         </div>
-        <div className="text-balance text-left w-full font-mono text-landing-foreground text-xs pl-4">
+        <div className="text-balance text-left w-full font-mono text-landing-foreground text-xs pl-4 z-20">
           A block-based canvas that lets you shape ideas your way. No rigid
           layouts. Just infinite freedom to think and create.
         </div>
