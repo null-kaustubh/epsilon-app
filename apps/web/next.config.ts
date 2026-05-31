@@ -27,6 +27,8 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "assets.kaustubh.cloud",
       },
+      { protocol: "https", hostname: "startupfa.me" },
+      { protocol: "https", hostname: "twelve.tools" },
     ],
   },
   allowedDevOrigins: ["192.168.29.106"],
