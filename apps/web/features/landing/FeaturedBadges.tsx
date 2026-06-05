@@ -5,12 +5,19 @@ const BADGE_HEIGHT = 30;
 
 const TWELVE_TOOLS = { width: 122, height: BADGE_HEIGHT };
 const STARTUP_FAME = { width: 107, height: BADGE_HEIGHT };
+const OPENHUNTS = { width: 139, height: BADGE_HEIGHT };
 
 export default function FeaturedBadges({ className }: { className?: string }) {
   return (
     <div
-      className={`flex h-7.5 shrink-0 items-center gap-0.5 ${className ?? ""}`}
-      style={{ width: TWELVE_TOOLS.width + STARTUP_FAME.width + 2 }}
+      className={`
+    flex items-center gap-1
+    w-full
+    max-md:overflow-x-auto
+    md:overflow-visible
+    max-md:scrollbar-none
+    ${className ?? ""}
+  `}
     >
       <Link
         href="https://twelve.tools"
@@ -42,6 +49,19 @@ export default function FeaturedBadges({ className }: { className?: string }) {
           priority
           className="object-contain object-left"
           sizes={`${STARTUP_FAME.width}px`}
+        />
+      </Link>
+      <Link
+        href="https://openhunts.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="shrink-0"
+      >
+        <Image
+          alt="OpenHunts Club Member"
+          src="https://cdn.openhunts.com/badges/club.webp"
+          width={OPENHUNTS.width}
+          height={OPENHUNTS.height}
         />
       </Link>
     </div>

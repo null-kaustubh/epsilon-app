@@ -79,6 +79,7 @@ const nextConfig: NextConfig = {
       },
       { protocol: "https", hostname: "startupfa.me" },
       { protocol: "https", hostname: "twelve.tools" },
+      { protocol: "https", hostname: "cdn.openhunts.com" },
     ],
   },
   allowedDevOrigins: ["192.168.29.106"],

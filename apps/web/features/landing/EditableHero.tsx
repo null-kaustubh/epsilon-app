@@ -314,7 +314,7 @@ export default function EditableHero() {
         <div style={{ height: "100px" }} />
 
         <div className="w-full flex flex-col gap-3">
-          <FeaturedBadges className="z-20 justify-center" />
+          <FeaturedBadges className="z-20" />
           <div className="flex justify-center">
             <LandingToolbar
               state={toolbar}
@@ -384,7 +384,7 @@ export default function EditableHero() {
           <div className="flex items-center gap-3">
             <Link
               href="/signup"
-              className="flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity"
+              className="shrink-0 flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity"
             >
               Start for free
               <svg
@@ -406,7 +406,7 @@ export default function EditableHero() {
 
             <button
               onClick={openDemo}
-              className="flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full"
+              className="shrink-0 flex items-center gap-2 font-inter font-medium text-sm text-landing-foreground-soft px-4 py-3 rounded-full"
             >
               <span className="flex items-center justify-center w-9 h-9 rounded-full border border-landing-foreground-soft">
                 <svg
