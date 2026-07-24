@@ -25,7 +25,7 @@ const cspDirectives = {
     "data:",
     "blob:",
     "https://*.amazonaws.com",
-    "https://assets.kaustubh.cloud",
+    "https://assets.1xkaustubh.com",
     "https://startupfa.me",
     "https://twelve.tools",
     "https://*.sentry.io",
@@ -75,7 +75,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "assets.kaustubh.cloud",
+        hostname: "assets.1xkaustubh.com",
       },
       { protocol: "https", hostname: "startupfa.me" },
       { protocol: "https", hostname: "twelve.tools" },

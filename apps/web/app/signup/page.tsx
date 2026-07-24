@@ -344,7 +344,7 @@ export default function SignUpPage() {
             {/* Image placeholder label */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <Image
-                src="https://assets.kaustubh.cloud/epsilon/signup_bg.png"
+                src="https://assets.1xkaustubh.com/epsilon/signup_bg.png"
                 alt="signupimage"
                 fill
                 priority

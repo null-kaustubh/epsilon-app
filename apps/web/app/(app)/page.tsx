@@ -36,12 +36,12 @@ function getPageJsonLd(): WithContext<WebApplication> {
     creator: {
       "@type": "Person",
       name: "Kaustubh Sankhe",
-      url: "https://kaustubh.cloud",
+      url: "https://1xkaustubh.com",
     },
     publisher: {
       "@type": "Person",
       name: "Kaustubh Sankhe",
-      url: "https://kaustubh.cloud",
+      url: "https://1xkaustubh.com",
     },
     offers: {
       "@type": "Offer",
