@@ -88,7 +88,7 @@ export default function SignInPage() {
             {/* Image placeholder label */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <Image
-                src="https://assets.kaustubh.cloud/epsilon/signin_bg.png"
+                src="https://assets.1xkaustubh.com/epsilon/signin_bg.png"
                 alt="signupiamge"
                 fill
                 priority

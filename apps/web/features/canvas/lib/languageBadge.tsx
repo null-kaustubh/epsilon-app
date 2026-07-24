@@ -7,7 +7,7 @@ const DARK_ICON_EXTS = new Set(["bash", "md", "rs", "shell", "txt"]);
 const iconCache = new Set<string>();
 
 export default function LanguageBadge({ ext }: { ext: string }) {
-  const base = "https://assets.kaustubh.cloud/languages";
+  const base = "https://assets.1xkaustubh.com/languages";
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const effectiveExt = ext || "plaintext";

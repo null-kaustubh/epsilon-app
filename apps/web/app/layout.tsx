@@ -71,7 +71,7 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "Kaustubh Sankhe",
-      url: "https://kaustubh.cloud",
+      url: "https://1xkaustubh.com",
     },
   ],
   creator: "Kaustubh Sankhe",
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
         alt: "Epsilon structured customizable canvas workspace",
       },
       {
-        url: "https://assets.kaustubh.cloud/images/epsilonog.png",
+        url: "https://assets.1xkaustubh.com/images/epsilonog.png",
         width: 1200,
         height: 630,
       },
@@ -137,7 +137,7 @@ export default async function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="https://assets.kaustubh.cloud/epsilon/epsilon.svg"
+          href="https://assets.1xkaustubh.com/epsilon/epsilon.svg"
           type="image/svg+xml"
         />
       </head>

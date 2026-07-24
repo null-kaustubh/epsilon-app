@@ -10,7 +10,7 @@ export const SITE_INFO = {
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://epsilonapp.site",
   ogImage:
     process.env.NEXT_PUBLIC_OG_IMAGE ||
-    "https://assets.kaustubh.cloud/images/epsilonog.png",
+    "https://assets.1xkaustubh.com/images/epsilonog.png",
   description:
     "A fully customizable canvas workspace for individuals to create organized spaces using different types of blocks. Design your workspace your way with complete freedom to arrange, structure, and shape ideas without the clutter.",
   keywords: [
