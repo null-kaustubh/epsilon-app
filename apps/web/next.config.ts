@@ -58,6 +58,12 @@ const buildCSP = (directives: Record<string, string[]>) =>
     .join("; ");
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/signin", destination: "/paused", permanent: false },
+      { source: "/signup", destination: "/paused", permanent: false },
+    ];
+  },
   async rewrites() {
     if (!apiOrigin) return [];
     return [
