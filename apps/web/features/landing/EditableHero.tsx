@@ -242,7 +242,7 @@ export default function EditableHero() {
         {/* CTA Buttons */}
         <div className="flex items-center gap-3 z-20">
           <Link
-            href="/signup"
+            href="/paused"
             className="flex items-center gap-2 bg-landing-foreground-soft text-landing-background font-inter font-medium text-sm px-5 py-3 rounded-full hover:opacity-80 transition-opacity cursor-pointer"
           >
             Start for free
@@ -383,7 +383,7 @@ export default function EditableHero() {
         <div className="flex w-full flex-col items-center gap-3 z-20 px-4">
           <div className="flex items-center gap-3">
             <Link
-              href="/signup"
+              href="/paused"
               className="shrink-0 flex items-center gap-2 bg-landing-foreground-soft text-white font-inter font-medium text-xs px-5 py-3 rounded-full hover:opacity-80 transition-opacity"
             >
               Start for free

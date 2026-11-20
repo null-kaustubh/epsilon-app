@@ -15,7 +15,7 @@ export async function proxy(req: NextRequest) {
 
   const cookie = req.cookies.get("session_id");
   if (!cookie?.value) {
-    return NextResponse.redirect(new URL("/signin", req.url));
+    return NextResponse.redirect(new URL("/paused", req.url));
   }
 
   return NextResponse.next();
